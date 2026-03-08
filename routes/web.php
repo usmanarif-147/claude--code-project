@@ -16,6 +16,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// routes
 Route::prefix('admin')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.dashboard'));
 
