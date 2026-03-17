@@ -43,6 +43,15 @@
                 Dashboard
             </a>
 
+            <a href="{{ route('admin.files.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.files.*') ? 'bg-accent-500/10 text-accent-400' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                File Manager
+            </a>
+
             {{-- Portfolio collapsible menu --}}
             @php
                 $portfolioActive = request()->routeIs('admin.profile.*') || request()->routeIs('admin.skills.*') || request()->routeIs('admin.technologies.*') || request()->routeIs('admin.experiences.*');

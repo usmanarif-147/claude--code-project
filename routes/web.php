@@ -3,6 +3,7 @@
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\ExperienceForm;
 use App\Livewire\Admin\ExperienceIndex;
+use App\Livewire\Admin\FileManager;
 use App\Livewire\Admin\Login;
 use App\Livewire\Admin\ProfileEdit;
 use App\Livewire\Admin\SkillForm;
@@ -42,6 +43,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/experiences', ExperienceIndex::class)->name('admin.experiences.index');
         Route::get('/experiences/create', ExperienceForm::class)->name('admin.experiences.create');
         Route::get('/experiences/{experience}/edit', ExperienceForm::class)->name('admin.experiences.edit');
+
+        Route::get('/files', FileManager::class)->name('admin.files.index');
     });
 
     Route::post('/logout', function () {
