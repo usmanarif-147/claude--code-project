@@ -25,8 +25,14 @@ WORKDIR /var/www
 # Copy application source
 COPY . /var/www
 
+# Create Laravel cache directories and env file
+RUN mkdir -p storage/framework/{cache/data,sessions,views} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache \
+    && if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi
+
 # Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --optimize-autoloader --no-dev --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
