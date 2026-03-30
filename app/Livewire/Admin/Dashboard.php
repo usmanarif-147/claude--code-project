@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\BlogPost;
 use App\Models\Experience;
-use App\Models\Profile;
+use App\Models\PortfolioVisitor;
+use App\Models\Project;
 use App\Models\Skill;
 use App\Models\Technology;
+use App\Models\Testimonial;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -20,7 +23,7 @@ class Dashboard extends Component
 
         if ($profile) {
             foreach ($profileFields as $field) {
-                if (!empty($profile->$field)) {
+                if (! empty($profile->$field)) {
                     $filledFields++;
                 }
             }
@@ -28,11 +31,19 @@ class Dashboard extends Component
 
         $profileCompletion = round(($filledFields / count($profileFields)) * 100);
 
+        $totalBlogPosts = BlogPost::count();
+        $publishedBlogPosts = BlogPost::published()->count();
+        $draftBlogPosts = BlogPost::draft()->count();
+
         $stats = [
             ['label' => 'Skills', 'value' => Skill::count(), 'icon' => 'lightbulb'],
             ['label' => 'Technologies', 'value' => Technology::count(), 'icon' => 'code'],
             ['label' => 'Experiences', 'value' => Experience::count(), 'icon' => 'briefcase'],
-            ['label' => 'Profile Complete', 'value' => $profileCompletion . '%', 'icon' => 'user'],
+            ['label' => 'Profile Complete', 'value' => $profileCompletion.'%', 'icon' => 'user'],
+            ['label' => 'Projects', 'value' => Project::active()->count(), 'icon' => 'project'],
+            ['label' => 'Blog Posts', 'value' => $totalBlogPosts, 'icon' => 'pencil', 'subtitle' => $publishedBlogPosts.' published, '.$draftBlogPosts.' draft'],
+            ['label' => 'Testimonials', 'value' => Testimonial::visible()->count(), 'icon' => 'chat'],
+            ['label' => 'Visitors This Month', 'value' => PortfolioVisitor::thisMonth()->count(), 'icon' => 'chart'],
         ];
 
         $skills = Skill::active()->ordered()->get();

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Skill;
+use App\Services\SkillService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -19,6 +20,9 @@ class SkillIndex extends Component
     #[Url]
     public string $activeFilter = 'all';
 
+    #[Url]
+    public string $categoryFilter = 'all';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -29,9 +33,14 @@ class SkillIndex extends Component
         $this->resetPage();
     }
 
-    public function delete(int $id): void
+    public function updatingCategoryFilter(): void
     {
-        Skill::findOrFail($id)->delete();
+        $this->resetPage();
+    }
+
+    public function delete(SkillService $service, int $id): void
+    {
+        $service->delete(Skill::findOrFail($id));
         session()->flash('success', 'Skill deleted successfully.');
     }
 
@@ -40,13 +49,17 @@ class SkillIndex extends Component
         $query = Skill::query()->ordered();
 
         if ($this->search) {
-            $query->where('title', 'like', '%' . $this->search . '%');
+            $query->where('title', 'like', '%'.$this->search.'%');
         }
 
         if ($this->activeFilter === 'active') {
             $query->where('is_active', true);
         } elseif ($this->activeFilter === 'inactive') {
             $query->where('is_active', false);
+        }
+
+        if ($this->categoryFilter !== 'all') {
+            $query->where('category', $this->categoryFilter);
         }
 
         return view('livewire.admin.skill-index', [

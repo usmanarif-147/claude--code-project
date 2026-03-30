@@ -9,11 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Experience extends Model
 {
     protected $fillable = [
+        'type',
         'role',
         'company',
         'start_date',
         'end_date',
         'is_current',
+        'description',
+        'degree',
+        'field_of_study',
         'sort_order',
         'is_active',
     ];
@@ -41,5 +45,15 @@ class Experience extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order');
+    }
+
+    public function scopeWork(Builder $query): Builder
+    {
+        return $query->where('type', 'work');
+    }
+
+    public function scopeEducation(Builder $query): Builder
+    {
+        return $query->where('type', 'education');
     }
 }

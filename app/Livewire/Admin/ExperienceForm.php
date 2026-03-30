@@ -3,8 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Experience;
-use App\Models\ExperienceResponsibility;
-use Illuminate\Support\Facades\DB;
+use App\Services\ExperienceService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -13,12 +12,26 @@ class ExperienceForm extends Component
 {
     public ?Experience $experience = null;
 
+    public string $type = 'work';
+
     public string $role = '';
+
     public string $company = '';
+
     public ?string $start_date = null;
+
     public ?string $end_date = null;
+
     public bool $is_current = false;
+
+    public string $description = '';
+
+    public string $degree = '';
+
+    public string $field_of_study = '';
+
     public int $sort_order = 0;
+
     public bool $is_active = true;
 
     public array $responsibilities = [];
@@ -27,11 +40,15 @@ class ExperienceForm extends Component
     {
         if ($experience && $experience->exists) {
             $this->experience = $experience;
+            $this->type = $experience->type ?? 'work';
             $this->role = $experience->role;
             $this->company = $experience->company;
             $this->start_date = $experience->start_date?->format('Y-m-d');
             $this->end_date = $experience->end_date?->format('Y-m-d');
             $this->is_current = $experience->is_current;
+            $this->description = $experience->description ?? '';
+            $this->degree = $experience->degree ?? '';
+            $this->field_of_study = $experience->field_of_study ?? '';
             $this->sort_order = $experience->sort_order ?? 0;
             $this->is_active = $experience->is_active;
 
@@ -61,64 +78,45 @@ class ExperienceForm extends Component
         array_splice($this->responsibilities, $index, 1);
     }
 
-    public function save(): void
+    public function save(ExperienceService $service): void
     {
-        $validated = $this->validate([
+        $rules = [
+            'type' => 'required|in:work,education',
             'role' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'is_current' => 'boolean',
+            'description' => 'nullable|string|max:500',
+            'degree' => 'required_if:type,education|nullable|string|max:255',
+            'field_of_study' => 'required_if:type,education|nullable|string|max:255',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
-            'responsibilities' => 'array',
-            'responsibilities.*.description' => 'required|string|max:1000',
-            'responsibilities.*.sort_order' => 'integer|min:0',
-        ]);
+        ];
+
+        if ($this->type !== 'education') {
+            $rules['responsibilities'] = 'array';
+            $rules['responsibilities.*.description'] = 'required|string|max:1000';
+            $rules['responsibilities.*.sort_order'] = 'integer|min:0';
+        }
+
+        $validated = $this->validate($rules);
 
         if ($this->is_current) {
             $validated['end_date'] = null;
         }
 
-        DB::transaction(function () use ($validated) {
-            $experienceData = collect($validated)->except('responsibilities')->toArray();
+        $experienceData = collect($validated)->except('responsibilities')->toArray();
+        $responsibilities = $this->type === 'education' ? [] : ($validated['responsibilities'] ?? []);
 
-            if ($this->experience) {
-                $this->experience->update($experienceData);
-                $experience = $this->experience;
-            } else {
-                $experience = Experience::create($experienceData);
-            }
+        if ($this->experience) {
+            $service->update($this->experience, $experienceData, $responsibilities);
+            $message = 'Experience updated successfully.';
+        } else {
+            $service->create($experienceData, $responsibilities);
+            $message = 'Experience created successfully.';
+        }
 
-            // Sync responsibilities
-            $keepIds = [];
-
-            foreach ($validated['responsibilities'] ?? [] as $resp) {
-                if (!empty($resp['id'] ?? null)) {
-                    // Update existing
-                    $responsibility = ExperienceResponsibility::find($resp['id']);
-                    if ($responsibility) {
-                        $responsibility->update([
-                            'description' => $resp['description'],
-                            'sort_order' => $resp['sort_order'],
-                        ]);
-                        $keepIds[] = $responsibility->id;
-                    }
-                } else {
-                    // Create new
-                    $new = $experience->responsibilities()->create([
-                        'description' => $resp['description'],
-                        'sort_order' => $resp['sort_order'],
-                    ]);
-                    $keepIds[] = $new->id;
-                }
-            }
-
-            // Delete removed responsibilities
-            $experience->responsibilities()->whereNotIn('id', $keepIds)->delete();
-        });
-
-        $message = $this->experience ? 'Experience updated successfully.' : 'Experience created successfully.';
         session()->flash('success', $message);
         $this->redirect(route('admin.experiences.index'), navigate: true);
     }

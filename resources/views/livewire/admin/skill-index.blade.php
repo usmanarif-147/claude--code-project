@@ -18,6 +18,13 @@
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search skills..."
                        class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
             </div>
+            <select wire:model.live="categoryFilter"
+                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                <option value="all">All Categories</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat }}">{{ $cat }}</option>
+                @endforeach
+            </select>
             <select wire:model.live="activeFilter"
                     class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
                 <option value="all">All Status</option>
@@ -34,6 +41,8 @@
                 <thead>
                     <tr class="bg-dark-700/50">
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
+                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Category</th>
+                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Proficiency</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Icon</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Sort Order</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
@@ -44,6 +53,23 @@
                     @forelse ($skills as $skill)
                         <tr class="hover:bg-dark-700/30 transition-colors">
                             <td class="px-6 py-4 text-sm text-white font-medium">{{ $skill->title }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-400">
+                                @if($skill->category)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">
+                                        {{ $skill->category }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-600">—</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-24 bg-dark-700 rounded-full h-2">
+                                        <div class="bg-accent-500 h-2 rounded-full" style="width: {{ $skill->proficiency }}%"></div>
+                                    </div>
+                                    <span class="text-xs">{{ $skill->proficiency }}%</span>
+                                </div>
+                            </td>
                             <td class="px-6 py-4">
                                 @if ($skill->icon)
                                     <div class="w-8 h-8 text-accent-400">
@@ -78,7 +104,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 No skills found. <a href="{{ route('admin.skills.create') }}" wire:navigate class="text-accent-400 hover:underline">Create one</a>.
                             </td>
                         </tr>

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Experience;
+use App\Services\ExperienceService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -19,6 +20,9 @@ class ExperienceIndex extends Component
     #[Url]
     public string $activeFilter = 'all';
 
+    #[Url]
+    public string $typeFilter = 'all';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -29,9 +33,14 @@ class ExperienceIndex extends Component
         $this->resetPage();
     }
 
-    public function delete(int $id): void
+    public function updatingTypeFilter(): void
     {
-        Experience::findOrFail($id)->delete();
+        $this->resetPage();
+    }
+
+    public function delete(ExperienceService $service, int $id): void
+    {
+        $service->delete(Experience::findOrFail($id));
         session()->flash('success', 'Experience deleted successfully.');
     }
 
@@ -41,8 +50,8 @@ class ExperienceIndex extends Component
 
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('role', 'like', '%' . $this->search . '%')
-                  ->orWhere('company', 'like', '%' . $this->search . '%');
+                $q->where('role', 'like', '%'.$this->search.'%')
+                    ->orWhere('company', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -50,6 +59,10 @@ class ExperienceIndex extends Component
             $query->where('is_active', true);
         } elseif ($this->activeFilter === 'inactive') {
             $query->where('is_active', false);
+        }
+
+        if ($this->typeFilter !== 'all') {
+            $query->where('type', $this->typeFilter);
         }
 
         return view('livewire.admin.experience-index', [

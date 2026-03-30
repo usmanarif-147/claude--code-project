@@ -9,6 +9,8 @@ class Skill extends Model
 {
     protected $fillable = [
         'title',
+        'category',
+        'proficiency',
         'icon',
         'sort_order',
         'is_active',
@@ -18,6 +20,7 @@ class Skill extends Model
     {
         return [
             'is_active' => 'boolean',
+            'proficiency' => 'integer',
         ];
     }
 
@@ -29,5 +32,15 @@ class Skill extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order');
+    }
+
+    public function scopeByCategory(Builder $query, string $category): Builder
+    {
+        return $query->where('category', $category);
+    }
+
+    public static function groupedByCategory(): \Illuminate\Support\Collection
+    {
+        return static::query()->active()->ordered()->get()->groupBy('category');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Technology;
+use App\Services\TechnologyService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -37,9 +38,9 @@ class TechnologyIndex extends Component
         $this->resetPage();
     }
 
-    public function delete(int $id): void
+    public function delete(TechnologyService $service, int $id): void
     {
-        Technology::findOrFail($id)->delete();
+        $service->delete(Technology::findOrFail($id));
         session()->flash('success', 'Technology deleted successfully.');
     }
 
@@ -48,7 +49,7 @@ class TechnologyIndex extends Component
         $query = Technology::query()->ordered();
 
         if ($this->search) {
-            $query->where('name', 'like', '%' . $this->search . '%');
+            $query->where('name', 'like', '%'.$this->search.'%');
         }
 
         if ($this->activeFilter === 'active') {

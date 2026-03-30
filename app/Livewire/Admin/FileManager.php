@@ -17,20 +17,28 @@ class FileManager extends Component
 
     // Upload
     public array $uploadQueue = [];
+
     public array $uploadMeta = [];
 
     // Table
     #[Url]
     public string $search = '';
+
     public string $sortField = 'created_at';
+
     public string $sortDirection = 'desc';
+
     public string $dateFrom = '';
+
     public string $dateTo = '';
+
     public array $selectedIds = [];
+
     public bool $selectAll = false;
 
     // Preview
     public ?int $previewFileId = null;
+
     public ?string $previewContent = null;
 
     public function updatingSearch(): void

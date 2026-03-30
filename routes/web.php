@@ -1,15 +1,9 @@
 <?php
 
 use App\Livewire\Admin\Dashboard;
-use App\Livewire\Admin\ExperienceForm;
-use App\Livewire\Admin\ExperienceIndex;
 use App\Livewire\Admin\FileManager;
 use App\Livewire\Admin\Login;
 use App\Livewire\Admin\ProfileEdit;
-use App\Livewire\Admin\SkillForm;
-use App\Livewire\Admin\SkillIndex;
-use App\Livewire\Admin\TechnologyForm;
-use App\Livewire\Admin\TechnologyIndex;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -31,18 +25,6 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('auth')->group(function () {
         Route::get('/profile', ProfileEdit::class)->name('admin.profile.edit');
-
-        Route::get('/skills', SkillIndex::class)->name('admin.skills.index');
-        Route::get('/skills/create', SkillForm::class)->name('admin.skills.create');
-        Route::get('/skills/{skill}/edit', SkillForm::class)->name('admin.skills.edit');
-
-        Route::get('/technologies', TechnologyIndex::class)->name('admin.technologies.index');
-        Route::get('/technologies/create', TechnologyForm::class)->name('admin.technologies.create');
-        Route::get('/technologies/{technology}/edit', TechnologyForm::class)->name('admin.technologies.edit');
-
-        Route::get('/experiences', ExperienceIndex::class)->name('admin.experiences.index');
-        Route::get('/experiences/create', ExperienceForm::class)->name('admin.experiences.create');
-        Route::get('/experiences/{experience}/edit', ExperienceForm::class)->name('admin.experiences.edit');
 
         Route::get('/files', FileManager::class)->name('admin.files.index');
     });

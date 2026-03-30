@@ -14,6 +14,26 @@
                 @error('title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
+            {{-- Category --}}
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                <input type="text" id="category" wire:model="category"
+                       placeholder="e.g. Frontend, Backend, DevOps, AI"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-colors">
+                @error('category') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Proficiency --}}
+            <div x-data="{ proficiency: @entangle('proficiency') }">
+                <label for="proficiency" class="block text-sm font-medium text-gray-300 mb-2">
+                    Proficiency <span class="text-accent-400" x-text="proficiency + '%'"></span>
+                </label>
+                <input type="range" id="proficiency" x-model="proficiency" wire:model="proficiency"
+                       min="0" max="100" step="5"
+                       class="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-accent-500">
+                @error('proficiency') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+            </div>
+
             <div>
                 <label for="icon" class="block text-sm font-medium text-gray-400 mb-1.5">Icon (SVG path data)</label>
                 <textarea id="icon" wire:model="icon" rows="3"

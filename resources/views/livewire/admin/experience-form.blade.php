@@ -9,23 +9,69 @@
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
             <h2 class="text-lg font-semibold text-white">Experience Details</h2>
 
+            {{-- Type Toggle --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Type</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model.live="type" value="work"
+                               class="text-accent-500 bg-dark-700 border-dark-600 focus:ring-accent-500">
+                        <span class="text-sm text-gray-300">Work Experience</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" wire:model.live="type" value="education"
+                               class="text-accent-500 bg-dark-700 border-dark-600 focus:ring-accent-500">
+                        <span class="text-sm text-gray-300">Education</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                    <label for="role" class="block text-sm font-medium text-gray-400 mb-1.5">Role <span class="text-red-400">*</span></label>
+                    <label for="role" class="block text-sm font-medium text-gray-400 mb-1.5">{{ $type === 'education' ? 'Degree Title' : 'Role' }} <span class="text-red-400">*</span></label>
                     <input type="text" id="role" wire:model="role"
                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-                           placeholder="e.g. Senior Developer">
+                           placeholder="{{ $type === 'education' ? 'e.g. Bachelor of Science' : 'e.g. Senior Developer' }}">
                     @error('role') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label for="company" class="block text-sm font-medium text-gray-400 mb-1.5">Company <span class="text-red-400">*</span></label>
+                    <label for="company" class="block text-sm font-medium text-gray-400 mb-1.5">{{ $type === 'education' ? 'Institution' : 'Company' }} <span class="text-red-400">*</span></label>
                     <input type="text" id="company" wire:model="company"
                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-                           placeholder="e.g. Acme Inc.">
+                           placeholder="{{ $type === 'education' ? 'e.g. MIT' : 'e.g. Acme Inc.' }}">
                     @error('company') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                 </div>
             </div>
+
+            @if($type === 'education')
+                {{-- Degree --}}
+                <div>
+                    <label for="degree" class="block text-sm font-medium text-gray-300 mb-2">Degree <span class="text-red-400">*</span></label>
+                    <input type="text" id="degree" wire:model="degree"
+                           placeholder="e.g. Bachelor of Science"
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-colors">
+                    @error('degree') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- Field of Study --}}
+                <div>
+                    <label for="field_of_study" class="block text-sm font-medium text-gray-300 mb-2">Field of Study <span class="text-red-400">*</span></label>
+                    <input type="text" id="field_of_study" wire:model="field_of_study"
+                           placeholder="e.g. Computer Science"
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-colors">
+                    @error('field_of_study') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- Description --}}
+                <div class="col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                    <textarea id="description" wire:model="description" rows="3"
+                              placeholder="Brief description of your education"
+                              class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition-colors resize-none"></textarea>
+                    @error('description') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                </div>
+            @endif
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
@@ -70,6 +116,7 @@
             </div>
         </div>
 
+        @if($type === 'work')
         {{-- Responsibilities --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6">
             <div class="flex items-center justify-between mb-5">
@@ -108,6 +155,7 @@
                 <p class="text-gray-500 text-sm text-center py-4">No responsibilities added yet. Click "Add Responsibility" to begin.</p>
             @endif
         </div>
+        @endif
 
         {{-- Actions --}}
         <div class="flex items-center gap-3">

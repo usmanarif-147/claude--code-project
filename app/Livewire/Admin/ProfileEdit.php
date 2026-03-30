@@ -14,15 +14,25 @@ class ProfileEdit extends Component
     use WithFileUploads;
 
     public ?int $profileId = null;
+
     public string $tagline = '';
+
     public string $bio = '';
+
     public $profile_image;
+
     public ?string $existing_image = null;
+
     public string $secondary_email = '';
+
     public string $phone = '';
+
     public string $location = '';
+
     public string $linkedin_url = '';
+
     public string $github_url = '';
+
     public string $availability_status = '';
 
     public function mount(): void

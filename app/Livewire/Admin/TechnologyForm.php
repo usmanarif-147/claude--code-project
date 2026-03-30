@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Technology;
+use App\Services\TechnologyService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -12,8 +13,11 @@ class TechnologyForm extends Component
     public ?Technology $technology = null;
 
     public string $name = '';
+
     public string $category = 'frontend';
+
     public int $sort_order = 0;
+
     public bool $is_active = true;
 
     public function mount(?Technology $technology = null): void
@@ -27,7 +31,7 @@ class TechnologyForm extends Component
         }
     }
 
-    public function save(): void
+    public function save(TechnologyService $service): void
     {
         $validated = $this->validate([
             'name' => 'required|string|max:255',
@@ -37,10 +41,10 @@ class TechnologyForm extends Component
         ]);
 
         if ($this->technology) {
-            $this->technology->update($validated);
+            $service->update($this->technology, $validated);
             $message = 'Technology updated successfully.';
         } else {
-            Technology::create($validated);
+            $service->create($validated);
             $message = 'Technology created successfully.';
         }
 

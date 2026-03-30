@@ -18,6 +18,12 @@
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by role or company..."
                        class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
             </div>
+            <select wire:model.live="typeFilter"
+                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                <option value="all">All Types</option>
+                <option value="work">Work</option>
+                <option value="education">Education</option>
+            </select>
             <select wire:model.live="activeFilter"
                     class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
                 <option value="all">All Status</option>
@@ -34,6 +40,7 @@
                 <thead>
                     <tr class="bg-dark-700/50">
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Role</th>
+                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Type</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Company</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Period</th>
                         <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
@@ -44,6 +51,11 @@
                     @forelse ($experiences as $experience)
                         <tr class="hover:bg-dark-700/30 transition-colors">
                             <td class="px-6 py-4 text-sm text-white font-medium">{{ $experience->role }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $experience->type === 'work' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400' }}">
+                                    {{ ucfirst($experience->type) }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-400">{{ $experience->company }}</td>
                             <td class="px-6 py-4 text-sm text-gray-400">
                                 {{ $experience->start_date->format('M Y') }} — {{ $experience->is_current ? 'Present' : $experience->end_date?->format('M Y') }}
@@ -70,7 +82,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                 No experiences found. <a href="{{ route('admin.experiences.create') }}" wire:navigate class="text-accent-400 hover:underline">Create one</a>.
                             </td>
                         </tr>
