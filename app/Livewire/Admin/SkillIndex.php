@@ -62,8 +62,14 @@ class SkillIndex extends Component
             $query->where('category', $this->categoryFilter);
         }
 
+        $categories = Skill::whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category');
+
         return view('livewire.admin.skill-index', [
             'skills' => $query->paginate(10),
+            'categories' => $categories,
         ]);
     }
 }
