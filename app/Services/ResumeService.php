@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\ResumeDownload;
 use App\Models\Skill;
 use App\Models\Technology;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResumeService
 {
-    public function getResumeData(): array
+    public function getResumeData(?User $user = null): array
     {
-        $user = Auth::user();
+        $user = $user ?? Auth::user();
         $profile = Profile::where('user_id', $user->id)->first();
 
         return [
@@ -40,18 +41,18 @@ class ResumeService
         ];
     }
 
-    public function generateHtml(string $template = 'modern'): string
+    public function generateHtml(string $template = 'modern', ?User $user = null): string
     {
         $this->validateTemplate($template);
-        $data = $this->getResumeData();
+        $data = $this->getResumeData($user);
 
         return view("resume.templates.{$template}", $data)->render();
     }
 
-    public function generatePdf(string $template = 'modern'): \Barryvdh\DomPDF\PDF
+    public function generatePdf(string $template = 'modern', ?User $user = null): \Barryvdh\DomPDF\PDF
     {
         $this->validateTemplate($template);
-        $data = $this->getResumeData();
+        $data = $this->getResumeData($user);
 
         return Pdf::loadView("resume.templates.{$template}", $data)
             ->setPaper('a4')
@@ -65,9 +66,9 @@ class ResumeService
         }
     }
 
-    public function download(string $template, ?Request $request = null): Response
+    public function download(string $template, ?Request $request = null, ?User $user = null): Response
     {
-        $pdf = $this->generatePdf($template);
+        $pdf = $this->generatePdf($template, $user);
 
         if ($request) {
             ResumeDownload::create([
@@ -78,7 +79,7 @@ class ResumeService
             ]);
         }
 
-        $user = Auth::user();
+        $user = $user ?? Auth::user();
         $filename = str_replace(' ', '_', $user->name).'_Resume.pdf';
 
         return $pdf->download($filename);

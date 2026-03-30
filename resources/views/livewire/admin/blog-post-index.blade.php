@@ -1,11 +1,11 @@
 <div>
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-white">Blog Posts</h1>
+            <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Blog Posts</h1>
             <p class="text-gray-500 mt-1">Manage your blog articles.</p>
         </div>
         <a href="{{ route('admin.blog.create') }}" wire:navigate
-           class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
+           class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             New Post
         </a>
@@ -16,10 +16,10 @@
         <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search posts..."
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
             </div>
             <select wire:model.live="statusFilter"
-                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <option value="all">All Status</option>
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -33,14 +33,14 @@
             <table class="w-full">
                 <thead>
                     <tr class="bg-dark-700/50">
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Cover</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tags</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Reading Time</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Views</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Published</th>
-                        <th class="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Cover</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tags</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Reading Time</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Views</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Published</th>
+                        <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-dark-700">
@@ -65,7 +65,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if ($post->status === 'published')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">Published</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Published</span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400">Draft</span>
                                 @endif
@@ -73,7 +73,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex flex-wrap gap-1">
                                     @foreach ($post->tags->take(3) as $tag)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent-500/10 text-accent-400">{{ $tag->tag }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary-light">{{ $tag->tag }}</span>
                                     @endforeach
                                     @if ($post->tags->count() > 3)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-dark-700 text-gray-400">+{{ $post->tags->count() - 3 }}</span>
@@ -92,7 +92,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.blog.edit', $post) }}" wire:navigate
-                                       class="text-gray-400 hover:text-accent-400 transition-colors p-1">
+                                       class="text-gray-400 hover:text-primary-light transition-colors p-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
                                     <button wire:click="delete({{ $post->id }})" wire:confirm="Are you sure you want to delete this post?"
@@ -105,7 +105,7 @@
                     @empty
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-                                No blog posts found. <a href="{{ route('admin.blog.create') }}" wire:navigate class="text-accent-400 hover:underline">Create one</a>.
+                                No blog posts found. <a href="{{ route('admin.blog.create') }}" wire:navigate class="text-primary-light hover:underline">Create one</a>.
                             </td>
                         </tr>
                     @endforelse

@@ -10,11 +10,33 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, monospace;
 
+    /* Background layers */
+    --color-dark-950: #050508;
     --color-dark-900: #0a0a0f;
-    --color-dark-800: #12121a;
-    --color-dark-700: #1a1a2e;
-    --color-accent: #6366f1;
-    --color-accent-light: #818cf8;
+    --color-dark-800: #111118;
+    --color-dark-700: #1a1a24;
+    --color-dark-600: #25253a;
+
+    /* Primary accent — Purple */
+    --color-primary: #7c3aed;
+    --color-primary-light: #a78bfa;
+    --color-primary-dark: #6d28d9;
+    --color-primary-hover: #8b5cf6;
+
+    /* Secondary accent — kept for backward compat */
+    --color-accent: #7c3aed;
+    --color-accent-light: #a78bfa;
+
+    /* Status colors */
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
+
+    /* Gradient accents (for badges, highlights, CTAs) */
+    --color-gradient-start: #7c3aed;
+    --color-gradient-mid: #c026d3;
+    --color-gradient-end: #f97316;
 
     --animate-fade-in-up: fade-in-up 0.6s ease-out forwards;
     --animate-float: float 6s ease-in-out infinite;
@@ -42,4 +64,33 @@
 
 html {
     scroll-behavior: smooth;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a0a0f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #25253a;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
+}
+
+/* Landing page theme overrides (emerald accent) */
+.landing {
+  --color-accent: #10b981;
+  --color-accent-light: #34d399;
+  --color-primary: #10b981;
+  --color-primary-light: #34d399;
+  --color-primary-dark: #059669;
+  --color-primary-hover: #059669;
 }

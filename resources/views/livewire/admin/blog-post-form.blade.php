@@ -37,19 +37,19 @@
     <script src="https://unpkg.com/trix@2.1.8/dist/trix.umd.min.js"></script>
 
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-white">{{ $blogPost ? 'Edit Post' : 'Create Post' }}</h1>
+        <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">{{ $blogPost ? 'Edit Post' : 'Create Post' }}</h1>
         <p class="text-gray-500 mt-1">{{ $blogPost ? 'Update your blog post.' : 'Write a new blog article.' }}</p>
     </div>
 
     <div class="max-w-3xl space-y-6">
         {{-- Section 1 — Basic Info --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-white">Basic Info</h2>
+            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Basic Info</h2>
 
             <div>
                 <label for="title" class="block text-sm font-medium text-gray-400 mb-1.5">Title <span class="text-red-400">*</span></label>
                 <input type="text" id="title" wire:model="title"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                        placeholder="e.g. Getting Started with Laravel">
                 @error('title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -57,7 +57,7 @@
             <div>
                 <label for="excerpt" class="block text-sm font-medium text-gray-400 mb-1.5">Excerpt</label>
                 <textarea id="excerpt" wire:model="excerpt" rows="2" maxlength="500"
-                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
+                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                           placeholder="A brief summary of the post..."></textarea>
                 @error('excerpt') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -65,7 +65,7 @@
 
         {{-- Section 2 — Content --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-white">Content</h2>
+            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Content</h2>
 
             <div>
                 <div wire:ignore>
@@ -82,7 +82,7 @@
 
         {{-- Section 3 — Cover Image --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-white">Cover Image</h2>
+            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Cover Image</h2>
 
             <div>
                 @if ($existingCoverImage)
@@ -107,7 +107,7 @@
 
                 @if (!$coverImage && !$existingCoverImage)
                     <input type="file" wire:model="coverImage" accept="image/*"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-accent-500/10 file:text-accent-400 hover:file:bg-accent-500/20">
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary-light hover:file:bg-primary/20">
                 @endif
 
                 @error('coverImage') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
@@ -116,14 +116,14 @@
 
         {{-- Section 4 — Tags --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-white">Tags</h2>
+            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Tags</h2>
 
             <div class="flex gap-2">
                 <input type="text" wire:model="tagInput" wire:keydown.enter.prevent="addTag"
-                       class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm"
+                       class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                        placeholder="e.g. Laravel, PHP, Tutorial">
                 <button type="button" wire:click="addTag"
-                        class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm">
+                        class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm">
                     Add
                 </button>
             </div>
@@ -132,9 +132,9 @@
             @if (count($tags) > 0)
                 <div class="flex flex-wrap gap-2">
                     @foreach($tags as $index => $tag)
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-accent-500/10 text-accent-400">
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary-light">
                             {{ $tag }}
-                            <button type="button" wire:click="removeTag({{ $index }})" class="text-accent-400/60 hover:text-red-400">
+                            <button type="button" wire:click="removeTag({{ $index }})" class="text-primary-light/60 hover:text-red-400">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </span>
@@ -146,12 +146,12 @@
 
         {{-- Section 5 — SEO --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-white">SEO</h2>
+            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">SEO</h2>
 
             <div>
                 <label for="meta_title" class="block text-sm font-medium text-gray-400 mb-1.5">Meta Title</label>
                 <input type="text" id="meta_title" wire:model="meta_title" maxlength="255"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                        placeholder="SEO title (defaults to post title if empty)">
                 @error('meta_title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -159,7 +159,7 @@
             <div>
                 <label for="meta_description" class="block text-sm font-medium text-gray-400 mb-1.5">Meta Description</label>
                 <textarea id="meta_description" wire:model="meta_description" rows="2" maxlength="500"
-                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
+                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                           placeholder="Brief description for search engines..."></textarea>
                 @error('meta_description') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -186,7 +186,7 @@
                     </span>
                 </button>
                 <button wire:click="publish"
-                        class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                        class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
                     <span wire:loading.remove wire:target="publish">Publish</span>
                     <span wire:loading wire:target="publish" class="flex items-center gap-2">
                         <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

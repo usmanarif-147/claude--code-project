@@ -1,6 +1,6 @@
 <div>
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-white">{{ $testimonial ? 'Edit Testimonial' : 'Create Testimonial' }}</h1>
+        <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">{{ $testimonial ? 'Edit Testimonial' : 'Create Testimonial' }}</h1>
         <p class="text-gray-500 mt-1">{{ $testimonial ? 'Update testimonial details.' : 'Add a new client testimonial.' }}</p>
     </div>
 
@@ -10,7 +10,7 @@
             <div>
                 <label for="client_name" class="block text-sm font-medium text-gray-400 mb-1.5">Client Name <span class="text-red-400">*</span></label>
                 <input type="text" id="client_name" wire:model="client_name"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                        placeholder="e.g. John Doe">
                 @error('client_name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -18,7 +18,7 @@
             <div>
                 <label for="company" class="block text-sm font-medium text-gray-400 mb-1.5">Company</label>
                 <input type="text" id="company" wire:model="company"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                        placeholder="e.g. Acme Inc.">
                 @error('company') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -49,7 +49,7 @@
 
                 @if (!$clientPhoto && !$existingPhoto)
                     <input type="file" wire:model="clientPhoto" accept="image/*"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-accent-500/10 file:text-accent-400 hover:file:bg-accent-500/20">
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary-light hover:file:bg-primary/20">
                 @endif
 
                 @error('clientPhoto') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
@@ -58,7 +58,7 @@
             <div>
                 <label for="review" class="block text-sm font-medium text-gray-400 mb-1.5">Review <span class="text-red-400">*</span></label>
                 <textarea id="review" wire:model="review" rows="4"
-                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
+                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                           placeholder="What the client said about your work..."></textarea>
                 @error('review') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -87,7 +87,7 @@
             <div>
                 <label for="project_url" class="block text-sm font-medium text-gray-400 mb-1.5">Project URL</label>
                 <input type="url" id="project_url" wire:model="project_url"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                        placeholder="https://example.com">
                 @error('project_url') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -96,7 +96,7 @@
                 <div class="flex items-center pt-2">
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" wire:model="is_visible" class="sr-only peer">
-                        <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-accent-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-500"></div>
+                        <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         <span class="ml-3 text-sm font-medium text-gray-400">Visible</span>
                     </label>
                 </div>
@@ -104,14 +104,14 @@
                 <div>
                     <label for="sort_order" class="block text-sm font-medium text-gray-400 mb-1.5">Sort Order</label>
                     <input type="number" id="sort_order" wire:model="sort_order" min="0"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent">
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">
                     @error('sort_order') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label for="received_at" class="block text-sm font-medium text-gray-400 mb-1.5">Received At</label>
                     <input type="date" id="received_at" wire:model="received_at"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent">
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
                     @error('received_at') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -120,7 +120,7 @@
         {{-- Actions --}}
         <div class="flex items-center gap-3">
             <button type="submit"
-                    class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
                 <span wire:loading.remove wire:target="save">{{ $testimonial ? 'Update Testimonial' : 'Save Testimonial' }}</span>
                 <span wire:loading wire:target="save" class="flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

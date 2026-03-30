@@ -1,6 +1,6 @@
 <div>
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-white">Edit Profile</h1>
+        <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Edit Profile</h1>
         <p class="text-gray-500 mt-1">Update your portfolio profile information.</p>
     </div>
 
@@ -9,12 +9,12 @@
             {{-- Main Info --}}
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-                    <h2 class="text-lg font-semibold text-white">Basic Information</h2>
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Basic Information</h2>
 
                     <div>
                         <label for="tagline" class="block text-sm font-medium text-gray-400 mb-1.5">Tagline</label>
                         <input type="text" id="tagline" wire:model="tagline"
-                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="e.g. Full-Stack Developer">
                         @error('tagline') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
@@ -22,7 +22,7 @@
                     <div>
                         <label for="bio" class="block text-sm font-medium text-gray-400 mb-1.5">Bio</label>
                         <textarea id="bio" wire:model="bio" rows="5"
-                                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                  class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                   placeholder="Tell visitors about yourself..."></textarea>
                         @error('bio') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
@@ -30,20 +30,20 @@
                     <div>
                         <label for="availability_status" class="block text-sm font-medium text-gray-400 mb-1.5">Availability Status</label>
                         <input type="text" id="availability_status" wire:model="availability_status"
-                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="e.g. Available for freelance">
                         @error('availability_status') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-                    <h2 class="text-lg font-semibold text-white">Contact & Links</h2>
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Contact & Links</h2>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                             <label for="secondary_email" class="block text-sm font-medium text-gray-400 mb-1.5">Secondary Email</label>
                             <input type="email" id="secondary_email" wire:model="secondary_email"
-                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="contact@example.com">
                             @error('secondary_email') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -51,7 +51,7 @@
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-400 mb-1.5">Phone</label>
                             <input type="text" id="phone" wire:model="phone"
-                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="+1 234 567 890">
                             @error('phone') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -59,7 +59,7 @@
                         <div>
                             <label for="location" class="block text-sm font-medium text-gray-400 mb-1.5">Location</label>
                             <input type="text" id="location" wire:model="location"
-                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="City, Country">
                             @error('location') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -69,7 +69,7 @@
                         <div>
                             <label for="linkedin_url" class="block text-sm font-medium text-gray-400 mb-1.5">LinkedIn URL</label>
                             <input type="url" id="linkedin_url" wire:model="linkedin_url"
-                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="https://linkedin.com/in/username">
                             @error('linkedin_url') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -77,7 +77,7 @@
                         <div>
                             <label for="github_url" class="block text-sm font-medium text-gray-400 mb-1.5">GitHub URL</label>
                             <input type="url" id="github_url" wire:model="github_url"
-                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="https://github.com/username">
                             @error('github_url') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -88,7 +88,7 @@
             {{-- Sidebar: Image Upload --}}
             <div class="space-y-6">
                 <div class="bg-dark-800 border border-dark-700 rounded-xl p-6">
-                    <h2 class="text-lg font-semibold text-white mb-4">Profile Image</h2>
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider mb-4">Profile Image</h2>
 
                     <div class="space-y-4">
                         @if ($profile_image)
@@ -119,7 +119,7 @@
 
                         <div>
                             <label for="profile_image"
-                                   class="block w-full text-center cursor-pointer bg-dark-700 border border-dark-600 border-dashed rounded-lg px-4 py-3 text-sm text-gray-400 hover:text-white hover:border-accent-500 transition-colors">
+                                   class="block w-full text-center cursor-pointer bg-dark-700 border border-dark-600 border-dashed rounded-lg px-4 py-3 text-sm text-gray-400 hover:text-white hover:border-primary transition-colors">
                                 <span wire:loading.remove wire:target="profile_image">Choose Image</span>
                                 <span wire:loading wire:target="profile_image">Uploading...</span>
                             </label>
@@ -135,7 +135,7 @@
         {{-- Save Button --}}
         <div class="mt-6 flex justify-end">
             <button type="submit"
-                    class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
                 <span wire:loading.remove wire:target="save">Save Profile</span>
                 <span wire:loading wire:target="save" class="flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

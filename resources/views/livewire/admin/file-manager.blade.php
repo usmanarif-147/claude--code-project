@@ -2,7 +2,7 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-white">File Manager</h1>
+            <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">File Manager</h1>
             <p class="text-gray-500 mt-1">Upload, tag, search, and preview research documents.</p>
         </div>
     </div>
@@ -12,12 +12,12 @@
         <button @click="uploadOpen = !uploadOpen"
                 class="w-full flex items-center justify-between px-6 py-4 text-left">
             <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
                 <span class="text-white font-medium text-sm">Upload Files</span>
                 @if (count($uploadQueue) > 0)
-                    <span class="bg-accent-500/20 text-accent-400 text-xs font-medium px-2 py-0.5 rounded-full">{{ count($uploadQueue) }} queued</span>
+                    <span class="bg-primary/20 text-primary-light text-xs font-medium px-2 py-0.5 rounded-full">{{ count($uploadQueue) }} queued</span>
                 @endif
             </div>
             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="uploadOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,12 +41,12 @@
                          input.dispatchEvent(new Event('change', { bubbles: true }));
                      "
                      class="border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer"
-                     :class="dragging ? 'border-accent-400 bg-accent-500/5' : 'border-dark-600 hover:border-dark-500'"
+                     :class="dragging ? 'border-primary-light bg-primary/5' : 'border-dark-600 hover:border-dark-500'"
                      @click="$refs.fileInput.click()">
                     <svg class="w-10 h-10 mx-auto mb-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
-                    <p class="text-gray-400 text-sm">Drag & drop files here or <span class="text-accent-400">browse</span></p>
+                    <p class="text-gray-400 text-sm">Drag & drop files here or <span class="text-primary-light">browse</span></p>
                     <p class="text-gray-500 text-xs mt-1">txt, pdf, png, jpg, webp, docx, csv, doc, md — max 10MB each</p>
                     <input x-ref="fileInput" type="file" wire:model="uploadQueue" multiple
                            accept=".txt,.pdf,.png,.jpg,.webp,.docx,.csv,.doc,.md"
@@ -88,13 +88,13 @@
                                         {{-- Note --}}
                                         <textarea wire:model="uploadMeta.{{ $index }}.note" placeholder="Add a note (optional)..."
                                                   rows="2"
-                                                  class="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-xs resize-none"></textarea>
+                                                  class="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-xs resize-none"></textarea>
 
                                         {{-- Tags --}}
                                         <div class="mt-2">
                                             <div class="flex flex-wrap gap-1.5 mb-2">
                                                 @foreach ($uploadMeta[$index]['tags'] ?? [] as $tagIndex => $tag)
-                                                    <span class="inline-flex items-center gap-1 bg-accent-500/10 text-accent-400 text-xs font-medium px-2 py-0.5 rounded-full">
+                                                    <span class="inline-flex items-center gap-1 bg-primary/10 text-primary-light text-xs font-medium px-2 py-0.5 rounded-full">
                                                         {{ $tag }}
                                                         <button wire:click="removeTag({{ $index }}, {{ $tagIndex }})" class="hover:text-red-400 transition-colors">
                                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -107,7 +107,7 @@
                                                     <input type="text" x-model="tagInput" placeholder="Add tag + Enter"
                                                            @keydown.enter.prevent="if(tagInput.trim()) { $wire.addTag({{ $index }}, tagInput.trim()); tagInput = ''; }"
                                                            @keydown.comma.prevent="if(tagInput.trim()) { $wire.addTag({{ $index }}, tagInput.trim()); tagInput = ''; }"
-                                                           class="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-xs">
+                                                           class="w-full bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-xs">
                                                 </div>
                                             @endif
                                             @error("uploadMeta.{$index}.tags")
@@ -123,7 +123,7 @@
                     {{-- Upload Actions --}}
                     <div class="flex items-center gap-3 mt-4">
                         <button wire:click="saveFiles" wire:loading.attr="disabled"
-                                class="bg-accent-500 hover:bg-accent-600 disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
+                                class="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
                             <svg wire:loading wire:target="saveFiles" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -148,12 +148,12 @@
             <div class="flex flex-col sm:flex-row gap-4">
                 <div class="flex-1">
                     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search files by name or tag..."
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 </div>
                 <input type="date" wire:model.live="dateFrom" placeholder="From"
-                       class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                       class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <input type="date" wire:model.live="dateTo" placeholder="To"
-                       class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                       class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
             </div>
 
             {{-- Bulk Actions --}}
@@ -176,9 +176,9 @@
                     <tr class="bg-dark-700/50">
                         <th class="px-6 py-3 text-left">
                             <input type="checkbox" wire:model.live="selectAll"
-                                   class="rounded border-dark-600 bg-dark-700 text-accent-500 focus:ring-accent-500">
+                                   class="rounded border-dark-600 bg-dark-700 text-primary focus:ring-primary">
                         </th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
                             wire:click="sortBy('file_title')">
                             <span class="flex items-center gap-1">
                                 File Title
@@ -193,7 +193,7 @@
                                 @endif
                             </span>
                         </th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
                             wire:click="sortBy('mime_type')">
                             <span class="flex items-center gap-1">
                                 Type
@@ -208,7 +208,7 @@
                                 @endif
                             </span>
                         </th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
                             wire:click="sortBy('size_kb')">
                             <span class="flex items-center gap-1">
                                 Size
@@ -223,9 +223,9 @@
                                 @endif
                             </span>
                         </th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tags</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Note</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tags</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Note</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3 cursor-pointer select-none"
                             wire:click="sortBy('created_at')">
                             <span class="flex items-center gap-1">
                                 Date
@@ -240,7 +240,7 @@
                                 @endif
                             </span>
                         </th>
-                        <th class="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+                        <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-dark-700">
@@ -249,11 +249,11 @@
                             <td class="px-6 py-4">
                                 <input type="checkbox" value="{{ $file->id }}" wire:click="toggleFileSelection({{ $file->id }})"
                                        @checked(in_array($file->id, $selectedIds))
-                                       class="rounded border-dark-600 bg-dark-700 text-accent-500 focus:ring-accent-500">
+                                       class="rounded border-dark-600 bg-dark-700 text-primary focus:ring-primary">
                             </td>
                             <td class="px-6 py-4 text-sm text-white font-medium max-w-[200px] truncate">{{ $file->file_title }}</td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent-500/10 text-accent-400">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary-light">
                                     {{ $file->extension }}
                                 </span>
                             </td>
@@ -276,7 +276,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <button wire:click="openPreview({{ $file->id }})"
-                                            class="text-gray-400 hover:text-accent-400 transition-colors p-1">
+                                            class="text-gray-400 hover:text-primary-light transition-colors p-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </button>
                                     <button wire:click="delete({{ $file->id }})" wire:confirm="Are you sure you want to delete this file?"
@@ -317,7 +317,7 @@
                 {{-- Modal Header --}}
                 <div class="flex items-center justify-between px-6 py-4 border-b border-dark-700">
                     <div>
-                        <h3 class="text-white font-medium">{{ $previewFile->file_title }}.{{ $previewFile->extension }}</h3>
+                        <h3 class="text-white font-mono font-medium uppercase tracking-wider">{{ $previewFile->file_title }}.{{ $previewFile->extension }}</h3>
                         <p class="text-gray-500 text-xs mt-0.5">{{ $previewFile->mime_type }}</p>
                     </div>
                     <button wire:click="closePreview" class="text-gray-400 hover:text-white transition-colors p-1">
@@ -349,7 +349,7 @@
                                 </svg>
                                 <p class="text-gray-400 mb-4">This file type cannot be previewed in the browser.</p>
                                 <a href="{{ Storage::url($previewFile->file_path) }}" download
-                                   class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm inline-flex items-center gap-2">
+                                   class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm inline-flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     Download File
                                 </a>

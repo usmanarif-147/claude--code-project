@@ -1,11 +1,11 @@
 <div>
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-white">Technologies</h1>
+            <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Technologies</h1>
             <p class="text-gray-500 mt-1">Manage your technology stack.</p>
         </div>
         <a href="{{ route('admin.technologies.create') }}" wire:navigate
-           class="bg-accent-500 hover:bg-accent-600 text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
+           class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Add Technology
         </a>
@@ -16,17 +16,17 @@
         <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search technologies..."
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
             </div>
             <select wire:model.live="categoryFilter"
-                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <option value="all">All Categories</option>
                 <option value="frontend">Frontend</option>
                 <option value="backend">Backend</option>
                 <option value="database_tools">Database & Tools</option>
             </select>
             <select wire:model.live="activeFilter"
-                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-accent-500 focus:border-transparent text-sm">
+                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -40,11 +40,11 @@
             <table class="w-full">
                 <thead>
                     <tr class="bg-dark-700/50">
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Name</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Category</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Sort Order</th>
-                        <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
-                        <th class="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Name</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Category</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Sort Order</th>
+                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
+                        <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-dark-700">
@@ -67,7 +67,7 @@
                             <td class="px-6 py-4 text-sm text-gray-400">{{ $technology->sort_order }}</td>
                             <td class="px-6 py-4">
                                 @if ($technology->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">Active</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Active</span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">Inactive</span>
                                 @endif
@@ -75,7 +75,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.technologies.edit', $technology) }}" wire:navigate
-                                       class="text-gray-400 hover:text-accent-400 transition-colors p-1">
+                                       class="text-gray-400 hover:text-primary-light transition-colors p-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
                                     <button wire:click="delete({{ $technology->id }})" wire:confirm="Are you sure you want to delete this technology?"
@@ -88,7 +88,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                                No technologies found. <a href="{{ route('admin.technologies.create') }}" wire:navigate class="text-accent-400 hover:underline">Create one</a>.
+                                No technologies found. <a href="{{ route('admin.technologies.create') }}" wire:navigate class="text-primary-light hover:underline">Create one</a>.
                             </td>
                         </tr>
                     @endforelse

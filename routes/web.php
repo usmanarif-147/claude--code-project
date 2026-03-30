@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PortfolioController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\FileManager;
 use App\Livewire\Admin\Login;
@@ -7,9 +8,8 @@ use App\Livewire\Admin\ProfileEdit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PortfolioController::class, 'index']);
+Route::get('/resume/download/{template?}', [PortfolioController::class, 'downloadResume'])->name('resume.download');
 
 // routes
 Route::prefix('admin')->group(function () {
