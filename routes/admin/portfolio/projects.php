@@ -1,7 +1,7 @@
 <?php
 
-use App\Livewire\Admin\ProjectForm;
-use App\Livewire\Admin\ProjectIndex;
+use App\Livewire\Admin\Portfolio\Projects\ProjectForm;
+use App\Livewire\Admin\Portfolio\Projects\ProjectIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/projects', ProjectIndex::class)->name('admin.projects.index');

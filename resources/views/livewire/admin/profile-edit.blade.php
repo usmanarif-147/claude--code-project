@@ -12,7 +12,7 @@
                     <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Basic Information</h2>
 
                     <div>
-                        <label for="tagline" class="block text-sm font-medium text-gray-400 mb-1.5">Tagline</label>
+                        <label for="tagline" class="block text-sm font-medium text-gray-300 mb-1.5">Tagline</label>
                         <input type="text" id="tagline" wire:model="tagline"
                                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="e.g. Full-Stack Developer">
@@ -20,7 +20,7 @@
                     </div>
 
                     <div>
-                        <label for="bio" class="block text-sm font-medium text-gray-400 mb-1.5">Bio</label>
+                        <label for="bio" class="block text-sm font-medium text-gray-300 mb-1.5">Bio</label>
                         <textarea id="bio" wire:model="bio" rows="5"
                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                   placeholder="Tell visitors about yourself..."></textarea>
@@ -28,7 +28,7 @@
                     </div>
 
                     <div>
-                        <label for="availability_status" class="block text-sm font-medium text-gray-400 mb-1.5">Availability Status</label>
+                        <label for="availability_status" class="block text-sm font-medium text-gray-300 mb-1.5">Availability Status</label>
                         <input type="text" id="availability_status" wire:model="availability_status"
                                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                placeholder="e.g. Available for freelance">
@@ -41,7 +41,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label for="secondary_email" class="block text-sm font-medium text-gray-400 mb-1.5">Secondary Email</label>
+                            <label for="secondary_email" class="block text-sm font-medium text-gray-300 mb-1.5">Secondary Email</label>
                             <input type="email" id="secondary_email" wire:model="secondary_email"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="contact@example.com">
@@ -49,7 +49,7 @@
                         </div>
 
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-400 mb-1.5">Phone</label>
+                            <label for="phone" class="block text-sm font-medium text-gray-300 mb-1.5">Phone</label>
                             <input type="text" id="phone" wire:model="phone"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="+1 234 567 890">
@@ -57,7 +57,7 @@
                         </div>
 
                         <div>
-                            <label for="location" class="block text-sm font-medium text-gray-400 mb-1.5">Location</label>
+                            <label for="location" class="block text-sm font-medium text-gray-300 mb-1.5">Location</label>
                             <input type="text" id="location" wire:model="location"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="City, Country">
@@ -67,7 +67,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label for="linkedin_url" class="block text-sm font-medium text-gray-400 mb-1.5">LinkedIn URL</label>
+                            <label for="linkedin_url" class="block text-sm font-medium text-gray-300 mb-1.5">LinkedIn URL</label>
                             <input type="url" id="linkedin_url" wire:model="linkedin_url"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="https://linkedin.com/in/username">
@@ -75,7 +75,7 @@
                         </div>
 
                         <div>
-                            <label for="github_url" class="block text-sm font-medium text-gray-400 mb-1.5">GitHub URL</label>
+                            <label for="github_url" class="block text-sm font-medium text-gray-300 mb-1.5">GitHub URL</label>
                             <input type="url" id="github_url" wire:model="github_url"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="https://github.com/username">

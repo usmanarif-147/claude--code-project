@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\BlogPost;
+use App\Models\Blog\BlogPost;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

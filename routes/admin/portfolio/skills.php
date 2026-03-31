@@ -1,7 +1,7 @@
 <?php
 
-use App\Livewire\Admin\SkillForm;
-use App\Livewire\Admin\SkillIndex;
+use App\Livewire\Admin\Portfolio\Skills\SkillForm;
+use App\Livewire\Admin\Portfolio\Skills\SkillIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/skills', SkillIndex::class)->name('admin.skills.index');

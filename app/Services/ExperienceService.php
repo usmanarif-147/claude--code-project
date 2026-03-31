@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Experience;
-use App\Models\ExperienceResponsibility;
+use App\Models\Experience\Experience;
+use App\Models\Experience\ExperienceResponsibility;
 use Illuminate\Support\Facades\DB;
 
 class ExperienceService

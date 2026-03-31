@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Project;
+use App\Models\Project\Project;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

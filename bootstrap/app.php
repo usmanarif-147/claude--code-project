@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware(['web', 'auth'])
                 ->prefix('admin')
                 ->group(function () {
-                    foreach (glob(base_path('routes/admin/portfolio/*.php')) as $routeFile) {
+                    foreach (glob(base_path('routes/admin/*/*.php')) as $routeFile) {
                         require $routeFile;
                     }
                 });

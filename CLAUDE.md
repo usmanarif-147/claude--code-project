@@ -9,7 +9,7 @@
 - Livewire components live in app/Livewire/ (admin components in Admin/ subdirectory)
 - Blade views live in resources/views/livewire/ (matching subdirectory structure)
 - Admin components use the layout attribute: #[Layout('components.layouts.admin')]
-- Feature routes live in routes/admin/[module-group]/*.php (auto-loaded via bootstrap/app.php)
+- Feature routes live in routes/admin/[module-group]/*.php (auto-loaded via bootstrap/app.php using `glob('routes/admin/*/*.php')` — any new module folder is auto-discovered, no registration needed)
 - Core routes (login, logout, dashboard, profile, files) stay in routes/web.php
 - Models are in app/Models/
 - Service classes are in app/Services/ — ALL business logic goes here, not in controllers/components

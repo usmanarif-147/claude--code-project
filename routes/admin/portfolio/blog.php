@@ -1,7 +1,7 @@
 <?php
 
-use App\Livewire\Admin\BlogPostForm;
-use App\Livewire\Admin\BlogPostIndex;
+use App\Livewire\Admin\Portfolio\Blog\BlogPostForm;
+use App\Livewire\Admin\Portfolio\Blog\BlogPostIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/blog', BlogPostIndex::class)->name('admin.blog.index');

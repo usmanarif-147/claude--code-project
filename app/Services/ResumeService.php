@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Experience;
+use App\Models\Experience\Experience;
 use App\Models\Profile;
-use App\Models\Project;
+use App\Models\Project\Project;
 use App\Models\ResumeDownload;
 use App\Models\Skill;
 use App\Models\Technology;

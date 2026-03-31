@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\BlogPost;
-use App\Models\BlogPostTag;
-use App\Models\Experience;
-use App\Models\ExperienceResponsibility;
+use App\Models\Blog\BlogPost;
+use App\Models\Blog\BlogPostTag;
+use App\Models\Experience\Experience;
+use App\Models\Experience\ExperienceResponsibility;
 use App\Models\Profile;
-use App\Models\Project;
+use App\Models\Project\Project;
 use App\Models\Skill;
 use App\Models\Technology;
 use App\Models\Testimonial;

@@ -317,7 +317,7 @@
                 {{-- Modal Header --}}
                 <div class="flex items-center justify-between px-6 py-4 border-b border-dark-700">
                     <div>
-                        <h3 class="text-white font-mono font-medium uppercase tracking-wider">{{ $previewFile->file_title }}.{{ $previewFile->extension }}</h3>
+                        <h3 class="text-white font-mono font-semibold uppercase tracking-wider">{{ $previewFile->file_title }}.{{ $previewFile->extension }}</h3>
                         <p class="text-gray-500 text-xs mt-0.5">{{ $previewFile->mime_type }}</p>
                     </div>
                     <button wire:click="closePreview" class="text-gray-400 hover:text-white transition-colors p-1">
