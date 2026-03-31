@@ -18,6 +18,10 @@ class Profile extends Model
         'linkedin_url',
         'github_url',
         'availability_status',
+        'fiverr_url',
+        'youtube_url',
+        'timezone',
+        'language',
     ];
 
     public function user(): BelongsTo
