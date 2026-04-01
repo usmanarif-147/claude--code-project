@@ -39,6 +39,7 @@ If all checks pass → continue.
 3. Read every remaining `.md` file completely
 4. Read `CLAUDE.md` completely
 5. Read `resources/views/DESIGN-SYSTEM.md` completely
+6. Read `docs/PROJECT-STATUS.md` if it exists — this tells you what modules and features are already built. Use this context when generating specs so agents know about existing models, tables, services, and routes they can reference. If the file doesn't exist, this is the first module being built — you will create it at the end.
 
 ### Step 3: Derive Module Info
 
@@ -103,6 +104,7 @@ DOCKER RULE: Every shell command MUST use `docker compose exec app <command>`. N
 Read these files completely before doing anything:
 - CLAUDE.md
 - resources/views/DESIGN-SYSTEM.md
+- docs/PROJECT-STATUS.md (if it exists — shows what modules/models/tables are already built so you can reference them instead of recreating)
 - [plan file path for this feature]
 
 Then read .claude/commands/specs.md completely and follow EVERY step exactly to generate the spec.
@@ -344,6 +346,54 @@ Final checks:
 Status: READY FOR YOUR TESTING
 ════════════════════════════════════════════════
 ```
+
+### Update Project Status
+
+After the final report, update `docs/PROJECT-STATUS.md` to include the newly built module.
+
+If the file doesn't exist, create it with this structure. If it exists, ADD the new module section — never remove or rewrite existing module sections.
+
+```markdown
+# Project Status
+
+Last updated: [date]
+
+## Completed Modules
+
+### [Module Name] (module group: [module-group])
+Completed: [date]
+Features: [count]
+Side: ADMIN | PUBLIC | BOTH
+
+Routes:
+  - [METHOD] /admin/[path] → [route-name]
+  - ...
+
+Models:
+  - [ModelName] → app/Models/[path]
+  - ...
+
+Services:
+  - [ServiceName] → app/Services/[path]
+  - ...
+
+Livewire Components:
+  - [ComponentName] → app/Livewire/Admin/[path]
+  - ...
+
+Database Tables:
+  - [table_name] — [short description]
+  - ...
+
+Sidebar: [Module Name] group with [N] links
+
+---
+
+### [Next Module]
+...
+```
+
+Keep each module section concise — route names, model paths, table names. This is a quick reference, not a duplicate of the specs.
 
 ---
 

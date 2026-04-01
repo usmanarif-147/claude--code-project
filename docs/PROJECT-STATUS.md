@@ -1,0 +1,260 @@
+# Project Status
+
+Last updated: 2026-04-01 (Job Search module added)
+
+## Completed Modules
+
+### Portfolio (module group: portfolio)
+Completed: 2026-03-30
+Features: 7 (Skills, Technologies, Experiences, Projects, Testimonials, Blog, Analytics + Resume)
+Side: BOTH
+
+Routes:
+  - GET /admin/skills → admin.skills.index
+  - GET /admin/skills/create → admin.skills.create
+  - GET /admin/skills/{skill}/edit → admin.skills.edit
+  - GET /admin/technologies → admin.technologies.index
+  - GET /admin/technologies/create → admin.technologies.create
+  - GET /admin/technologies/{technology}/edit → admin.technologies.edit
+  - GET /admin/experiences → admin.experiences.index
+  - GET /admin/experiences/create → admin.experiences.create
+  - GET /admin/experiences/{experience}/edit → admin.experiences.edit
+  - GET /admin/projects → admin.projects.index
+  - GET /admin/projects/create → admin.projects.create
+  - GET /admin/projects/{project}/edit → admin.projects.edit
+  - GET /admin/testimonials → admin.testimonials.index
+  - GET /admin/testimonials/create → admin.testimonials.create
+  - GET /admin/testimonials/{testimonial}/edit → admin.testimonials.edit
+  - GET /admin/blog → admin.blog.index
+  - GET /admin/blog/create → admin.blog.create
+  - GET /admin/blog/{blogPost}/edit → admin.blog.edit
+  - GET /admin/analytics → admin.analytics
+  - GET /admin/resume → admin.resume
+  - GET /admin/resume/download/{template} → admin.resume.download
+
+Models:
+  - Skill → app/Models/Skill.php
+  - Technology → app/Models/Technology.php
+  - Project → app/Models/Project/Project.php
+  - ProjectImage → app/Models/Project/ProjectImage.php
+  - Experience → app/Models/Experience/Experience.php
+  - ExperienceResponsibility → app/Models/Experience/ExperienceResponsibility.php
+  - Testimonial → app/Models/Testimonial.php
+  - BlogPost → app/Models/Blog/BlogPost.php
+  - BlogPostTag → app/Models/Blog/BlogPostTag.php
+
+Services:
+  - SkillService → app/Services/SkillService.php
+  - TechnologyService → app/Services/TechnologyService.php
+  - ProjectService → app/Services/ProjectService.php
+  - ExperienceService → app/Services/ExperienceService.php
+  - TestimonialService → app/Services/TestimonialService.php
+  - BlogPostService → app/Services/BlogPostService.php
+  - AnalyticsService → app/Services/AnalyticsService.php
+  - ResumeService → app/Services/ResumeService.php
+
+Livewire Components:
+  - SkillIndex → app/Livewire/Admin/Portfolio/Skills/SkillIndex.php
+  - SkillForm → app/Livewire/Admin/Portfolio/Skills/SkillForm.php
+  - TechnologyIndex → app/Livewire/Admin/Portfolio/Technologies/TechnologyIndex.php
+  - TechnologyForm → app/Livewire/Admin/Portfolio/Technologies/TechnologyForm.php
+  - ExperienceIndex → app/Livewire/Admin/Portfolio/Experiences/ExperienceIndex.php
+  - ExperienceForm → app/Livewire/Admin/Portfolio/Experiences/ExperienceForm.php
+  - ProjectIndex → app/Livewire/Admin/Portfolio/Projects/ProjectIndex.php
+  - ProjectForm → app/Livewire/Admin/Portfolio/Projects/ProjectForm.php
+  - TestimonialIndex → app/Livewire/Admin/Portfolio/Testimonials/TestimonialIndex.php
+  - TestimonialForm → app/Livewire/Admin/Portfolio/Testimonials/TestimonialForm.php
+  - BlogPostIndex → app/Livewire/Admin/Portfolio/Blog/BlogPostIndex.php
+  - BlogPostForm → app/Livewire/Admin/Portfolio/Blog/BlogPostForm.php
+  - Analytics → app/Livewire/Admin/Portfolio/Analytics.php
+
+Database Tables:
+  - profiles — user profile (tagline, bio, photo, social links, timezone, language)
+  - skills — skill cards with category and proficiency
+  - technologies — tech stack grouped by category
+  - experiences — work history and education timeline
+  - experience_responsibilities — bullet points under each experience
+  - projects — portfolio projects with tech stack, links, featured flag
+  - project_images — gallery images for projects
+  - testimonials — client reviews with rating
+  - blog_posts — articles with status (draft/published)
+  - blog_post_tags — tags per blog post
+  - portfolio_visitors — visitor tracking records
+  - resume_downloads — resume download count tracking
+
+Sidebar: Portfolio group with Profile, Skills, Technologies, Experiences, Projects, Testimonials, Blog, Analytics, Resume
+
+---
+
+### Settings (module group: settings)
+Completed: 2026-04-01
+Features: 3 (Profile Settings, API Keys, Job Search Filters)
+Side: ADMIN
+
+Routes:
+  - GET /admin/settings/profile → admin.settings.profile
+  - GET /admin/settings/api-keys → admin.settings.api-keys
+  - GET /admin/settings/job-search-filters → admin.settings.job-search-filters
+
+Models:
+  - ApiKey → app/Models/ApiKey.php
+  - JobSearchFilter → app/Models/JobSearchFilter.php
+  - Profile (shared with Portfolio) → app/Models/Profile.php
+
+Services:
+  - ProfileSettingsService → app/Services/ProfileSettingsService.php
+  - ApiKeyService → app/Services/ApiKeyService.php
+  - JobSearchFilterService → app/Services/JobSearchFilterService.php
+
+Livewire Components:
+  - ProfileSettingsEdit → app/Livewire/Admin/Settings/ProfileSettings/ProfileSettingsEdit.php
+  - ApiKeysIndex → app/Livewire/Admin/Settings/ApiKeys/ApiKeysIndex.php
+  - JobSearchFiltersEdit → app/Livewire/Admin/Settings/JobSearchFilters/JobSearchFiltersEdit.php
+
+Database Tables:
+  - profiles (extended) — added fiverr_url, youtube_url, timezone, language
+  - api_keys — encrypted API keys per provider with test status
+  - job_search_filters — job search preferences (titles, tech, location, salary, platforms)
+
+Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters
+
+---
+
+### Tasks (module group: tasks)
+Completed: 2026-04-01
+Features: 7 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization)
+Side: ADMIN
+
+Routes:
+  - GET /admin/tasks/categories → admin.tasks.categories.index
+  - GET /admin/tasks/categories/create → admin.tasks.categories.create
+  - GET /admin/tasks/categories/{taskCategory}/edit → admin.tasks.categories.edit
+  - GET /admin/tasks/planner → admin.tasks.planner.index
+  - GET /admin/tasks/calendar → admin.tasks.calendar.index
+  - GET /admin/tasks/recurring-tasks → admin.tasks.recurring.index
+  - GET /admin/tasks/recurring-tasks/create → admin.tasks.recurring.create
+  - GET /admin/tasks/recurring-tasks/{recurringTask}/edit → admin.tasks.recurring.edit
+  - GET /admin/tasks/weekly-review → admin.tasks.weekly-review.index
+  - GET /admin/tasks/ai-prioritization → admin.tasks.ai-prioritization.index
+
+Models:
+  - Task → app/Models/Task/Task.php
+  - TaskCategory → app/Models/Task/TaskCategory.php
+  - RecurringTask → app/Models/Task/RecurringTask.php
+  - WeeklyReview → app/Models/Task/WeeklyReview.php
+
+Services:
+  - TaskService → app/Services/TaskService.php
+  - TaskCategoryService → app/Services/TaskCategoryService.php
+  - RecurringTaskService → app/Services/RecurringTaskService.php
+  - WeeklyReviewService → app/Services/WeeklyReviewService.php
+  - CalendarService → app/Services/CalendarService.php
+  - AiTaskPrioritizationService → app/Services/AiTaskPrioritizationService.php
+
+Livewire Components:
+  - TaskCategoryIndex → app/Livewire/Admin/Tasks/Categories/TaskCategoryIndex.php
+  - TaskCategoryForm → app/Livewire/Admin/Tasks/Categories/TaskCategoryForm.php
+  - DailyPlannerIndex → app/Livewire/Admin/Tasks/DailyPlanner/DailyPlannerIndex.php
+  - QuickCapture → app/Livewire/Admin/Tasks/QuickCapture/QuickCapture.php
+  - CalendarIndex → app/Livewire/Admin/Tasks/Calendar/CalendarIndex.php
+  - RecurringTaskIndex → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskIndex.php
+  - RecurringTaskForm → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskForm.php
+  - WeeklyReviewIndex → app/Livewire/Admin/Tasks/WeeklyReview/WeeklyReviewIndex.php
+  - AiPrioritizationIndex → app/Livewire/Admin/Tasks/AiPrioritization/AiPrioritizationIndex.php
+
+Database Tables:
+  - task_categories — task grouping with color and icon
+  - tasks — daily tasks with priority, status, due date, category
+  - recurring_tasks — repeating task templates with frequency
+  - weekly_reviews — weekly summary snapshots
+
+Sidebar: Tasks group with Categories, Daily Planner, Quick Capture, Calendar, Recurring Tasks, Weekly Review, AI Prioritization
+
+---
+
+## Core Components (not part of any module)
+
+- Dashboard → app/Livewire/Admin/Dashboard.php
+- FileManager → app/Livewire/Admin/FileManager.php
+- Login → app/Livewire/Admin/Login.php
+- ProfileEdit → app/Livewire/Admin/ProfileEdit.php
+- ResumeGenerator → app/Livewire/Admin/ResumeGenerator.php
+
+## Shared Models
+
+- User → app/Models/User.php
+- Profile → app/Models/Profile.php (used by Portfolio + Settings)
+- File → app/Models/File.php
+- PortfolioVisitor → app/Models/PortfolioVisitor.php
+- ResumeDownload → app/Models/ResumeDownload.php
+
+### Job Search (module group: job-search)
+Completed: 2026-04-01
+Features: 7 (Job Feed, Saved Searches, Application Tracker, AI Job Match Scoring, AI Cover Letter Generator, Job Alerts, Application Stats)
+Side: ADMIN
+
+Routes:
+  - GET /admin/job-search/feed → admin.job-search.feed.index
+  - GET /admin/job-search/saved-searches → admin.job-search.saved-searches.index
+  - GET /admin/job-search/saved-searches/create → admin.job-search.saved-searches.create
+  - GET /admin/job-search/saved-searches/{savedSearch}/edit → admin.job-search.saved-searches.edit
+  - GET /admin/job-search/applications → admin.job-search.applications.index
+  - GET /admin/job-search/applications/create → admin.job-search.applications.create
+  - GET /admin/job-search/applications/{jobApplication}/edit → admin.job-search.applications.edit
+  - GET /admin/job-search/ai-match-scoring → admin.job-search.ai-match-scoring.index
+  - GET /admin/job-search/cover-letters → admin.job-search.cover-letters.index
+  - GET /admin/job-search/cover-letters/create → admin.job-search.cover-letters.create
+  - GET /admin/job-search/cover-letters/{coverLetter}/edit → admin.job-search.cover-letters.edit
+  - GET /admin/job-search/alerts → admin.job-search.alerts.index
+  - GET /admin/job-search/alerts/settings → admin.job-search.alerts.settings
+  - GET /admin/job-search/application-stats → admin.job-search.application-stats.index
+
+Models:
+  - JobListing → app/Models/JobSearch/JobListing.php
+  - JobFetchLog → app/Models/JobSearch/JobFetchLog.php
+  - SavedSearch → app/Models/JobSearch/SavedSearch.php
+  - JobApplication → app/Models/JobSearch/JobApplication.php
+  - JobMatchScore → app/Models/JobSearch/JobMatchScore.php
+  - CoverLetter → app/Models/JobSearch/CoverLetter.php
+  - JobAlert → app/Models/JobSearch/JobAlert.php
+  - JobAlertNotification → app/Models/JobSearch/JobAlertNotification.php
+
+Services:
+  - JobFeedService → app/Services/JobFeedService.php
+  - SavedSearchService → app/Services/SavedSearchService.php
+  - ApplicationTrackerService → app/Services/ApplicationTrackerService.php
+  - AiJobMatchService → app/Services/AiJobMatchService.php
+  - AiCoverLetterService → app/Services/AiCoverLetterService.php
+  - JobAlertService → app/Services/JobAlertService.php
+  - ApplicationStatsService → app/Services/ApplicationStatsService.php
+
+Livewire Components:
+  - JobFeedIndex → app/Livewire/Admin/JobSearch/JobFeed/JobFeedIndex.php
+  - SavedSearchIndex → app/Livewire/Admin/JobSearch/SavedSearches/SavedSearchIndex.php
+  - SavedSearchForm → app/Livewire/Admin/JobSearch/SavedSearches/SavedSearchForm.php
+  - ApplicationTrackerIndex → app/Livewire/Admin/JobSearch/ApplicationTracker/ApplicationTrackerIndex.php
+  - ApplicationTrackerForm → app/Livewire/Admin/JobSearch/ApplicationTracker/ApplicationTrackerForm.php
+  - AiMatchScoringIndex → app/Livewire/Admin/JobSearch/AiMatchScoring/AiMatchScoringIndex.php
+  - AiCoverLetterIndex → app/Livewire/Admin/JobSearch/AiCoverLetter/AiCoverLetterIndex.php
+  - AiCoverLetterForm → app/Livewire/Admin/JobSearch/AiCoverLetter/AiCoverLetterForm.php
+  - JobAlertSettings → app/Livewire/Admin/JobSearch/JobAlerts/JobAlertSettings.php
+  - JobAlertIndex → app/Livewire/Admin/JobSearch/JobAlerts/JobAlertIndex.php
+  - ApplicationStatsIndex → app/Livewire/Admin/JobSearch/ApplicationStats/ApplicationStatsIndex.php
+
+Database Tables:
+  - job_listings — jobs fetched from external APIs with deduplication
+  - job_fetch_logs — fetch operation tracking per platform
+  - saved_searches — named search filter configurations
+  - job_applications — application tracking with kanban statuses
+  - job_match_scores — AI-generated match scores per job listing
+  - cover_letters — AI-generated cover letters for job listings
+  - job_alerts — user alert configuration (threshold, frequency, channels)
+  - job_alert_notifications — individual alert notifications per job
+
+Sidebar: Job Search group with Job Feed, Saved Searches, Application Tracker, AI Match Scoring, AI Cover Letter, Job Alerts, Application Stats
+
+---
+
+## Core Tables
+
+- users, cache, jobs, files, sessions
