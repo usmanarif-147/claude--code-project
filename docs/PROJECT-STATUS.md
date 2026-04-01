@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-04-01 (Job Search module added)
+Last updated: 2026-04-01 (Email module added)
 
 ## Completed Modules
 
@@ -252,6 +252,75 @@ Database Tables:
   - job_alert_notifications — individual alert notifications per job
 
 Sidebar: Job Search group with Job Feed, Saved Searches, Application Tracker, AI Match Scoring, AI Cover Letter, Job Alerts, Application Stats
+
+---
+
+### Email (module group: email)
+Completed: 2026-04-01
+Features: 5 (Email Templates, Morning Email Digest, Auto-Categorize Emails, Smart Reply Drafts, Recruiter Alerts)
+Side: ADMIN
+
+Routes:
+  - GET /admin/email/inbox → admin.email.inbox.index
+  - GET /admin/email/digest → admin.email.digest.index
+  - GET /admin/email/templates → admin.email.templates.index
+  - GET /admin/email/templates/create → admin.email.templates.create
+  - GET /admin/email/templates/{emailTemplate}/edit → admin.email.templates.edit
+  - GET /admin/email/categories → admin.email.categories.index
+  - GET /admin/email/categories/create → admin.email.categories.create
+  - GET /admin/email/categories/{emailCategory}/edit → admin.email.categories.edit
+  - GET /admin/email/categorize → admin.email.categorize.index
+  - GET /admin/email/smart-reply → admin.email.smart-reply.index
+  - GET /admin/email/smart-reply/create/{email?} → admin.email.smart-reply.create
+  - GET /admin/email/smart-reply/{smartReplyDraft}/edit → admin.email.smart-reply.edit
+  - GET /admin/email/recruiter-alerts → admin.email.recruiter-alerts.index
+  - GET /admin/email/recruiter-alerts/settings → admin.email.recruiter-alerts.settings
+
+Models:
+  - Email → app/Models/Email/Email.php
+  - EmailDigest → app/Models/Email/EmailDigest.php
+  - EmailSyncLog → app/Models/Email/EmailSyncLog.php
+  - EmailTemplate → app/Models/EmailTemplate.php
+  - EmailCategory → app/Models/Email/EmailCategory.php
+  - EmailCategoryCorrection → app/Models/Email/EmailCategoryCorrection.php
+  - SmartReplyDraft → app/Models/Email/SmartReplyDraft.php
+  - RecruiterAlert → app/Models/Email/RecruiterAlert.php
+  - RecruiterAlertSetting → app/Models/Email/RecruiterAlertSetting.php
+
+Services:
+  - GmailSyncService → app/Services/GmailSyncService.php
+  - EmailInboxService → app/Services/EmailInboxService.php
+  - EmailDigestService → app/Services/EmailDigestService.php
+  - EmailTemplateService → app/Services/EmailTemplateService.php
+  - EmailCategorizationService → app/Services/EmailCategorizationService.php
+  - SmartReplyDraftService → app/Services/SmartReplyDraftService.php
+  - RecruiterAlertService → app/Services/RecruiterAlertService.php
+
+Livewire Components:
+  - EmailInboxIndex → app/Livewire/Admin/Email/Inbox/EmailInboxIndex.php
+  - EmailDigestIndex → app/Livewire/Admin/Email/Digest/EmailDigestIndex.php
+  - EmailTemplateIndex → app/Livewire/Admin/Email/Templates/EmailTemplateIndex.php
+  - EmailTemplateForm → app/Livewire/Admin/Email/Templates/EmailTemplateForm.php
+  - EmailCategoryIndex → app/Livewire/Admin/Email/Categories/EmailCategoryIndex.php
+  - EmailCategoryForm → app/Livewire/Admin/Email/Categories/EmailCategoryForm.php
+  - CategorizeDashboard → app/Livewire/Admin/Email/Categorize/CategorizeDashboard.php
+  - SmartReplyIndex → app/Livewire/Admin/Email/SmartReply/SmartReplyIndex.php
+  - SmartReplyForm → app/Livewire/Admin/Email/SmartReply/SmartReplyForm.php
+  - RecruiterAlertIndex → app/Livewire/Admin/Email/RecruiterAlerts/RecruiterAlertIndex.php
+  - RecruiterAlertSettings → app/Livewire/Admin/Email/RecruiterAlerts/RecruiterAlertSettings.php
+
+Database Tables:
+  - emails — emails fetched from Gmail with deduplication by gmail_id
+  - email_digests — AI-generated daily digest summaries
+  - email_sync_logs — Gmail sync operation tracking
+  - email_templates — reusable email templates with categories
+  - email_categories — email classification categories (Job Response, Freelance, etc.)
+  - email_category_corrections — manual category correction history for AI learning
+  - smart_reply_drafts — AI-generated reply drafts with tone and status
+  - recruiter_alerts — detected recruiter/hiring manager email alerts
+  - recruiter_alert_settings — user preferences for alert behavior
+
+Sidebar: Email group with Inbox, Morning Digest, Templates, Categories, Auto-Categorize, Smart Reply, Recruiter Alerts, Alert Settings
 
 ---
 
