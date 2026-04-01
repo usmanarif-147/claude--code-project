@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\PortfolioController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\FileManager;
@@ -10,6 +11,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PortfolioController::class, 'index']);
 Route::get('/resume/download/{template?}', [PortfolioController::class, 'downloadResume'])->name('resume.download');
+
+Route::post('/chatbot/message', [ChatbotController::class, 'sendMessage'])
+    ->middleware('throttle:20,1')
+    ->name('chatbot.message');
 
 // routes
 Route::prefix('admin')->group(function () {

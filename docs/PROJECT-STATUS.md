@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-04-01 (Email module added)
+Last updated: 2026-04-01 (AI Assistant module added)
 
 ## Completed Modules
 
@@ -321,6 +321,47 @@ Database Tables:
   - recruiter_alert_settings — user preferences for alert behavior
 
 Sidebar: Email group with Inbox, Morning Digest, Templates, Categories, Auto-Categorize, Smart Reply, Recruiter Alerts, Alert Settings
+
+---
+
+### AI Assistant (module group: ai-assistant)
+Completed: 2026-04-01
+Features: 2 (Private AI Chat, Public AI Chatbot)
+Side: BOTH
+
+Routes:
+  - GET /admin/ai-assistant/chat → admin.ai-assistant.chat.index
+  - GET /admin/ai-assistant/chat-logs → admin.ai-assistant.chat-logs.index
+  - POST /chatbot/message → chatbot.message
+
+Models:
+  - AiChatConversation → app/Models/AiChat/AiChatConversation.php
+  - AiChatMessage → app/Models/AiChat/AiChatMessage.php
+  - ChatbotConversation → app/Models/Chatbot/ChatbotConversation.php
+  - ChatbotMessage → app/Models/Chatbot/ChatbotMessage.php
+
+Services:
+  - AiChatService → app/Services/AiChatService.php
+  - ChatbotService → app/Services/ChatbotService.php
+  - AiChatbotService → app/Services/AiChatbotService.php
+
+Livewire Components:
+  - PrivateChatIndex → app/Livewire/Admin/AiAssistant/PrivateChat/PrivateChatIndex.php
+  - ChatLogIndex → app/Livewire/Admin/AiAssistant/ChatLogs/ChatLogIndex.php
+
+Controllers:
+  - ChatbotController → app/Http/Controllers/ChatbotController.php (public chatbot API)
+
+Public Components:
+  - chatbot-widget → resources/views/components/chatbot-widget.blade.php (Alpine.js floating chat widget)
+
+Database Tables:
+  - ai_chat_conversations — private AI chat sessions per user
+  - ai_chat_messages — messages within private AI conversations
+  - chatbot_conversations — public visitor chatbot sessions (identified by UUID)
+  - chatbot_messages — messages within public chatbot conversations
+
+Sidebar: AI Assistant group with Private Chat, Chat Logs
 
 ---
 

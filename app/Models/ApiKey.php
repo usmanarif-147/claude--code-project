@@ -22,6 +22,10 @@ class ApiKey extends Model
 
     public const PROVIDER_YOUTUBE = 'youtube';
 
+    public const PROVIDER_GEMINI = 'gemini';
+
+    public const PROVIDER_GROQ = 'groq';
+
     public const ALL_PROVIDERS = [
         self::PROVIDER_GMAIL,
         self::PROVIDER_CLAUDE,
@@ -30,6 +34,8 @@ class ApiKey extends Model
         self::PROVIDER_ADZUNA,
         self::PROVIDER_SERPAPI,
         self::PROVIDER_YOUTUBE,
+        self::PROVIDER_GEMINI,
+        self::PROVIDER_GROQ,
     ];
 
     protected $fillable = [

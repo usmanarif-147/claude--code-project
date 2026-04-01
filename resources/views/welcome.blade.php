@@ -498,4 +498,6 @@
         </div>
     </footer>
 
+    <x-chatbot-widget />
+
 </x-layouts.app>

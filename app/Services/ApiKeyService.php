@@ -39,6 +39,8 @@ class ApiKeyService
                 ApiKey::PROVIDER_ADZUNA => $this->testAdzuna($apiKey),
                 ApiKey::PROVIDER_SERPAPI => $this->testSerpapi($apiKey),
                 ApiKey::PROVIDER_YOUTUBE => $this->testYoutube($apiKey),
+                ApiKey::PROVIDER_GEMINI => $this->testGemini($apiKey),
+                ApiKey::PROVIDER_GROQ => $this->testGroq($apiKey),
                 default => false,
             };
         } catch (\Throwable) {
@@ -140,6 +142,27 @@ class ApiKeyService
                 'mine' => 'true',
                 'key' => $apiKey->key_value,
             ]);
+
+        return $response->successful();
+    }
+
+    private function testGemini(ApiKey $apiKey): bool
+    {
+        $response = Http::timeout(10)
+            ->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$apiKey->key_value, [
+                'contents' => [
+                    ['parts' => [['text' => 'Hello']]],
+                ],
+            ]);
+
+        return $response->successful();
+    }
+
+    private function testGroq(ApiKey $apiKey): bool
+    {
+        $response = Http::timeout(10)
+            ->withToken($apiKey->key_value)
+            ->get('https://api.groq.com/openai/v1/models');
 
         return $response->successful();
     }
