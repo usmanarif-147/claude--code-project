@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-04-01 (AI Assistant module added)
+Last updated: 2026-04-01 (YouTube module added)
 
 ## Completed Modules
 
@@ -362,6 +362,50 @@ Database Tables:
   - chatbot_messages — messages within public chatbot conversations
 
 Sidebar: AI Assistant group with Private Chat, Chat Logs
+
+---
+
+### YouTube (module group: youtube)
+Completed: 2026-04-01
+Features: 3 (Content Calendar, Video Ideas Tracker, YouTube Stats)
+Side: ADMIN
+
+Routes:
+  - GET /admin/youtube/content-calendar → admin.youtube.content-calendar.index
+  - GET /admin/youtube/content-calendar/create → admin.youtube.content-calendar.create
+  - GET /admin/youtube/content-calendar/{contentCalendarItem}/edit → admin.youtube.content-calendar.edit
+  - GET /admin/youtube/video-ideas → admin.youtube.video-ideas.index
+  - GET /admin/youtube/video-ideas/create → admin.youtube.video-ideas.create
+  - GET /admin/youtube/video-ideas/{videoIdea}/edit → admin.youtube.video-ideas.edit
+  - GET /admin/youtube/stats → admin.youtube.stats.index
+
+Models:
+  - ContentCalendarItem → app/Models/ContentCalendarItem.php
+  - VideoIdea → app/Models/VideoIdea.php
+  - YouTubeChannelStat → app/Models/YouTube/YouTubeChannelStat.php
+  - YouTubeVideo → app/Models/YouTube/YouTubeVideo.php
+  - YouTubeWeeklySnapshot → app/Models/YouTube/YouTubeWeeklySnapshot.php
+
+Services:
+  - ContentCalendarService → app/Services/ContentCalendarService.php
+  - VideoIdeaService → app/Services/VideoIdeaService.php
+  - YouTubeStatsService → app/Services/YouTubeStatsService.php
+
+Livewire Components:
+  - ContentCalendarIndex → app/Livewire/Admin/Youtube/ContentCalendar/ContentCalendarIndex.php
+  - ContentCalendarForm → app/Livewire/Admin/Youtube/ContentCalendar/ContentCalendarForm.php
+  - VideoIdeaIndex → app/Livewire/Admin/Youtube/VideoIdeas/VideoIdeaIndex.php
+  - VideoIdeaForm → app/Livewire/Admin/Youtube/VideoIdeas/VideoIdeaForm.php
+  - YouTubeStatsIndex → app/Livewire/Admin/Youtube/Stats/YouTubeStatsIndex.php
+
+Database Tables:
+  - content_calendar_items — scheduled content with title, type (video/blog), planned date, status
+  - video_ideas — video ideas with priority, status, optional link to content calendar
+  - youtube_channel_stats — cached YouTube channel statistics (subscribers, views, watch time)
+  - youtube_videos — cached recent video data (views, likes, comments, duration)
+  - youtube_weekly_snapshots — weekly stat snapshots for week-over-week comparison
+
+Sidebar: YouTube group with Content Calendar, Video Ideas, YouTube Stats
 
 ---
 
