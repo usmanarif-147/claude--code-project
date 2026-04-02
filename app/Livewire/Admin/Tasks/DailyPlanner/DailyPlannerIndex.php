@@ -4,15 +4,20 @@ namespace App\Livewire\Admin\Tasks\DailyPlanner;
 
 use App\Models\Task\Task;
 use App\Models\Task\TaskCategory;
+use App\Services\AiTaskPrioritizationService;
+use App\Services\TaskImportService;
 use App\Services\TaskService;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.admin')]
 class DailyPlannerIndex extends Component
 {
+    use WithFileUploads;
+
     #[Url]
     public string $selectedDate = '';
 
@@ -30,6 +35,21 @@ class DailyPlannerIndex extends Component
     public string $newTaskPriority = 'medium';
 
     public string $newTaskCategoryId = '';
+
+    // Import modal
+    public $taskFile;
+
+    public bool $showImportModal = false;
+
+    public bool $aiCategorizeImport = false;
+
+    public string $importDefaultPriority = 'medium';
+
+    // AI auto-categorize toggle for inline add
+    public bool $aiAutoCategory = false;
+
+    // PDF dropdown
+    public bool $showPdfDropdown = false;
 
     public ?int $editingTaskId = null;
 
@@ -61,7 +81,8 @@ class DailyPlannerIndex extends Component
             'category_id' => $this->newTaskCategoryId ?: null,
             'due_date' => $this->selectedDate,
             'status' => 'pending',
-        ]);
+            'sort_order' => 0,
+        ], $this->aiAutoCategory, auth()->id());
 
         $this->reset('newTaskTitle', 'newTaskPriority', 'newTaskCategoryId');
         $this->newTaskPriority = 'medium';
@@ -156,6 +177,42 @@ class DailyPlannerIndex extends Component
         $this->selectedDate = Carbon::parse($this->selectedDate)->addDay()->format('Y-m-d');
     }
 
+    public function openImportModal(): void
+    {
+        $this->showImportModal = true;
+    }
+
+    public function closeImportModal(): void
+    {
+        $this->showImportModal = false;
+        $this->reset('taskFile', 'aiCategorizeImport', 'importDefaultPriority');
+    }
+
+    public function importTasks(TaskImportService $service): void
+    {
+        $this->validate([
+            'taskFile' => 'required|file|mimes:txt|max:1024',
+        ]);
+
+        $contents = $this->taskFile->get();
+
+        $result = $service->importFromTxt(
+            auth()->id(),
+            $contents,
+            $this->selectedDate,
+            $this->importDefaultPriority,
+            $this->aiCategorizeImport,
+        );
+
+        $this->closeImportModal();
+        session()->flash('success', "{$result['imported']} tasks imported successfully.".($result['skipped'] > 0 ? " {$result['skipped']} lines skipped." : ''));
+    }
+
+    public function togglePdfDropdown(): void
+    {
+        $this->showPdfDropdown = ! $this->showPdfDropdown;
+    }
+
     public function render()
     {
         $userId = auth()->id();
@@ -187,11 +244,13 @@ class DailyPlannerIndex extends Component
 
         $stats = (new TaskService)->getCompletionStats($userId, $date);
         $categories = TaskCategory::query()->ordered()->get();
+        $hasAiKey = app(AiTaskPrioritizationService::class)->getConfiguredProvider(auth()->id()) !== null;
 
         return view('livewire.admin.tasks.daily-planner.index', [
             'tasks' => $tasks,
             'stats' => $stats,
             'categories' => $categories,
+            'hasAiKey' => $hasAiKey,
         ]);
     }
 }

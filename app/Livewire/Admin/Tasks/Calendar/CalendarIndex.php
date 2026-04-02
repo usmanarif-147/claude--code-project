@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Admin\Tasks\Calendar;
 
+use App\Models\Task\Task;
 use App\Services\CalendarService;
+use App\Services\TaskService;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -22,6 +24,12 @@ class CalendarIndex extends Component
 
     #[Url]
     public string $currentWeekStart = '';
+
+    public bool $showDayModal = false;
+
+    public string $selectedDayDate = '';
+
+    public array $selectedDayTasks = ['personal' => [], 'project' => []];
 
     public function mount(): void
     {
@@ -79,9 +87,69 @@ class CalendarIndex extends Component
         $this->currentWeekStart = $today->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
     }
 
-    public function navigateToDay(string $date): void
+    public function openDayModal(string $date): void
     {
-        $this->redirect(route('admin.tasks.planner.index', ['selectedDate' => $date]), navigate: true);
+        $this->selectedDayDate = $date;
+
+        $service = app(CalendarService::class);
+        $result = $service->getTasksForDate(auth()->id(), $date);
+
+        $this->selectedDayTasks = [
+            'personal' => $result['personal']->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'status' => $task->status,
+                    'priority' => $task->priority,
+                    'category_name' => $task->category?->name,
+                    'category_color' => $task->category?->color,
+                ];
+            })->toArray(),
+            'project' => $result['project']->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'status' => $task->status,
+                    'priority' => $task->priority ?? 'medium',
+                    'board_name' => $task->board?->name ?? 'Unknown Board',
+                    'column_name' => $task->column?->name ?? 'Unknown',
+                ];
+            })->toArray(),
+        ];
+
+        $this->showDayModal = true;
+    }
+
+    public function closeDayModal(): void
+    {
+        $this->showDayModal = false;
+        $this->selectedDayDate = '';
+        $this->selectedDayTasks = ['personal' => [], 'project' => []];
+    }
+
+    public function toggleTaskComplete(int $taskId): void
+    {
+        $task = Task::where('id', $taskId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $task) {
+            return;
+        }
+
+        $service = app(TaskService::class);
+        $service->toggleComplete($task);
+
+        // Refresh modal data
+        $this->openDayModal($this->selectedDayDate);
+    }
+
+    public function goToPlanner(): void
+    {
+        $this->redirect(
+            route('admin.tasks.planner.index', ['selectedDate' => $this->selectedDayDate]),
+            navigate: true
+        );
     }
 
     public function render(CalendarService $service)

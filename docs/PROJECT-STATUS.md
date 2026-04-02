@@ -122,7 +122,8 @@ Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters
 
 ### Tasks (module group: tasks)
 Completed: 2026-04-01
-Features: 7 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization)
+Last updated: 2026-04-03 (Project Board, TXT Import, PDF Download, AI Categorization, Calendar Fix)
+Features: 12 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization, Project Board, TXT Import, PDF Download, AI Category Identification, Calendar Day Modal)
 Side: ADMIN
 
 Routes:
@@ -136,39 +137,58 @@ Routes:
   - GET /admin/tasks/recurring-tasks/{recurringTask}/edit → admin.tasks.recurring.edit
   - GET /admin/tasks/weekly-review → admin.tasks.weekly-review.index
   - GET /admin/tasks/ai-prioritization → admin.tasks.ai-prioritization.index
+  - GET /admin/tasks/project-board → admin.tasks.project-board.index
+  - GET /admin/tasks/pdf/download → admin.tasks.pdf.download
 
 Models:
   - Task → app/Models/Task/Task.php
   - TaskCategory → app/Models/Task/TaskCategory.php
   - RecurringTask → app/Models/Task/RecurringTask.php
   - WeeklyReview → app/Models/Task/WeeklyReview.php
+  - ProjectBoard → app/Models/Task/ProjectBoard.php
+  - ProjectBoardColumn → app/Models/Task/ProjectBoardColumn.php
+  - ProjectTask → app/Models/Task/ProjectTask.php
+  - ProjectTaskImage → app/Models/Task/ProjectTaskImage.php
 
 Services:
-  - TaskService → app/Services/TaskService.php
+  - TaskService → app/Services/TaskService.php (updated: AI auto-categorize on create)
   - TaskCategoryService → app/Services/TaskCategoryService.php
   - RecurringTaskService → app/Services/RecurringTaskService.php
   - WeeklyReviewService → app/Services/WeeklyReviewService.php
-  - CalendarService → app/Services/CalendarService.php
+  - CalendarService → app/Services/CalendarService.php (updated: dual-query personal + project tasks, day modal support)
   - AiTaskPrioritizationService → app/Services/AiTaskPrioritizationService.php
+  - ProjectBoardService → app/Services/ProjectBoardService.php
+  - ProjectTaskService → app/Services/ProjectTaskService.php
+  - TaskImportService → app/Services/TaskImportService.php
+  - TaskPdfService → app/Services/TaskPdfService.php
+  - AiCategoryIdentificationService → app/Services/AiCategoryIdentificationService.php
+
+Controllers:
+  - TaskPdfController → app/Http/Controllers/TaskPdfController.php
 
 Livewire Components:
   - TaskCategoryIndex → app/Livewire/Admin/Tasks/Categories/TaskCategoryIndex.php
   - TaskCategoryForm → app/Livewire/Admin/Tasks/Categories/TaskCategoryForm.php
-  - DailyPlannerIndex → app/Livewire/Admin/Tasks/DailyPlanner/DailyPlannerIndex.php
+  - DailyPlannerIndex → app/Livewire/Admin/Tasks/DailyPlanner/DailyPlannerIndex.php (updated: TXT import, PDF download, AI auto-categorize)
   - QuickCapture → app/Livewire/Admin/Tasks/QuickCapture/QuickCapture.php
-  - CalendarIndex → app/Livewire/Admin/Tasks/Calendar/CalendarIndex.php
+  - CalendarIndex → app/Livewire/Admin/Tasks/Calendar/CalendarIndex.php (updated: day modal replaces redirect)
   - RecurringTaskIndex → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskIndex.php
   - RecurringTaskForm → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskForm.php
   - WeeklyReviewIndex → app/Livewire/Admin/Tasks/WeeklyReview/WeeklyReviewIndex.php
   - AiPrioritizationIndex → app/Livewire/Admin/Tasks/AiPrioritization/AiPrioritizationIndex.php
+  - ProjectBoardIndex → app/Livewire/Admin/Tasks/ProjectBoard/ProjectBoardIndex.php
 
 Database Tables:
   - task_categories — task grouping with color and icon
   - tasks — daily tasks with priority, status, due date, category
   - recurring_tasks — repeating task templates with frequency
   - weekly_reviews — weekly summary snapshots
+  - project_boards — kanban boards with name and description
+  - project_board_columns — columns per board with color and sort order
+  - project_tasks — kanban tasks with board, column, priority, tags, target date
+  - project_task_images — image attachments for project tasks
 
-Sidebar: Tasks group with Categories, Daily Planner, Quick Capture, Calendar, Recurring Tasks, Weekly Review, AI Prioritization
+Sidebar: Tasks group with Daily Planner, Categories, Recurring Tasks, Project Board, Calendar, AI Prioritization, Weekly Review
 
 ---
 

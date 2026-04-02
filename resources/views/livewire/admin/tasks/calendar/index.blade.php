@@ -124,7 +124,7 @@
             {{-- Calendar grid --}}
             <div class="grid grid-cols-7">
                 @foreach($calendarDays as $day)
-                    <div wire:click="navigateToDay('{{ $day['date'] }}')"
+                    <div wire:click="openDayModal('{{ $day['date'] }}')"
                          x-data="{ hover: false }"
                          @mouseenter="hover = true"
                          @mouseleave="hover = false"
@@ -186,7 +186,7 @@
 
                 {{-- Column bodies --}}
                 @foreach($calendarDays as $day)
-                    <div wire:click="navigateToDay('{{ $day['date'] }}')"
+                    <div wire:click="openDayModal('{{ $day['date'] }}')"
                          class="min-h-64 p-2 border-r border-dark-700/50 cursor-pointer overflow-y-auto hover:bg-dark-700/10 transition-colors">
                         @forelse($day['tasks'] as $task)
                             <div class="rounded-lg px-2 py-1.5 mb-1 text-xs {{ $task->status === 'completed' ? 'opacity-50' : '' }}"
@@ -219,4 +219,213 @@
             <span class="text-xs text-gray-400">Uncategorized</span>
         </div>
     </div>
+
+    {{-- 8. DAY TASKS MODAL --}}
+    @if($showDayModal)
+        <div
+            x-data="{ open: @entangle('showDayModal') }"
+            x-show="open"
+            x-cloak
+            x-on:keydown.escape.window="open = false"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            {{-- Backdrop --}}
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                x-on:click="open = false"
+                class="absolute inset-0 bg-dark-950/80 backdrop-blur-sm"
+            ></div>
+
+            {{-- Modal Panel --}}
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                class="relative w-full max-w-lg bg-dark-800 border border-dark-700 rounded-xl shadow-2xl shadow-black/50 overflow-hidden"
+            >
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-dark-700">
+                    <div>
+                        <h3 class="text-base font-mono font-semibold text-white uppercase tracking-wider">
+                            {{ \Carbon\Carbon::parse($selectedDayDate)->format('l, M j') }}
+                        </h3>
+                        @php
+                            $totalCount = count($selectedDayTasks['personal']) + count($selectedDayTasks['project']);
+                        @endphp
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            {{ $totalCount }} {{ Str::plural('task', $totalCount) }}
+                        </p>
+                    </div>
+                    <button wire:click="closeDayModal"
+                            class="text-gray-500 hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-dark-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="px-6 py-4 max-h-96 overflow-y-auto">
+                    @if(count($selectedDayTasks['personal']) === 0 && count($selectedDayTasks['project']) === 0)
+                        {{-- Empty State --}}
+                        <div class="flex flex-col items-center justify-center py-10 text-center">
+                            <div class="w-12 h-12 rounded-full bg-dark-700 flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-500">No tasks for this day</p>
+                            <p class="text-xs text-gray-600 mt-1">Enjoy the free time!</p>
+                        </div>
+                    @endif
+
+                    {{-- Personal Tasks Section --}}
+                    @if(count($selectedDayTasks['personal']) > 0)
+                        <div class="mb-5">
+                            <h4 class="text-xs font-mono font-medium text-gray-500 uppercase tracking-widest mb-3">
+                                Personal Tasks
+                                <span class="text-gray-600 ml-1">({{ count($selectedDayTasks['personal']) }})</span>
+                            </h4>
+                            <div class="space-y-1.5">
+                                @foreach($selectedDayTasks['personal'] as $task)
+                                    <div class="flex items-center gap-3 group px-3 py-2.5 rounded-lg hover:bg-dark-700/50 transition-colors">
+                                        {{-- Checkbox --}}
+                                        <button wire:click="toggleTaskComplete({{ $task['id'] }})"
+                                                wire:loading.attr="disabled"
+                                                class="shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200
+                                                    {{ $task['status'] === 'completed'
+                                                        ? 'bg-emerald-500 border-emerald-500'
+                                                        : 'border-dark-600 hover:border-primary group-hover:border-dark-500' }}">
+                                            @if($task['status'] === 'completed')
+                                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            @endif
+                                        </button>
+
+                                        {{-- Task Info --}}
+                                        <div class="flex-1 min-w-0">
+                                            <span class="text-sm block truncate {{ $task['status'] === 'completed' ? 'line-through text-gray-500' : 'text-gray-300' }}">
+                                                {{ $task['title'] }}
+                                            </span>
+                                        </div>
+
+                                        {{-- Badges --}}
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            {{-- Priority Badge --}}
+                                            @switch($task['priority'])
+                                                @case('urgent')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400">Urgent</span>
+                                                    @break
+                                                @case('high')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400">High</span>
+                                                    @break
+                                                @case('medium')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">Med</span>
+                                                    @break
+                                                @case('low')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">Low</span>
+                                                    @break
+                                            @endswitch
+
+                                            {{-- Category Badge --}}
+                                            @if($task['category_name'])
+                                                <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                                      style="background-color: {{ $task['category_color'] ?? '#6b7280' }}1a; color: {{ $task['category_color'] ?? '#6b7280' }}">
+                                                    {{ $task['category_name'] }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Project Tasks Section --}}
+                    @if(count($selectedDayTasks['project']) > 0)
+                        <div>
+                            <h4 class="text-xs font-mono font-medium text-gray-500 uppercase tracking-widest mb-3">
+                                Project Tasks
+                                <span class="text-gray-600 ml-1">({{ count($selectedDayTasks['project']) }})</span>
+                            </h4>
+                            <div class="space-y-1.5">
+                                @foreach($selectedDayTasks['project'] as $task)
+                                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-dark-700/50 transition-colors">
+                                        {{-- Project icon --}}
+                                        <div class="shrink-0 w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
+                                            </svg>
+                                        </div>
+
+                                        {{-- Task Info --}}
+                                        <div class="flex-1 min-w-0">
+                                            <span class="text-sm block truncate {{ $task['status'] === 'done' ? 'line-through text-gray-500' : 'text-gray-300' }}">
+                                                {{ $task['title'] }}
+                                            </span>
+                                        </div>
+
+                                        {{-- Badges --}}
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            {{-- Priority Badge --}}
+                                            @switch($task['priority'])
+                                                @case('urgent')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400">Urgent</span>
+                                                    @break
+                                                @case('high')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400">High</span>
+                                                    @break
+                                                @case('medium')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">Med</span>
+                                                    @break
+                                                @case('low')
+                                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">Low</span>
+                                                    @break
+                                            @endswitch
+
+                                            {{-- Board Badge --}}
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary-light">
+                                                {{ $task['board_name'] }}
+                                            </span>
+
+                                            {{-- Column Badge --}}
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-dark-700 text-gray-400">
+                                                {{ $task['column_name'] }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex items-center justify-between px-6 py-4 border-t border-dark-700 bg-dark-800">
+                    <button wire:click="closeDayModal"
+                            class="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                        Close
+                    </button>
+                    <button wire:click="goToPlanner"
+                            class="inline-flex items-center gap-2 text-sm font-medium text-primary-light hover:text-white transition-colors">
+                        Open in Daily Planner
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

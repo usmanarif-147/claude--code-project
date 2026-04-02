@@ -41,9 +41,10 @@ If ANY check fails → **STOP**. Report failures. Do NOT modify code on top of b
 1. Detect mode from arguments (`production` or default `dev`)
 2. List all `.md` files in the plan folder
 3. Read every plan file completely
-4. Read `CLAUDE.md` completely
-5. Read `resources/views/DESIGN-SYSTEM.md` completely
-6. Read `docs/PROJECT-STATUS.md` — identify the target module and all other modules
+4. Check if a `screenshots/` subfolder exists in the plan folder. If yes, list all image files (png, jpg, jpeg, webp) and read them. These are UI references (mockups, design inspiration, expected layouts) that spec agents must view to design features correctly
+5. Read `CLAUDE.md` completely
+6. Read `resources/views/DESIGN-SYSTEM.md` completely
+7. Read `docs/PROJECT-STATUS.md` — identify the target module and all other modules
 
 ### Step 3: Identify Target Module
 
@@ -159,6 +160,7 @@ Read these files completely:
 - docs/PROJECT-STATUS.md
 - [update plan file path]
 - The original spec (if exists): docs/[module-group]-module/[original-feature-spec].md
+- If the plan folder contains a screenshots/ subfolder, read ALL images in it. These are UI references (mockups, design inspiration, expected layouts). Use them to understand the expected look, components, and interactions for the features being planned
 
 Then read ALL existing files for the feature being updated:
 [list relevant model, service, component, view, route files]

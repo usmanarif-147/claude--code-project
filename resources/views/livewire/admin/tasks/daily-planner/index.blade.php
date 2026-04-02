@@ -14,13 +14,52 @@
             <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Daily Planner</h1>
             <p class="text-gray-500 mt-1">{{ \Carbon\Carbon::parse($selectedDate)->format('l, F j, Y') }}</p>
         </div>
-        @if($stats['total'] > 0 && $stats['completed'] < $stats['total'])
-            <button wire:click="moveIncompleteToTomorrow" wire:confirm="Move all incomplete tasks to tomorrow?"
-                    class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                Move Incomplete to Tomorrow
+        <div class="flex items-center gap-3">
+            {{-- Import Button --}}
+            <button wire:click="openImportModal"
+                    class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors border border-dark-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Import
             </button>
-        @endif
+
+            {{-- PDF Download Dropdown --}}
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open"
+                        class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors border border-dark-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    PDF
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition
+                     class="absolute right-0 mt-2 w-40 bg-dark-800 border border-dark-700 rounded-lg shadow-xl z-50 py-1">
+                    <a href="{{ route('admin.tasks.pdf.download', ['period' => 'day', 'date' => $selectedDate]) }}"
+                       class="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                        This Day
+                    </a>
+                    <a href="{{ route('admin.tasks.pdf.download', ['period' => 'week', 'date' => $selectedDate]) }}"
+                       class="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                        This Week
+                    </a>
+                    <a href="{{ route('admin.tasks.pdf.download', ['period' => 'month', 'date' => $selectedDate]) }}"
+                       class="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                        This Month
+                    </a>
+                </div>
+            </div>
+
+            {{-- Move Incomplete to Tomorrow --}}
+            @if($stats['total'] > 0 && $stats['completed'] < $stats['total'])
+                <button wire:click="moveIncompleteToTomorrow" wire:confirm="Move all incomplete tasks to tomorrow?"
+                        class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    Move Incomplete to Tomorrow
+                </button>
+            @endif
+        </div>
     </div>
 
     {{-- Flash Messages --}}
@@ -155,13 +194,25 @@
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
             </select>
-            <select wire:model="newTaskCategoryId"
-                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-                <option value="">No Category</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
+            <div x-show="!$wire.aiAutoCategory">
+                <select wire:model="newTaskCategoryId"
+                        class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                    <option value="">No Category</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if($hasAiKey)
+            <label class="inline-flex items-center gap-2 cursor-pointer shrink-0" title="AI will auto-detect category">
+                <span class="relative">
+                    <input type="checkbox" wire:model="aiAutoCategory" class="sr-only peer">
+                    <span class="block w-9 h-5 bg-dark-600 peer-checked:bg-primary rounded-full transition-colors"></span>
+                    <span class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 peer-checked:bg-white rounded-full transition-all peer-checked:translate-x-4"></span>
+                </span>
+                <span class="text-xs text-gray-400">AI Auto</span>
+            </label>
+            @endif
             <button type="submit"
                     class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-colors whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -274,4 +325,56 @@
             </div>
         @endforelse
     </div>
+
+    {{-- IMPORT TASKS MODAL --}}
+    @if($showImportModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center" x-data x-on:keydown.escape.window="$wire.closeImportModal()">
+        <div class="absolute inset-0 bg-black/60" wire:click="closeImportModal"></div>
+        <div class="relative w-full max-w-md bg-dark-800 border border-dark-700 rounded-xl shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-dark-700">
+                <h3 class="text-lg font-mono font-bold text-white uppercase tracking-wider">Import Tasks</h3>
+                <button wire:click="closeImportModal" class="text-gray-500 hover:text-gray-300 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-300 mb-2 block">Upload .txt File</label>
+                    <p class="text-xs text-gray-500 mb-2">One task per line. Optional: @category #priority</p>
+                    <input type="file" wire:model="taskFile" accept=".txt"
+                           class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-dark-700 file:text-gray-300 hover:file:bg-dark-600">
+                    @error('taskFile') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-300 mb-2 block">Default Priority</label>
+                    <select wire:model="importDefaultPriority" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                @if($hasAiKey)
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <span class="relative">
+                        <input type="checkbox" wire:model="aiCategorizeImport" class="sr-only peer">
+                        <span class="block w-9 h-5 bg-dark-600 peer-checked:bg-primary rounded-full transition-colors"></span>
+                        <span class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-400 peer-checked:bg-white rounded-full transition-all peer-checked:translate-x-4"></span>
+                    </span>
+                    <span class="text-sm text-gray-300">Use AI to auto-categorize</span>
+                </label>
+                @endif
+            </div>
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-dark-700">
+                <button wire:click="closeImportModal" class="px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button wire:click="importTasks"
+                        wire:loading.attr="disabled"
+                        class="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
+                    <span wire:loading.remove wire:target="importTasks">Import</span>
+                    <span wire:loading wire:target="importTasks">Importing...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

@@ -5,12 +5,31 @@ namespace App\Services;
 use App\Models\Task\Task;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class TaskService
 {
-    public function create(array $data): Task
+    public function create(array $data, bool $aiCategorize = false, ?int $aiUserId = null): Task
     {
-        return Task::create($data);
+        $task = Task::create($data);
+
+        // If AI categorization is requested and no category was provided
+        if ($aiCategorize && empty($data['category_id']) && $aiUserId !== null) {
+            try {
+                $aiService = app(AiCategoryIdentificationService::class);
+                $category = $aiService->identifyCategory($aiUserId, $data['title'], $data['description'] ?? '');
+
+                if ($category !== null) {
+                    $task->update(['category_id' => $category->id]);
+                    $task->refresh();
+                }
+            } catch (\Throwable $e) {
+                // AI failure is non-fatal -- task is already created without category
+                Log::warning('AI categorization failed during task create: '.$e->getMessage());
+            }
+        }
+
+        return $task;
     }
 
     public function update(Task $task, array $data): Task
