@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-04-01 (YouTube module added)
+Last updated: 2026-04-02 (Personal module added)
 
 ## Completed Modules
 
@@ -406,6 +406,63 @@ Database Tables:
   - youtube_weekly_snapshots — weekly stat snapshots for week-over-week comparison
 
 Sidebar: YouTube group with Content Calendar, Video Ideas, YouTube Stats
+
+---
+
+### Personal (module group: personal)
+Completed: 2026-04-02
+Features: 4 (Bookmarks, Expense Tracker, Goals Tracker, Notes Scratchpad)
+Side: ADMIN
+
+Routes:
+  - GET /admin/personal/bookmarks → admin.personal.bookmarks.index
+  - GET /admin/personal/expense-tracker → admin.personal.expense-tracker.index
+  - GET /admin/personal/expense-tracker/create → admin.personal.expense-tracker.create
+  - GET /admin/personal/expense-tracker/{expense}/edit → admin.personal.expense-tracker.edit
+  - GET /admin/personal/expense-tracker/categories → admin.personal.expense-tracker.categories
+  - GET /admin/personal/goals-tracker → admin.personal.goals-tracker.index
+  - GET /admin/personal/goals-tracker/create → admin.personal.goals-tracker.create
+  - GET /admin/personal/goals-tracker/{goal}/edit → admin.personal.goals-tracker.edit
+  - GET /admin/personal/notes-scratchpad → admin.personal.notes-scratchpad.index
+  - GET /admin/personal/notes-scratchpad/create → admin.personal.notes-scratchpad.create
+  - GET /admin/personal/notes-scratchpad/{note}/edit → admin.personal.notes-scratchpad.edit
+
+Models:
+  - Bookmark → app/Models/Bookmark/Bookmark.php
+  - BookmarkCategory → app/Models/Bookmark/BookmarkCategory.php
+  - Expense → app/Models/Expense/Expense.php
+  - ExpenseCategory → app/Models/Expense/ExpenseCategory.php
+  - MonthlyBudget → app/Models/Expense/MonthlyBudget.php
+  - Goal → app/Models/Goal.php
+  - Note → app/Models/Note.php
+
+Services:
+  - BookmarkService → app/Services/BookmarkService.php
+  - ExpenseService → app/Services/ExpenseService.php
+  - ExpenseCategoryService → app/Services/ExpenseCategoryService.php
+  - GoalService → app/Services/GoalService.php
+  - NoteService → app/Services/NoteService.php
+
+Livewire Components:
+  - BookmarkIndex → app/Livewire/Admin/Personal/Bookmarks/BookmarkIndex.php
+  - ExpenseIndex → app/Livewire/Admin/Personal/ExpenseTracker/ExpenseIndex.php
+  - ExpenseForm → app/Livewire/Admin/Personal/ExpenseTracker/ExpenseForm.php
+  - ExpenseCategoryIndex → app/Livewire/Admin/Personal/ExpenseTracker/ExpenseCategoryIndex.php
+  - GoalIndex → app/Livewire/Admin/Personal/GoalsTracker/GoalIndex.php
+  - GoalForm → app/Livewire/Admin/Personal/GoalsTracker/GoalForm.php
+  - NotesScratchpadIndex → app/Livewire/Admin/Personal/NotesScratchpad/NotesScratchpadIndex.php
+  - NotesScratchpadForm → app/Livewire/Admin/Personal/NotesScratchpad/NotesScratchpadForm.php
+
+Database Tables:
+  - bookmark_categories — bookmark grouping with name, slug, is_default flag
+  - bookmarks — saved links with title, URL, description, FK to category
+  - expense_categories — expense grouping with name, color, icon, is_default flag
+  - expenses — daily expenses with amount, category, date, note
+  - monthly_budgets — monthly budget targets by year/month
+  - goals — personal goals with title, category, target date, progress percentage, status
+  - notes — quick notes with title, content, pin support
+
+Sidebar: Personal group with Bookmarks, Expense Tracker, Goals Tracker, Notes
 
 ---
 
