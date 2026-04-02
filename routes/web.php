@@ -18,7 +18,7 @@ Route::post('/chatbot/message', [ChatbotController::class, 'sendMessage'])
 
 // routes
 Route::prefix('admin')->group(function () {
-    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::get('/', fn () => redirect()->route('admin.home.daily-briefing'));
 
     Route::get('/login', Login::class)
         ->middleware('guest')

@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-04-02 (Personal module added)
+Last updated: 2026-04-03 (Home module added)
 
 ## Completed Modules
 
@@ -463,6 +463,29 @@ Database Tables:
   - notes — quick notes with title, content, pin support
 
 Sidebar: Personal group with Bookmarks, Expense Tracker, Goals Tracker, Notes
+
+---
+
+### Home (module group: home)
+Completed: 2026-04-03
+Features: 1 (Daily Briefing)
+Side: ADMIN
+
+Routes:
+  - GET /admin/home/daily-briefing → admin.home.daily-briefing
+
+Models: None (aggregation dashboard — reads from existing modules)
+
+Services:
+  - DailyBriefingService → app/Services/DailyBriefingService.php
+
+Livewire Components:
+  - DailyBriefingIndex → app/Livewire/Admin/Home/DailyBriefing/DailyBriefingIndex.php
+
+Database Tables: None (no new tables)
+
+Sidebar: Home group with Daily Briefing
+Landing page: /admin now redirects to Daily Briefing instead of Portfolio Dashboard
 
 ---
 
