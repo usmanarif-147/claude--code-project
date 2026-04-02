@@ -3,7 +3,7 @@
     <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
         <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-300 transition-colors">Dashboard</a>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        <a href="{{ route('admin.tasks.daily-planner.index') }}" wire:navigate class="hover:text-gray-300 transition-colors">Tasks</a>
+        <a href="{{ route('admin.tasks.planner.index') }}" wire:navigate class="hover:text-gray-300 transition-colors">Tasks</a>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         <span class="text-gray-300">Project Board</span>
     </div>
