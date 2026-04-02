@@ -132,27 +132,6 @@
     </div>
 
     {{-- 5. CALENDAR GRID --}}
-    @php
-        $startOfMonth = \Carbon\Carbon::create($year, $month, 1);
-        $endOfMonth = $startOfMonth->copy()->endOfMonth();
-        $startOfCalendar = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
-        $endOfCalendar = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
-        $today = now()->format('Y-m-d');
-        $dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-        // Group items by date
-        $itemsByDate = $items->groupBy(fn($item) => $item->planned_date->format('Y-m-d'));
-
-        // Convert gap weeks to a lookup of dates in gap weeks
-        $gapDates = [];
-        foreach ($gapWeeks as $weekStart) {
-            $ws = \Carbon\Carbon::parse($weekStart);
-            for ($d = 0; $d < 7; $d++) {
-                $gapDates[] = $ws->copy()->addDays($d)->format('Y-m-d');
-            }
-        }
-    @endphp
-
     <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden mb-6"
          x-data="{
              dragItemId: null,
@@ -189,8 +168,7 @@
 
         {{-- Calendar Day Cells --}}
         <div class="grid grid-cols-7">
-            @php $currentDay = $startOfCalendar->copy(); @endphp
-            @while($currentDay->lte($endOfCalendar))
+            @foreach($startOfCalendar->toPeriod($endOfCalendar, '1 day') as $currentDay)
                 @php
                     $dateStr = $currentDay->format('Y-m-d');
                     $isCurrentMonth = $currentDay->month === $month;
@@ -258,8 +236,7 @@
                         </div>
                     @endforeach
                 </div>
-                @php $currentDay->addDay(); @endphp
-            @endwhile
+            @endforeach
         </div>
 
         {{-- Empty State --}}

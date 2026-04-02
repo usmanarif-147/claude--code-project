@@ -129,6 +129,32 @@ class ContentCalendarIndex extends Component
 
     public function render()
     {
-        return view('livewire.admin.youtube.content-calendar.index');
+        $startOfMonth = \Carbon\Carbon::create($this->year, $this->month, 1);
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+        $startOfCalendar = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+        $endOfCalendar = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+        $today = now()->format('Y-m-d');
+        $dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        $itemsByDate = $this->items->groupBy(fn ($item) => $item->planned_date instanceof \Carbon\Carbon
+            ? $item->planned_date->format('Y-m-d')
+            : (string) $item->planned_date);
+
+        $gapDates = [];
+        foreach ($this->gapWeeks as $weekStart) {
+            $ws = \Carbon\Carbon::parse($weekStart);
+            for ($d = 0; $d < 7; $d++) {
+                $gapDates[] = $ws->copy()->addDays($d)->format('Y-m-d');
+            }
+        }
+
+        return view('livewire.admin.youtube.content-calendar.index', [
+            'startOfCalendar' => $startOfCalendar,
+            'endOfCalendar' => $endOfCalendar,
+            'today' => $today,
+            'dayNames' => $dayNames,
+            'itemsByDate' => $itemsByDate,
+            'gapDates' => $gapDates,
+        ]);
     }
 }
