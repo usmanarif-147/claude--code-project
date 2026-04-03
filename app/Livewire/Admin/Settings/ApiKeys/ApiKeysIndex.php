@@ -192,6 +192,18 @@ class ApiKeysIndex extends Component
                 'icon' => 'youtube',
                 'color' => 'red',
             ],
+            ApiKey::PROVIDER_GEMINI => [
+                'name' => 'Gemini',
+                'description' => 'Google AI for resume template generation & data parsing',
+                'icon' => 'gemini',
+                'color' => 'blue',
+            ],
+            ApiKey::PROVIDER_GROQ => [
+                'name' => 'Groq',
+                'description' => 'Fast AI inference for resume data parsing (backup)',
+                'icon' => 'groq',
+                'color' => 'orange',
+            ],
         ];
     }
 }
