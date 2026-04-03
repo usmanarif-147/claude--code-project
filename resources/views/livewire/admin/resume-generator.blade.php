@@ -652,10 +652,10 @@
                     </div>
                     <div class="p-6 space-y-5">
                         <div class="bg-dark-700/50 border border-dark-600 rounded-lg p-4">
-                            <p class="text-sm text-gray-300 mb-2">Upload a TXT or JSON file with your resume details. AI will parse and map the data to the correct sections.</p>
-                            <p class="text-xs text-gray-500 mb-3">You can upload multiple times — add as much or as little data as you want.</p>
+                            <p class="text-sm text-gray-300 mb-2">Upload a PDF, TXT, or JSON file with your resume details. AI will parse and show you a preview before importing.</p>
+                            <p class="text-xs text-gray-500 mb-3">Supports: PDF, TXT, JSON (max 5MB)</p>
                             <details class="text-xs text-gray-500">
-                                <summary class="cursor-pointer text-primary-light hover:text-white transition-colors">Example format</summary>
+                                <summary class="cursor-pointer text-primary-light hover:text-white transition-colors">Example TXT format</summary>
                                 <pre class="mt-2 bg-dark-800 rounded p-3 text-gray-400 overflow-x-auto">Name: John Doe
 Tagline: Full Stack Developer
 Location: New York, NY
@@ -679,7 +679,7 @@ Portfolio Website - React + Tailwind CSS</pre>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Resume File</label>
-                            <input type="file" wire:model="resumeFile" accept=".txt,.json"
+                            <input type="file" wire:model="resumeFile" accept=".txt,.json,.pdf"
                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/20 file:text-primary-light hover:file:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             @error('resumeFile') <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p> @enderror
                         </div>
@@ -688,11 +688,222 @@ Portfolio Website - React + Tailwind CSS</pre>
                         <button wire:click="closeModal" class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 text-sm font-medium rounded-lg px-5 py-2.5 transition-colors">Cancel</button>
                         <button wire:click="uploadResumeDetails" wire:loading.attr="disabled"
                                 class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-all shadow-lg shadow-primary/20 disabled:opacity-50">
-                            <span wire:loading.remove wire:target="uploadResumeDetails">Import Details</span>
+                            <span wire:loading.remove wire:target="uploadResumeDetails">Parse File</span>
                             <span wire:loading wire:target="uploadResumeDetails" class="flex items-center gap-2">
                                 <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                Importing...
+                                Parsing...
                             </span>
+                        </button>
+                    </div>
+                @endif
+
+                {{-- ── Preview Parsed Details Modal ── --}}
+                @if($activeModal === 'preview-details')
+                    <div class="px-6 py-4 border-b border-dark-700 flex items-center justify-between">
+                        <h2 class="text-base font-mono font-semibold text-white uppercase tracking-wider">Review Parsed Details</h2>
+                        <button wire:click="discardParsedData" class="p-1 text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                    </div>
+                    <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+                        <div class="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3">
+                            <p class="text-sm text-primary-light">Review the details below. You can edit any field before confirming. Only sections with data will be imported.</p>
+                        </div>
+
+                        {{-- Profile Section --}}
+                        @if(!empty($parsedResumeData['profile']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Profile</h3>
+                                </div>
+                                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    @foreach(['name' => 'Name', 'tagline' => 'Tagline', 'bio' => 'Bio', 'phone' => 'Phone', 'location' => 'Location', 'linkedin_url' => 'LinkedIn', 'github_url' => 'GitHub'] as $field => $label)
+                                        @if(isset($parsedResumeData['profile'][$field]))
+                                            <div class="{{ $field === 'bio' ? 'sm:col-span-2' : '' }}">
+                                                <label class="block text-xs font-medium text-gray-500 mb-1">{{ $label }}</label>
+                                                @if($field === 'bio')
+                                                    <textarea wire:model="parsedResumeData.profile.{{ $field }}" rows="3" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
+                                                @else
+                                                    <input type="text" wire:model="parsedResumeData.profile.{{ $field }}" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Skills Section --}}
+                        @if(!empty($parsedResumeData['skills']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Skills</h3>
+                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['skills']) }} found)</span>
+                                </div>
+                                <div class="p-4 space-y-2">
+                                    @foreach($parsedResumeData['skills'] as $idx => $skill)
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" wire:model="parsedResumeData.skills.{{ $idx }}.title" placeholder="Skill name" class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <input type="text" wire:model="parsedResumeData.skills.{{ $idx }}.category" placeholder="Category" class="w-32 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <button wire:click="$set('parsedResumeData.skills.{{ $idx }}', null)" class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">&times;</button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Technologies Section --}}
+                        @if(!empty($parsedResumeData['technologies']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Technologies</h3>
+                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['technologies']) }} found)</span>
+                                </div>
+                                <div class="p-4 space-y-2">
+                                    @foreach($parsedResumeData['technologies'] as $idx => $tech)
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" wire:model="parsedResumeData.technologies.{{ $idx }}.name" placeholder="Technology" class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <input type="text" wire:model="parsedResumeData.technologies.{{ $idx }}.category" placeholder="Category" class="w-36 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <button wire:click="$set('parsedResumeData.technologies.{{ $idx }}', null)" class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">&times;</button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Experiences Section --}}
+                        @if(!empty($parsedResumeData['experiences']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Work Experience</h3>
+                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['experiences']) }} found)</span>
+                                </div>
+                                <div class="p-4 space-y-4">
+                                    @foreach($parsedResumeData['experiences'] as $idx => $exp)
+                                        <div class="bg-dark-700/50 rounded-lg p-4 space-y-3">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Role</label>
+                                                    <input type="text" wire:model="parsedResumeData.experiences.{{ $idx }}.role" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Company</label>
+                                                    <input type="text" wire:model="parsedResumeData.experiences.{{ $idx }}.company" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Start Date</label>
+                                                    <input type="date" wire:model="parsedResumeData.experiences.{{ $idx }}.start_date" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">End Date</label>
+                                                    <input type="date" wire:model="parsedResumeData.experiences.{{ $idx }}.end_date" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                            </div>
+                                            @if(!empty($exp['description']))
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Description</label>
+                                                    <textarea wire:model="parsedResumeData.experiences.{{ $idx }}.description" rows="2" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
+                                                </div>
+                                            @endif
+                                            @if(!empty($exp['responsibilities']))
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Responsibilities</label>
+                                                    @foreach($exp['responsibilities'] as $rIdx => $resp)
+                                                        <input type="text" wire:model="parsedResumeData.experiences.{{ $idx }}.responsibilities.{{ $rIdx }}" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm mb-1.5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Education Section --}}
+                        @if(!empty($parsedResumeData['education']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Education</h3>
+                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['education']) }} found)</span>
+                                </div>
+                                <div class="p-4 space-y-4">
+                                    @foreach($parsedResumeData['education'] as $idx => $edu)
+                                        <div class="bg-dark-700/50 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Degree</label>
+                                                <input type="text" wire:model="parsedResumeData.education.{{ $idx }}.degree" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Field of Study</label>
+                                                <input type="text" wire:model="parsedResumeData.education.{{ $idx }}.field_of_study" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Institution</label>
+                                                <input type="text" wire:model="parsedResumeData.education.{{ $idx }}.institution" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Start</label>
+                                                    <input type="date" wire:model="parsedResumeData.education.{{ $idx }}.start_date" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">End</label>
+                                                    <input type="date" wire:model="parsedResumeData.education.{{ $idx }}.end_date" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Projects Section --}}
+                        @if(!empty($parsedResumeData['projects']))
+                            <div class="border border-dark-600 rounded-lg overflow-hidden">
+                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Projects</h3>
+                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['projects']) }} found)</span>
+                                </div>
+                                <div class="p-4 space-y-4">
+                                    @foreach($parsedResumeData['projects'] as $idx => $proj)
+                                        <div class="bg-dark-700/50 rounded-lg p-4 space-y-3">
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Title</label>
+                                                <input type="text" wire:model="parsedResumeData.projects.{{ $idx }}.title" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Description</label>
+                                                <textarea wire:model="parsedResumeData.projects.{{ $idx }}.description" rows="2" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
+                                            </div>
+                                            @if(!empty($proj['tech_stack']))
+                                                <div>
+                                                    <label class="block text-xs text-gray-500 mb-1">Tech Stack</label>
+                                                    <div class="flex flex-wrap gap-1.5">
+                                                        @foreach($proj['tech_stack'] as $tIdx => $t)
+                                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-primary/10 text-primary-light">{{ $t }}</span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="px-6 py-4 border-t border-dark-700 flex items-center justify-between">
+                        <button wire:click="discardParsedData" class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 text-sm font-medium rounded-lg px-5 py-2.5 transition-colors">
+                            Discard
+                        </button>
+                        <button wire:click="confirmImportDetails"
+                                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-all shadow-lg shadow-emerald-600/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span wire:loading.remove wire:target="confirmImportDetails">Confirm & Import</span>
+                            <span wire:loading wire:target="confirmImportDetails">Importing...</span>
                         </button>
                     </div>
                 @endif

@@ -369,6 +369,41 @@ class ResumeService
         }
     }
 
+    public function extractPdfText(string $filePath): string
+    {
+        $apiKey = $this->getGeminiApiKey();
+        $pdfBase64 = base64_encode(file_get_contents($filePath));
+
+        $response = Http::timeout(90)
+            ->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='.$apiKey->key_value, [
+                'contents' => [
+                    [
+                        'parts' => [
+                            [
+                                'inlineData' => [
+                                    'mimeType' => 'application/pdf',
+                                    'data' => $pdfBase64,
+                                ],
+                            ],
+                            [
+                                'text' => 'Extract ALL text content from this PDF document. Return the raw text only, preserving the structure and sections. No commentary.',
+                            ],
+                        ],
+                    ],
+                ],
+                'generationConfig' => [
+                    'maxOutputTokens' => 8000,
+                    'temperature' => 0.1,
+                ],
+            ]);
+
+        if ($response->failed()) {
+            throw new \RuntimeException('Failed to extract text from PDF. Please try a TXT file instead.');
+        }
+
+        return $response->json('candidates.0.content.parts.0.text') ?? '';
+    }
+
     public function parseResumeDetails(string $content, string $fileType): array
     {
         $prompt = $this->getDetailsParsingPrompt($content, $fileType);

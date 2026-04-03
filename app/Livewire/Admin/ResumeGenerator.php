@@ -106,6 +106,9 @@ class ResumeGenerator extends Component
 
     public string $processingMessage = '';
 
+    // Parsed resume data (preview before confirm)
+    public array $parsedResumeData = [];
+
     public function mount(ResumeService $service): void
     {
         $keys = $service->getAllTemplateKeys();
@@ -580,22 +583,24 @@ class ResumeGenerator extends Component
     public function uploadResumeDetails(ResumeService $service): void
     {
         $this->validate([
-            'resumeFile' => 'required|file|mimes:txt,json|max:2048',
+            'resumeFile' => 'required|file|mimes:txt,json,pdf|max:5120',
         ]);
 
         $this->isProcessing = true;
         $this->processingMessage = 'AI is parsing your resume details...';
 
         try {
-            $content = file_get_contents($this->resumeFile->getRealPath());
             $fileType = $this->resumeFile->getClientOriginalExtension();
 
-            $parsed = $service->parseResumeDetails($content, $fileType);
-            $summary = $service->importParsedData($parsed);
+            if ($fileType === 'pdf') {
+                $content = $service->extractPdfText($this->resumeFile->getRealPath());
+            } else {
+                $content = file_get_contents($this->resumeFile->getRealPath());
+            }
 
-            $this->refreshPreview($service);
-            session()->flash('success', 'Resume details imported: '.implode(', ', $summary));
-            $this->closeModal();
+            $parsed = $service->parseResumeDetails($content, $fileType);
+            $this->parsedResumeData = $parsed;
+            $this->activeModal = 'preview-details';
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
         } finally {
@@ -603,6 +608,33 @@ class ResumeGenerator extends Component
             $this->processingMessage = '';
             $this->resumeFile = null;
         }
+    }
+
+    public function confirmImportDetails(ResumeService $service): void
+    {
+        try {
+            // Filter out nulls from removed items
+            $data = $this->parsedResumeData;
+            foreach (['skills', 'technologies', 'experiences', 'education', 'projects'] as $key) {
+                if (isset($data[$key])) {
+                    $data[$key] = array_values(array_filter($data[$key]));
+                }
+            }
+
+            $summary = $service->importParsedData($data);
+            $this->parsedResumeData = [];
+            $this->refreshPreview($service);
+            session()->flash('success', 'Resume details imported: '.implode(', ', $summary));
+            $this->closeModal();
+        } catch (\Throwable $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
+    public function discardParsedData(): void
+    {
+        $this->parsedResumeData = [];
+        $this->activeModal = 'upload-details';
     }
 
     // ─── Delete Custom Template ──────────────────────────────────
