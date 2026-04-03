@@ -387,7 +387,8 @@ Sidebar: AI Assistant group with Private Chat, Chat Logs
 
 ### YouTube (module group: youtube)
 Completed: 2026-04-01
-Features: 3 (Content Calendar, Video Ideas Tracker, YouTube Stats)
+Last updated: 2026-04-03 (Subscriptions feature: channels, video feed, saved videos)
+Features: 6 (Content Calendar, Video Ideas Tracker, YouTube Stats, Subscriptions, Video Feed, Saved Videos)
 Side: ADMIN
 
 Routes:
@@ -398,6 +399,9 @@ Routes:
   - GET /admin/youtube/video-ideas/create → admin.youtube.video-ideas.create
   - GET /admin/youtube/video-ideas/{videoIdea}/edit → admin.youtube.video-ideas.edit
   - GET /admin/youtube/stats → admin.youtube.stats.index
+  - GET /admin/youtube/subscriptions → admin.youtube.subscriptions.index
+  - GET /admin/youtube/subscriptions/feed → admin.youtube.subscriptions.feed
+  - GET /admin/youtube/subscriptions/saved → admin.youtube.subscriptions.saved
 
 Models:
   - ContentCalendarItem → app/Models/ContentCalendarItem.php
@@ -405,11 +409,15 @@ Models:
   - YouTubeChannelStat → app/Models/YouTube/YouTubeChannelStat.php
   - YouTubeVideo → app/Models/YouTube/YouTubeVideo.php
   - YouTubeWeeklySnapshot → app/Models/YouTube/YouTubeWeeklySnapshot.php
+  - YouTubeSubscription → app/Models/YouTube/YouTubeSubscription.php
+  - YouTubeSubscriptionVideo → app/Models/YouTube/YouTubeSubscriptionVideo.php
+  - YouTubeSavedVideo → app/Models/YouTube/YouTubeSavedVideo.php
 
 Services:
   - ContentCalendarService → app/Services/ContentCalendarService.php
   - VideoIdeaService → app/Services/VideoIdeaService.php
   - YouTubeStatsService → app/Services/YouTubeStatsService.php
+  - YouTubeSubscriptionService → app/Services/YouTubeSubscriptionService.php
 
 Livewire Components:
   - ContentCalendarIndex → app/Livewire/Admin/Youtube/ContentCalendar/ContentCalendarIndex.php
@@ -417,6 +425,9 @@ Livewire Components:
   - VideoIdeaIndex → app/Livewire/Admin/Youtube/VideoIdeas/VideoIdeaIndex.php
   - VideoIdeaForm → app/Livewire/Admin/Youtube/VideoIdeas/VideoIdeaForm.php
   - YouTubeStatsIndex → app/Livewire/Admin/Youtube/Stats/YouTubeStatsIndex.php
+  - SubscriptionIndex → app/Livewire/Admin/Youtube/Subscriptions/SubscriptionIndex.php
+  - VideoFeedIndex → app/Livewire/Admin/Youtube/Subscriptions/VideoFeedIndex.php
+  - SavedVideoIndex → app/Livewire/Admin/Youtube/Subscriptions/SavedVideoIndex.php
 
 Database Tables:
   - content_calendar_items — scheduled content with title, type (video/blog), planned date, status
@@ -424,8 +435,11 @@ Database Tables:
   - youtube_channel_stats — cached YouTube channel statistics (subscribers, views, watch time)
   - youtube_videos — cached recent video data (views, likes, comments, duration)
   - youtube_weekly_snapshots — weekly stat snapshots for week-over-week comparison
+  - youtube_subscriptions — subscribed YouTube channels with cached metadata
+  - youtube_subscription_videos — cached videos from subscribed channels with is_new flag
+  - youtube_saved_videos — user's saved/favorite videos with personal notes
 
-Sidebar: YouTube group with Content Calendar, Video Ideas, YouTube Stats
+Sidebar: YouTube group with Content Calendar, Video Ideas, YouTube Stats, Subscriptions, Video Feed, Saved Videos
 
 ---
 
