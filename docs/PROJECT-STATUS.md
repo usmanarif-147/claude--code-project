@@ -6,7 +6,8 @@ Last updated: 2026-04-03 (Home module added)
 
 ### Portfolio (module group: portfolio)
 Completed: 2026-03-30
-Features: 7 (Skills, Technologies, Experiences, Projects, Testimonials, Blog, Analytics + Resume)
+Last updated: 2026-04-04 (Resume Generator → Resume Builder: click-to-edit modals, template carousel, AI template generation from screenshots, AI data import from TXT/JSON)
+Features: 7 (Skills, Technologies, Experiences, Projects, Testimonials, Blog, Analytics + Resume Builder)
 Side: BOTH
 
 Routes:

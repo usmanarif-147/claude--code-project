@@ -9,9 +9,7 @@ class ResumeController extends Controller
 {
     public function download(Request $request, ResumeService $service, string $template = 'modern')
     {
-        $validTemplates = array_keys($service->getAvailableTemplates());
-
-        if (! in_array($template, $validTemplates)) {
+        if (! $service->isValidTemplate($template)) {
             abort(404);
         }
 

@@ -35,9 +35,7 @@ class PortfolioController extends Controller
 
     public function downloadResume(ResumeService $service, Request $request, string $template = 'modern')
     {
-        $validTemplates = array_keys($service->getAvailableTemplates());
-
-        if (! in_array($template, $validTemplates)) {
+        if (! $service->isValidTemplate($template)) {
             abort(404);
         }
 
