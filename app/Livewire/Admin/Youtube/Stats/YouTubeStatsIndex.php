@@ -32,7 +32,7 @@ class YouTubeStatsIndex extends Component
             ->where('user_id', auth()->id())
             ->first();
 
-        if (! $apiKey || ! $apiKey->key_value) {
+        if (! $apiKey || ! $apiKey->extra_data) {
             $this->isConfigured = false;
 
             return;
@@ -40,7 +40,7 @@ class YouTubeStatsIndex extends Component
 
         $extra = $apiKey->extra_data;
 
-        if (empty($extra['channel_id'])) {
+        if (empty($extra['refresh_token'])) {
             $this->isConfigured = false;
 
             return;

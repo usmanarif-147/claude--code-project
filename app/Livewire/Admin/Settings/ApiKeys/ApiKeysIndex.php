@@ -24,7 +24,7 @@ class ApiKeysIndex extends Component
 
     public function saveKey(string $provider, ApiKeyService $service): void
     {
-        if ($provider === ApiKey::PROVIDER_GMAIL) {
+        if (in_array($provider, [ApiKey::PROVIDER_GMAIL, ApiKey::PROVIDER_YOUTUBE])) {
             $this->validate([
                 "formData.{$provider}.client_id" => 'required|string|max:500',
                 "formData.{$provider}.client_secret" => 'required|string|max:500',
@@ -32,7 +32,7 @@ class ApiKeysIndex extends Component
             ]);
 
             $data = [
-                'key_value' => 'gmail-oauth',
+                'key_value' => $provider.'-oauth',
                 'extra_data' => [
                     'client_id' => $this->formData[$provider]['client_id'],
                     'client_secret' => $this->formData[$provider]['client_secret'],
@@ -114,7 +114,7 @@ class ApiKeysIndex extends Component
                 $data = $apiKey->toArray() + ['exists' => true];
 
                 // Add masked preview (key_value is hidden from toArray for security)
-                if ($apiKey->provider !== ApiKey::PROVIDER_GMAIL && $apiKey->key_value) {
+                if (! in_array($apiKey->provider, [ApiKey::PROVIDER_GMAIL, ApiKey::PROVIDER_YOUTUBE]) && $apiKey->key_value) {
                     $data['key_preview'] = str_repeat('*', 12).substr($apiKey->key_value, -6);
                 }
 
@@ -134,7 +134,7 @@ class ApiKeysIndex extends Component
 
     private function initFormDataForProvider(string $provider): void
     {
-        if ($provider === ApiKey::PROVIDER_GMAIL) {
+        if (in_array($provider, [ApiKey::PROVIDER_GMAIL, ApiKey::PROVIDER_YOUTUBE])) {
             $this->formData[$provider] = [
                 'client_id' => '',
                 'client_secret' => '',

@@ -60,6 +60,19 @@ class SubscriptionIndex extends Component
         }
     }
 
+    public function importSubscriptions(): void
+    {
+        $service = app(YouTubeSubscriptionService::class);
+
+        try {
+            $result = $service->importMySubscriptions(auth()->id());
+            $this->loadSubscriptions($service);
+            session()->flash('success', "Imported {$result['imported']} channels, skipped {$result['skipped']} already subscribed.");
+        } catch (\RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
     public function refreshAll(): void
     {
         $service = app(YouTubeSubscriptionService::class);

@@ -27,12 +27,12 @@ class YouTubeSubscriptionService
 
     public function subscribe(int $userId, string $channelIdentifier): YouTubeSubscription
     {
-        $apiKey = $this->getApiKey($userId);
-        if (! $apiKey) {
-            throw new \RuntimeException('YouTube API key not configured.');
+        $accessToken = $this->getAccessToken($userId);
+        if (! $accessToken) {
+            throw new \RuntimeException('YouTube OAuth not configured. Go to Settings > API Keys to set up YouTube OAuth credentials.');
         }
 
-        $channelId = $this->resolveChannelId($apiKey, $channelIdentifier);
+        $channelId = $this->resolveChannelId($accessToken, $channelIdentifier);
         if (! $channelId) {
             throw new \RuntimeException('Could not find YouTube channel.');
         }
@@ -45,7 +45,7 @@ class YouTubeSubscriptionService
             throw new \RuntimeException('Already subscribed to this channel.');
         }
 
-        $channelInfo = $this->fetchChannelInfo($apiKey, $channelId);
+        $channelInfo = $this->fetchChannelInfo($accessToken, $channelId);
         if (empty($channelInfo)) {
             throw new \RuntimeException('Could not fetch channel data.');
         }
@@ -76,12 +76,12 @@ class YouTubeSubscriptionService
             ->where('user_id', $userId)
             ->firstOrFail();
 
-        $apiKey = $this->getApiKey($userId);
-        if (! $apiKey) {
-            throw new \RuntimeException('YouTube API key not configured.');
+        $accessToken = $this->getAccessToken($userId);
+        if (! $accessToken) {
+            throw new \RuntimeException('YouTube OAuth not configured. Go to Settings > API Keys to set up YouTube OAuth credentials.');
         }
 
-        $channelInfo = $this->fetchChannelInfo($apiKey, $subscription->channel_id);
+        $channelInfo = $this->fetchChannelInfo($accessToken, $subscription->channel_id);
         if (! empty($channelInfo)) {
             $subscription->update([
                 'channel_title' => $channelInfo['title'],
@@ -98,13 +98,13 @@ class YouTubeSubscriptionService
 
     public function syncVideosForSubscription(int $userId, YouTubeSubscription $subscription, int $maxResults = 10): int
     {
-        $apiKey = $this->getApiKey($userId);
-        if (! $apiKey) {
+        $accessToken = $this->getAccessToken($userId);
+        if (! $accessToken) {
             return 0;
         }
 
         try {
-            $videosData = $this->fetchChannelVideos($apiKey, $subscription->channel_id, $maxResults);
+            $videosData = $this->fetchChannelVideos($accessToken, $subscription->channel_id, $maxResults);
         } catch (\Throwable $e) {
             Log::error('YouTube video sync failed', [
                 'user_id' => $userId,
@@ -388,18 +388,108 @@ class YouTubeSubscriptionService
         }
     }
 
+    // --- Import My Subscriptions ---
+
+    public function importMySubscriptions(int $userId): array
+    {
+        $accessToken = $this->getAccessToken($userId);
+        if (! $accessToken) {
+            throw new \RuntimeException('YouTube OAuth not configured. Go to Settings > API Keys to set up YouTube OAuth credentials.');
+        }
+
+        $imported = 0;
+        $skipped = 0;
+        $pageToken = null;
+
+        do {
+            $params = [
+                'part' => 'snippet',
+                'mine' => 'true',
+                'maxResults' => 50,
+            ];
+
+            if ($pageToken) {
+                $params['pageToken'] = $pageToken;
+            }
+
+            $response = Http::timeout(15)
+                ->withToken($accessToken)
+                ->get('https://www.googleapis.com/youtube/v3/subscriptions', $params);
+
+            if (! $response->successful()) {
+                throw new \RuntimeException('YouTube API error: '.$response->status());
+            }
+
+            $items = $response->json('items', []);
+
+            foreach ($items as $item) {
+                $snippet = $item['snippet'] ?? [];
+                $resourceId = $snippet['resourceId'] ?? [];
+                $channelId = $resourceId['channelId'] ?? null;
+
+                if (! $channelId) {
+                    continue;
+                }
+
+                $existing = YouTubeSubscription::forUser($userId)
+                    ->where('channel_id', $channelId)
+                    ->first();
+
+                if ($existing) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                YouTubeSubscription::create([
+                    'user_id' => $userId,
+                    'channel_id' => $channelId,
+                    'channel_title' => $snippet['title'] ?? 'Unknown',
+                    'channel_thumbnail_url' => $snippet['thumbnails']['default']['url'] ?? null,
+                    'channel_description' => $snippet['description'] ?? null,
+                    'subscriber_count' => 0,
+                    'video_count' => 0,
+                    'subscribed_at' => now(),
+                ]);
+
+                $imported++;
+            }
+
+            $pageToken = $response->json('nextPageToken');
+        } while ($pageToken);
+
+        return ['imported' => $imported, 'skipped' => $skipped];
+    }
+
     // --- Private API Helpers ---
 
-    private function getApiKey(int $userId): ?string
+    private function getAccessToken(int $userId): ?string
     {
         $apiKey = ApiKey::forUser($userId)
             ->forProvider(ApiKey::PROVIDER_YOUTUBE)
             ->first();
 
-        return $apiKey?->key_value;
+        if (! $apiKey || ! $apiKey->extra_data) {
+            return null;
+        }
+
+        $extra = $apiKey->extra_data;
+
+        $response = Http::timeout(10)->asForm()->post('https://oauth2.googleapis.com/token', [
+            'client_id' => $extra['client_id'] ?? '',
+            'client_secret' => $extra['client_secret'] ?? '',
+            'refresh_token' => $extra['refresh_token'] ?? '',
+            'grant_type' => 'refresh_token',
+        ]);
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        return $response->json('access_token');
     }
 
-    private function resolveChannelId(string $apiKey, string $identifier): ?string
+    private function resolveChannelId(string $accessToken, string $identifier): ?string
     {
         $identifier = trim($identifier);
 
@@ -410,34 +500,29 @@ class YouTubeSubscriptionService
 
         // Extract from URL patterns
         if (str_contains($identifier, 'youtube.com')) {
-            // Handle /channel/UC... URLs
             if (preg_match('/\/channel\/(UC[\w-]{22})/', $identifier, $matches)) {
                 return $matches[1];
             }
 
-            // Handle /@handle URLs
             if (preg_match('/\/@([\w.-]+)/', $identifier, $matches)) {
                 $identifier = '@'.$matches[1];
             }
 
-            // Handle /c/customname or /user/username URLs
             if (preg_match('/\/(c|user)\/([\w.-]+)/', $identifier, $matches)) {
                 $identifier = $matches[2];
             }
         }
 
-        // Prepend @ if not present (assume handle)
         if (! str_starts_with($identifier, '@')) {
             $identifier = '@'.$identifier;
         }
 
-        // Try to resolve handle via search
         try {
             $response = Http::timeout(10)
+                ->withToken($accessToken)
                 ->get('https://www.googleapis.com/youtube/v3/channels', [
                     'part' => 'id',
                     'forHandle' => $identifier,
-                    'key' => $apiKey,
                 ]);
 
             if ($response->successful()) {
@@ -450,15 +535,14 @@ class YouTubeSubscriptionService
             Log::error('YouTube channel resolve failed', ['identifier' => $identifier, 'error' => $e->getMessage()]);
         }
 
-        // Fallback: try search endpoint
         try {
             $response = Http::timeout(10)
+                ->withToken($accessToken)
                 ->get('https://www.googleapis.com/youtube/v3/search', [
                     'part' => 'id',
                     'type' => 'channel',
                     'q' => $identifier,
                     'maxResults' => 1,
-                    'key' => $apiKey,
                 ]);
 
             if ($response->successful()) {
@@ -474,13 +558,13 @@ class YouTubeSubscriptionService
         return null;
     }
 
-    private function fetchChannelInfo(string $apiKey, string $channelId): array
+    private function fetchChannelInfo(string $accessToken, string $channelId): array
     {
         $response = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/channels', [
                 'part' => 'snippet,statistics',
                 'id' => $channelId,
-                'key' => $apiKey,
             ]);
 
         if (! $response->successful()) {
@@ -506,17 +590,16 @@ class YouTubeSubscriptionService
         ];
     }
 
-    private function fetchChannelVideos(string $apiKey, string $channelId, int $maxResults = 10): array
+    private function fetchChannelVideos(string $accessToken, string $channelId, int $maxResults = 10): array
     {
-        // Step 1: Get video IDs via search
         $searchResponse = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/search', [
                 'part' => 'id',
                 'channelId' => $channelId,
                 'type' => 'video',
                 'order' => 'date',
                 'maxResults' => $maxResults,
-                'key' => $apiKey,
             ]);
 
         if (! $searchResponse->successful()) {
@@ -532,12 +615,11 @@ class YouTubeSubscriptionService
             return [];
         }
 
-        // Step 2: Get video details
         $videosResponse = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/videos', [
                 'part' => 'snippet,statistics,contentDetails',
                 'id' => $videoIds,
-                'key' => $apiKey,
             ]);
 
         if (! $videosResponse->successful()) {

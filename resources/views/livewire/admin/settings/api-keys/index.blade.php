@@ -114,11 +114,11 @@
                                     Never tested
                                 @endif
                             </p>
-                            @if ($providerKey !== 'gmail' && $keyPreview)
+                            @if (! in_array($providerKey, ['gmail', 'youtube']) && $keyPreview)
                                 <p class="text-xs text-gray-400 font-mono">
                                     {{ $keyPreview }}
                                 </p>
-                            @elseif ($providerKey === 'gmail')
+                            @elseif (in_array($providerKey, ['gmail', 'youtube']))
                                 <p class="text-xs text-gray-400 font-mono">OAuth2 credentials configured</p>
                             @endif
                         </div>
@@ -173,14 +173,14 @@
                     class="border-t border-dark-700 pt-4"
                 >
                     <div class="space-y-3">
-                        @if ($providerKey === 'gmail')
-                            {{-- Gmail: 3 fields --}}
+                        @if (in_array($providerKey, ['gmail', 'youtube']))
+                            {{-- OAuth: 3 fields --}}
                             <div>
                                 <label class="text-sm font-medium text-gray-300 mb-1 block">Client ID</label>
                                 <input
                                     type="text"
                                     wire:model="formData.{{ $providerKey }}.client_id"
-                                    placeholder="Enter Gmail Client ID"
+                                    placeholder="Enter {{ ucfirst($providerKey) }} Client ID"
                                     class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                                 >
                                 @error("formData.{$providerKey}.client_id") <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
@@ -190,7 +190,7 @@
                                 <input
                                     type="password"
                                     wire:model="formData.{{ $providerKey }}.client_secret"
-                                    placeholder="Enter Gmail Client Secret"
+                                    placeholder="Enter {{ ucfirst($providerKey) }} Client Secret"
                                     class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                                 >
                                 @error("formData.{$providerKey}.client_secret") <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
@@ -200,7 +200,7 @@
                                 <input
                                     type="password"
                                     wire:model="formData.{{ $providerKey }}.refresh_token"
-                                    placeholder="Enter Gmail Refresh Token"
+                                    placeholder="Enter {{ ucfirst($providerKey) }} Refresh Token"
                                     class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                                 >
                                 @error("formData.{$providerKey}.refresh_token") <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror

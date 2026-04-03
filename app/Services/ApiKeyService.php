@@ -136,11 +136,26 @@ class ApiKeyService
 
     private function testYoutube(ApiKey $apiKey): bool
     {
+        $extra = $apiKey->extra_data;
+
+        $tokenResponse = Http::timeout(5)->asForm()->post('https://oauth2.googleapis.com/token', [
+            'client_id' => $extra['client_id'] ?? '',
+            'client_secret' => $extra['client_secret'] ?? '',
+            'refresh_token' => $extra['refresh_token'] ?? '',
+            'grant_type' => 'refresh_token',
+        ]);
+
+        if (! $tokenResponse->successful()) {
+            return false;
+        }
+
+        $accessToken = $tokenResponse->json('access_token');
+
         $response = Http::timeout(5)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/channels', [
                 'part' => 'id',
                 'mine' => 'true',
-                'key' => $apiKey->key_value,
             ]);
 
         return $response->successful();

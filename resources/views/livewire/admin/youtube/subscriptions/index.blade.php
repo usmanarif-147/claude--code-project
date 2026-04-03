@@ -19,15 +19,26 @@
             </div>
             <p class="text-sm text-gray-500 mt-1">Manage your YouTube channel subscriptions.</p>
         </div>
-        <button wire:click="refreshAll"
-                wire:loading.attr="disabled"
-                wire:target="refreshAll"
-                class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200 shadow-lg shadow-primary/20 disabled:opacity-50">
-            <svg wire:loading.remove wire:target="refreshAll" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <svg wire:loading wire:target="refreshAll" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-            <span wire:loading.remove wire:target="refreshAll">Sync All</span>
-            <span wire:loading wire:target="refreshAll">Syncing...</span>
-        </button>
+        <div class="flex items-center gap-2">
+            <button wire:click="importSubscriptions"
+                    wire:loading.attr="disabled"
+                    wire:target="importSubscriptions"
+                    class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors disabled:opacity-50">
+                <svg wire:loading.remove wire:target="importSubscriptions" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <svg wire:loading wire:target="importSubscriptions" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                <span wire:loading.remove wire:target="importSubscriptions">Import My Subscriptions</span>
+                <span wire:loading wire:target="importSubscriptions">Importing...</span>
+            </button>
+            <button wire:click="refreshAll"
+                    wire:loading.attr="disabled"
+                    wire:target="refreshAll"
+                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200 shadow-lg shadow-primary/20 disabled:opacity-50">
+                <svg wire:loading.remove wire:target="refreshAll" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <svg wire:loading wire:target="refreshAll" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                <span wire:loading.remove wire:target="refreshAll">Sync All</span>
+                <span wire:loading wire:target="refreshAll">Syncing...</span>
+            </button>
+        </div>
     </div>
 
     {{-- Flash Messages --}}
@@ -120,7 +131,14 @@
                             </h3>
                             <p class="text-xs text-gray-400 mt-0.5">
                                 @if($subscription->subscriber_count)
-                                    {{ Number::abbreviate($subscription->subscriber_count) }} subscribers
+                                    @if($subscription->subscriber_count >= 1000000)
+                                        {{ round($subscription->subscriber_count / 1000000, 1) }}M
+                                    @elseif($subscription->subscriber_count >= 1000)
+                                        {{ round($subscription->subscriber_count / 1000, 1) }}K
+                                    @else
+                                        {{ $subscription->subscriber_count }}
+                                    @endif
+                                    subscribers
                                 @else
                                     No subscriber data
                                 @endif

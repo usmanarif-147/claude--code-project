@@ -62,23 +62,21 @@ class YouTubeStatsService
 
     public function refreshFromApi(int $userId): bool
     {
-        $apiKey = ApiKey::forUser($userId)
-            ->forProvider(ApiKey::PROVIDER_YOUTUBE)
-            ->first();
+        $accessToken = $this->getAccessToken($userId);
 
-        if (! $apiKey || ! $apiKey->key_value) {
+        if (! $accessToken) {
             return false;
         }
 
-        $extra = $apiKey->extra_data;
-        $channelId = $extra['channel_id'] ?? null;
+        // Get channel ID from "mine" endpoint
+        $channelId = $this->getMyChannelId($accessToken);
 
         if (! $channelId) {
             return false;
         }
 
         try {
-            $channelData = $this->fetchChannelData($apiKey->key_value, $channelId);
+            $channelData = $this->fetchChannelData($accessToken, $channelId);
 
             if (empty($channelData)) {
                 return false;
@@ -98,7 +96,7 @@ class YouTubeStatsService
                 ],
             );
 
-            $videosData = $this->fetchRecentVideos($apiKey->key_value, $channelId);
+            $videosData = $this->fetchRecentVideos($accessToken, $channelId);
             $this->syncVideos($userId, $videosData);
 
             $this->saveWeeklySnapshot($userId);
@@ -155,13 +153,13 @@ class YouTubeStatsService
         return $stat->fetched_at->diffInMinutes(now()) >= self::REFRESH_COOLDOWN_MINUTES;
     }
 
-    public function fetchChannelData(string $apiKey, string $channelId): array
+    public function fetchChannelData(string $accessToken, string $channelId): array
     {
         $response = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/channels', [
                 'part' => 'snippet,statistics',
                 'id' => $channelId,
-                'key' => $apiKey,
             ]);
 
         if (! $response->successful()) {
@@ -188,16 +186,16 @@ class YouTubeStatsService
         ];
     }
 
-    public function fetchRecentVideos(string $apiKey, string $channelId, int $maxResults = 10): array
+    public function fetchRecentVideos(string $accessToken, string $channelId, int $maxResults = 10): array
     {
         $searchResponse = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/search', [
                 'part' => 'id',
                 'channelId' => $channelId,
                 'type' => 'video',
                 'order' => 'date',
                 'maxResults' => $maxResults,
-                'key' => $apiKey,
             ]);
 
         if (! $searchResponse->successful()) {
@@ -214,10 +212,10 @@ class YouTubeStatsService
         }
 
         $videosResponse = Http::timeout(10)
+            ->withToken($accessToken)
             ->get('https://www.googleapis.com/youtube/v3/videos', [
                 'part' => 'snippet,statistics,contentDetails',
                 'id' => $videoIds,
-                'key' => $apiKey,
             ]);
 
         if (! $videosResponse->successful()) {
@@ -261,6 +259,50 @@ class YouTubeStatsService
                 'estimated_watch_hours' => $stat->estimated_watch_hours,
             ],
         );
+    }
+
+    private function getAccessToken(int $userId): ?string
+    {
+        $apiKey = ApiKey::forUser($userId)
+            ->forProvider(ApiKey::PROVIDER_YOUTUBE)
+            ->first();
+
+        if (! $apiKey || ! $apiKey->extra_data) {
+            return null;
+        }
+
+        $extra = $apiKey->extra_data;
+
+        $response = Http::timeout(10)->asForm()->post('https://oauth2.googleapis.com/token', [
+            'client_id' => $extra['client_id'] ?? '',
+            'client_secret' => $extra['client_secret'] ?? '',
+            'refresh_token' => $extra['refresh_token'] ?? '',
+            'grant_type' => 'refresh_token',
+        ]);
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        return $response->json('access_token');
+    }
+
+    private function getMyChannelId(string $accessToken): ?string
+    {
+        $response = Http::timeout(10)
+            ->withToken($accessToken)
+            ->get('https://www.googleapis.com/youtube/v3/channels', [
+                'part' => 'id',
+                'mine' => 'true',
+            ]);
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $items = $response->json('items', []);
+
+        return $items[0]['id'] ?? null;
     }
 
     private function syncVideos(int $userId, array $videosData): void
