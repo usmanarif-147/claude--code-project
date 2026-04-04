@@ -82,9 +82,63 @@
                 </button>
 
                 @if ($selectedBoardId)
-                    <button wire:click="deleteBoard({{ $selectedBoardId }})"
-                            wire:confirm="Are you sure you want to delete this board? All columns and tasks will be permanently removed."
-                            class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium rounded-lg px-4 py-2.5 text-sm transition-colors">
+                    {{-- Export Dropdown --}}
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open"
+                                class="bg-dark-700 hover:bg-dark-600 text-gray-300 font-medium rounded-lg px-4 py-2.5 text-sm transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Export
+                            <svg class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                             class="absolute right-0 mt-2 w-48 bg-dark-800 border border-dark-700 rounded-lg shadow-xl z-20 py-1">
+                            <a href="{{ route('admin.tasks.project-board.export', ['format' => 'pdf', 'boardId' => $selectedBoardId]) }}"
+                               target="_blank"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                Export as PDF
+                            </a>
+                            <a href="{{ route('admin.tasks.project-board.export', ['format' => 'csv', 'boardId' => $selectedBoardId]) }}"
+                               target="_blank"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Export as CSV
+                            </a>
+                            <a href="{{ route('admin.tasks.project-board.export', ['format' => 'md', 'boardId' => $selectedBoardId]) }}"
+                               target="_blank"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-700 hover:text-white transition-colors">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Export as Markdown
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Delete Board --}}
+                    <button @click="
+                        Swal.fire({
+                            title: 'Delete Board?',
+                            text: 'All columns and tasks will be permanently removed.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#374151',
+                            confirmButtonText: 'Yes, delete it',
+                            background: '#111118',
+                            color: '#e5e7eb',
+                        }).then((result) => {
+                            if (result.isConfirmed) $wire.deleteBoard({{ $selectedBoardId }})
+                        })
+                    " class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium rounded-lg px-4 py-2.5 text-sm transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
@@ -96,23 +150,77 @@
 
     {{-- Kanban Board --}}
     @if ($selectedBoard)
-        <div class="flex gap-5 overflow-x-auto pb-4" style="height: calc(100vh - 280px);">
+        <div class="flex gap-5 overflow-x-auto pb-4" data-sortable-columns style="height: calc(100vh - 280px);">
             @foreach ($selectedBoard->columns as $column)
-                <div class="w-80 shrink-0 bg-dark-800 border border-dark-700 rounded-xl flex flex-col max-h-full">
+                <div class="w-80 shrink-0 bg-dark-800 border border-dark-700 rounded-xl flex flex-col max-h-full"
+                     data-column-id="{{ $column->id }}">
                     {{-- Column Header --}}
-                    <div class="px-4 py-3 border-b border-dark-700 shrink-0 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $column->color ?? '#7c3aed' }}"></span>
-                            <h3 class="font-mono font-semibold text-white uppercase tracking-wider text-sm">{{ $column->name }}</h3>
-                            <span class="bg-dark-700 text-gray-400 text-xs px-2 py-0.5 rounded-full">{{ $column->tasks->count() }}</span>
-                        </div>
-                        <button wire:click="deleteColumn({{ $column->id }})"
-                                wire:confirm="Delete this column? It must be empty first."
-                                class="text-gray-600 hover:text-red-400 transition-colors p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
+                    <div class="px-4 py-3 border-b border-dark-700 shrink-0">
+                        @if ($editingColumnId === $column->id)
+                            {{-- Edit Mode --}}
+                            <div class="flex items-center gap-2" @click.stop>
+                                <input type="color" wire:model="editColumnColor"
+                                       class="w-6 h-6 rounded border border-dark-600 bg-dark-700 cursor-pointer shrink-0">
+                                <input type="text" wire:model="editColumnName"
+                                       class="flex-1 bg-dark-700 border border-dark-600 rounded px-2 py-1 text-white text-sm focus:ring-1 focus:ring-primary"
+                                       @keydown.enter="$wire.saveColumn()"
+                                       @keydown.escape="$wire.cancelEditColumn()">
+                                <button wire:click="saveColumn"
+                                        class="text-emerald-400 hover:text-emerald-300 p-1" title="Save">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </button>
+                                <button wire:click="cancelEditColumn"
+                                        class="text-gray-500 hover:text-gray-300 p-1" title="Cancel">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        @else
+                            {{-- Display Mode --}}
+                            <div class="flex items-center justify-between column-drag-handle cursor-grab">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm8-16a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
+                                    </svg>
+                                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $column->color ?? '#7c3aed' }}"></span>
+                                    <h3 class="font-mono font-semibold text-white uppercase tracking-wider text-sm"
+                                        @dblclick="$wire.startEditColumn({{ $column->id }})">
+                                        {{ $column->name }}
+                                    </h3>
+                                    <span class="bg-dark-700 text-gray-400 text-xs px-2 py-0.5 rounded-full">{{ $column->tasks->count() }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button wire:click="startEditColumn({{ $column->id }})"
+                                            class="text-gray-600 hover:text-primary-light transition-colors p-1" title="Edit column">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                                    <button @click="
+                                        Swal.fire({
+                                            title: 'Delete Column?',
+                                            text: 'Column must be empty before it can be deleted.',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#ef4444',
+                                            cancelButtonColor: '#374151',
+                                            confirmButtonText: 'Delete',
+                                            background: '#111118',
+                                            color: '#e5e7eb',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) $wire.deleteColumn({{ $column->id }})
+                                        })
+                                    " class="text-gray-600 hover:text-red-400 transition-colors p-1" title="Delete column">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Task List --}}
@@ -174,41 +282,23 @@
                                     </div>
                                 @endif
 
-                                {{-- Cross-Board Move Buttons --}}
-                                @if ($boards->count() > 1)
-                                    @php
-                                        $boardIds = $boards->pluck('id')->values()->toArray();
-                                        $currentIndex = array_search($selectedBoard->id, $boardIds);
-                                        $prevBoardId = $currentIndex > 0 ? $boardIds[$currentIndex - 1] : null;
-                                        $nextBoardId = $currentIndex < count($boardIds) - 1 ? $boardIds[$currentIndex + 1] : null;
-                                    @endphp
-                                    <div class="flex items-center gap-1 mt-2 pt-2 border-t border-dark-600">
-                                        @if ($prevBoardId)
-                                            <button wire:click="moveTaskToBoard({{ $task->id }}, {{ $prevBoardId }})"
-                                                    title="Move to {{ $boards->firstWhere('id', $prevBoardId)->name }}"
-                                                    class="text-gray-600 hover:text-primary-light transition-colors p-1 rounded hover:bg-dark-600">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                                </svg>
-                                            </button>
-                                        @endif
-                                        @if ($nextBoardId)
-                                            <button wire:click="moveTaskToBoard({{ $task->id }}, {{ $nextBoardId }})"
-                                                    title="Move to {{ $boards->firstWhere('id', $nextBoardId)->name }}"
-                                                    class="text-gray-600 hover:text-primary-light transition-colors p-1 rounded hover:bg-dark-600">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </button>
-                                        @endif
-                                    </div>
-                                @endif
-
                                 {{-- Delete Task --}}
                                 <div class="flex justify-end mt-1">
-                                    <button wire:click="deleteTask({{ $task->id }})"
-                                            wire:confirm="Delete this task?"
-                                            class="text-gray-600 hover:text-red-400 transition-colors p-1">
+                                    <button @click="
+                                        Swal.fire({
+                                            title: 'Delete Task?',
+                                            text: 'This task will be permanently removed.',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#ef4444',
+                                            cancelButtonColor: '#374151',
+                                            confirmButtonText: 'Delete',
+                                            background: '#111118',
+                                            color: '#e5e7eb',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) $wire.deleteTask({{ $task->id }})
+                                        })
+                                    " class="text-gray-600 hover:text-red-400 transition-colors p-1">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
@@ -533,18 +623,13 @@
     @endif
 </div>
 
-@push('scripts')
+@assets
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+@endassets
+
+@script
 <script>
-    document.addEventListener('livewire:navigated', () => {
-        initSortable();
-    });
-
-    document.addEventListener('livewire:morph', () => {
-        setTimeout(() => initSortable(), 100);
-    });
-
-    function initSortable() {
+    function initTaskSortable() {
         document.querySelectorAll('[data-sortable-column]').forEach(el => {
             if (el._sortable) el._sortable.destroy();
             el._sortable = new Sortable(el, {
@@ -553,15 +638,62 @@
                 ghostClass: 'opacity-30',
                 dragClass: 'rotate-2',
                 handle: '[data-task-card]',
-                onEnd: function (evt) {
+                onEnd: async function (evt) {
                     const taskId = parseInt(evt.item.dataset.taskId);
                     const targetColumnId = parseInt(evt.to.dataset.sortableColumn);
                     const newPosition = evt.newIndex;
-                    Livewire.find(evt.item.closest('[wire\\:id]').getAttribute('wire:id'))
-                        .call('moveTask', taskId, targetColumnId, newPosition);
+
+                    const result = await $wire.moveTask(taskId, targetColumnId, newPosition);
+
+                    if (result && !result.success) {
+                        // Revert: move DOM element back to original column
+                        if (evt.from !== evt.to) {
+                            evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex] || null);
+                        }
+
+                        Swal.fire({
+                            title: 'Move Not Allowed',
+                            text: result.error,
+                            icon: 'warning',
+                            confirmButtonColor: '#7c3aed',
+                            background: '#111118',
+                            color: '#e5e7eb',
+                        });
+                    }
                 }
             });
         });
     }
+
+    function initColumnSortable() {
+        const container = document.querySelector('[data-sortable-columns]');
+        if (!container) return;
+        if (container._sortable) container._sortable.destroy();
+
+        container._sortable = new Sortable(container, {
+            animation: 150,
+            ghostClass: 'opacity-30',
+            handle: '.column-drag-handle',
+            draggable: '[data-column-id]',
+            onEnd: function (evt) {
+                const orderedIds = Array.from(
+                    container.querySelectorAll('[data-column-id]')
+                ).map(el => parseInt(el.dataset.columnId));
+                $wire.reorderColumns(orderedIds);
+            }
+        });
+    }
+
+    function initAll() {
+        initTaskSortable();
+        initColumnSortable();
+    }
+
+    // Initialize on first load and after Livewire morphs
+    initAll();
+
+    Livewire.hook('morph.updated', () => {
+        setTimeout(initAll, 100);
+    });
 </script>
-@endpush
+@endscript

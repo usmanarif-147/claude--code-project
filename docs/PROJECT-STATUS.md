@@ -123,8 +123,8 @@ Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters
 
 ### Tasks (module group: tasks)
 Completed: 2026-04-01
-Last updated: 2026-04-03 (Project Board, TXT Import, PDF Download, AI Categorization, Calendar Fix)
-Features: 12 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization, Project Board, TXT Import, PDF Download, AI Category Identification, Calendar Day Modal)
+Last updated: 2026-04-04 (Project Board: SweetAlert confirmations, column drag-drop reorder, column edit name/color, adjacent-column task restriction, board export PDF/CSV/MD, removed cross-board movement)
+Features: 13 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization, Project Board, TXT Import, PDF Download, AI Category Identification, Calendar Day Modal, Board Export)
 Side: ADMIN
 
 Routes:
@@ -139,6 +139,7 @@ Routes:
   - GET /admin/tasks/weekly-review → admin.tasks.weekly-review.index
   - GET /admin/tasks/ai-prioritization → admin.tasks.ai-prioritization.index
   - GET /admin/tasks/project-board → admin.tasks.project-board.index
+  - GET /admin/tasks/project-board/export/{format}/{boardId} → admin.tasks.project-board.export
   - GET /admin/tasks/pdf/download → admin.tasks.pdf.download
 
 Models:
@@ -159,13 +160,15 @@ Services:
   - CalendarService → app/Services/CalendarService.php (updated: dual-query personal + project tasks, day modal support)
   - AiTaskPrioritizationService → app/Services/AiTaskPrioritizationService.php
   - ProjectBoardService → app/Services/ProjectBoardService.php
-  - ProjectTaskService → app/Services/ProjectTaskService.php
+  - ProjectTaskService → app/Services/ProjectTaskService.php (updated: removed moveToBoard)
+  - ProjectBoardExportService → app/Services/ProjectBoardExportService.php
   - TaskImportService → app/Services/TaskImportService.php
   - TaskPdfService → app/Services/TaskPdfService.php
   - AiCategoryIdentificationService → app/Services/AiCategoryIdentificationService.php
 
 Controllers:
   - TaskPdfController → app/Http/Controllers/TaskPdfController.php
+  - ProjectBoardExportController → app/Http/Controllers/ProjectBoardExportController.php
 
 Livewire Components:
   - TaskCategoryIndex → app/Livewire/Admin/Tasks/Categories/TaskCategoryIndex.php
@@ -177,7 +180,7 @@ Livewire Components:
   - RecurringTaskForm → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskForm.php
   - WeeklyReviewIndex → app/Livewire/Admin/Tasks/WeeklyReview/WeeklyReviewIndex.php
   - AiPrioritizationIndex → app/Livewire/Admin/Tasks/AiPrioritization/AiPrioritizationIndex.php
-  - ProjectBoardIndex → app/Livewire/Admin/Tasks/ProjectBoard/ProjectBoardIndex.php
+  - ProjectBoardIndex → app/Livewire/Admin/Tasks/ProjectBoard/ProjectBoardIndex.php (updated: SweetAlert, column edit/reorder, adjacent-column restriction, export dropdown, removed cross-board move)
 
 Database Tables:
   - task_categories — task grouping with color and icon

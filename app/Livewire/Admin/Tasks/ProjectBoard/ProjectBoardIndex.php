@@ -69,6 +69,13 @@ class ProjectBoardIndex extends Component
 
     public string $newColumnColor = '#7c3aed';
 
+    // --- Column Editing ---
+    public ?int $editingColumnId = null;
+
+    public string $editColumnName = '';
+
+    public string $editColumnColor = '#7c3aed';
+
     public function mount(): void
     {
         if (! $this->selectedBoardId) {
@@ -175,6 +182,52 @@ class ProjectBoardIndex extends Component
         session()->flash('success', 'Column deleted successfully.');
     }
 
+    // -- Column Editing --
+
+    public function startEditColumn(int $columnId): void
+    {
+        $column = ProjectBoardColumn::findOrFail($columnId);
+        $this->editingColumnId = $column->id;
+        $this->editColumnName = $column->name;
+        $this->editColumnColor = $column->color ?? '#7c3aed';
+    }
+
+    public function saveColumn(ProjectBoardService $service): void
+    {
+        $this->validate([
+            'editColumnName' => 'required|string|max:100',
+            'editColumnColor' => 'nullable|string|max:7',
+        ]);
+
+        $column = ProjectBoardColumn::findOrFail($this->editingColumnId);
+        $service->updateColumn($column, [
+            'name' => $this->editColumnName,
+            'color' => $this->editColumnColor,
+        ]);
+
+        $this->editingColumnId = null;
+        $this->editColumnName = '';
+        $this->editColumnColor = '#7c3aed';
+    }
+
+    public function cancelEditColumn(): void
+    {
+        $this->editingColumnId = null;
+        $this->editColumnName = '';
+        $this->editColumnColor = '#7c3aed';
+    }
+
+    // -- Column Reorder --
+
+    public function reorderColumns(ProjectBoardService $service, array $orderedIds): void
+    {
+        $columnOrder = [];
+        foreach ($orderedIds as $index => $columnId) {
+            $columnOrder[(int) $columnId] = $index;
+        }
+        $service->reorderColumns($columnOrder);
+    }
+
     // -- Task CRUD --
 
     public function openTaskModal(?int $columnId = null, ?int $taskId = null): void
@@ -267,18 +320,31 @@ class ProjectBoardIndex extends Component
 
     // -- Drag-Drop --
 
-    public function moveTask(ProjectTaskService $service, int $taskId, int $columnId, int $position): void
+    public function moveTask(ProjectTaskService $service, int $taskId, int $columnId, int $position): array
     {
+        $task = ProjectTask::findOrFail($taskId);
+
+        // Same column reorder — always allowed
+        if ($task->column_id === $columnId) {
+            $service->moveToColumn($taskId, $columnId, $position);
+
+            return ['success' => true];
+        }
+
+        // Cross-column — check adjacency
+        $sourceColumn = ProjectBoardColumn::findOrFail($task->column_id);
+        $targetColumn = ProjectBoardColumn::findOrFail($columnId);
+
+        if (abs($sourceColumn->sort_order - $targetColumn->sort_order) !== 1) {
+            return [
+                'success' => false,
+                'error' => 'Tasks can only be moved to adjacent columns (one step forward or back).',
+            ];
+        }
+
         $service->moveToColumn($taskId, $columnId, $position);
-    }
 
-    // -- Cross-Board Move --
-
-    public function moveTaskToBoard(ProjectTaskService $service, int $taskId, int $targetBoardId): void
-    {
-        $service->moveToBoard($taskId, $targetBoardId);
-
-        session()->flash('success', 'Task moved to another board.');
+        return ['success' => true];
     }
 
     // -- Tags --

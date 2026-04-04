@@ -755,6 +755,7 @@
 
     <livewire:admin.tasks.quick-capture.quick-capture />
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @livewireScripts
 </body>
 </html>

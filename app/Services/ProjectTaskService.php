@@ -93,44 +93,6 @@ class ProjectTaskService
     }
 
     /**
-     * Move a task to another board entirely.
-     */
-    public function moveToBoard(int $taskId, int $targetBoardId): ProjectTask
-    {
-        return DB::transaction(function () use ($taskId, $targetBoardId) {
-            $task = ProjectTask::findOrFail($taskId);
-
-            // Get the first column of the target board (lowest sort_order)
-            $targetColumn = ProjectBoardColumn::where('board_id', $targetBoardId)
-                ->ordered()
-                ->firstOrFail();
-
-            // Close the gap in the old column
-            ProjectTask::where('column_id', $task->column_id)
-                ->where('position', '>', $task->position)
-                ->decrement('position');
-
-            // Set position to end of target column
-            $maxPosition = ProjectTask::where('column_id', $targetColumn->id)->max('position') ?? -1;
-
-            $task->board_id = $targetBoardId;
-            $task->column_id = $targetColumn->id;
-            $task->position = $maxPosition + 1;
-
-            // Handle completed_at based on target column
-            if ($targetColumn->is_completed_column) {
-                $task->completed_at = now();
-            } else {
-                $task->completed_at = null;
-            }
-
-            $task->save();
-
-            return $task;
-        });
-    }
-
-    /**
      * Reorder tasks within a single column.
      * Accepts array of [task_id => position].
      */
