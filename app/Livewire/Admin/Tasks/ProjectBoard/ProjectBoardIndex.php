@@ -90,9 +90,9 @@ class ProjectBoardIndex extends Component
         }
     }
 
-    public function selectBoard(int $boardId): void
+    public function selectBoard(string $boardId): void
     {
-        $this->selectedBoardId = $boardId;
+        $this->selectedBoardId = (int) $boardId;
         $this->reset('search', 'priorityFilter', 'categoryFilter');
     }
 
