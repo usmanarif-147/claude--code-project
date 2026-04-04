@@ -89,13 +89,16 @@ Sidebar: Portfolio group with Profile, Skills, Technologies, Experiences, Projec
 
 ### Settings (module group: settings)
 Completed: 2026-04-01
-Features: 3 (Profile Settings, API Keys, Job Search Filters)
+Last updated: 2026-04-04 (Added Logs Viewer and Database Management features)
+Features: 5 (Profile Settings, API Keys, Job Search Filters, Logs Viewer, Database Management)
 Side: ADMIN
 
 Routes:
   - GET /admin/settings/profile → admin.settings.profile
   - GET /admin/settings/api-keys → admin.settings.api-keys
   - GET /admin/settings/job-search-filters → admin.settings.job-search-filters
+  - GET /admin/settings/logs → admin.settings.logs
+  - GET /admin/settings/database-management → admin.settings.database-management
 
 Models:
   - ApiKey → app/Models/ApiKey.php
@@ -106,16 +109,25 @@ Services:
   - ProfileSettingsService → app/Services/ProfileSettingsService.php
   - ApiKeyService → app/Services/ApiKeyService.php
   - JobSearchFilterService → app/Services/JobSearchFilterService.php
+  - LogViewerService → app/Services/LogViewerService.php
+  - DatabaseManagementService → app/Services/DatabaseManagementService.php
 
 Livewire Components:
   - ProfileSettingsEdit → app/Livewire/Admin/Settings/ProfileSettings/ProfileSettingsEdit.php
   - ApiKeysIndex → app/Livewire/Admin/Settings/ApiKeys/ApiKeysIndex.php
   - JobSearchFiltersEdit → app/Livewire/Admin/Settings/JobSearchFilters/JobSearchFiltersEdit.php
+  - LogsIndex → app/Livewire/Admin/Settings/Logs/LogsIndex.php
+  - DatabaseManagementIndex → app/Livewire/Admin/Settings/DatabaseManagement/DatabaseManagementIndex.php
+
+Config:
+  - config/database-management.php — max_attempts, lockout_minutes, backup_path
 
 Database Tables:
   - profiles (extended) — added fiverr_url, youtube_url, timezone, language
   - api_keys — encrypted API keys per provider with test status
   - job_search_filters — job search preferences (titles, tech, location, salary, platforms)
+
+Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters, Logs, Database
 
 Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters
 
