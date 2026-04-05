@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\ApiKey;
-use App\Models\Task\Task;
-use App\Models\Task\TaskCategory;
-use App\Models\Task\WeeklyReview;
+use App\Models\ProjectManagement\ProjectBoard;
+use App\Models\ProjectManagement\ProjectTask;
+use App\Models\ProjectManagement\WeeklyReview;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -27,7 +27,7 @@ class WeeklyReviewService
         }
 
         $stats = $this->computeWeekStats($userId, $weekStart, $weekEnd);
-        $categoryBreakdown = $this->computeCategoryBreakdown($userId, $weekStart, $weekEnd);
+        $boardColumnBreakdown = $this->computeBoardColumnBreakdown($userId, $weekStart, $weekEnd);
 
         $review = WeeklyReview::create([
             'user_id' => $userId,
@@ -36,7 +36,7 @@ class WeeklyReviewService
             'total_planned' => $stats['total_planned'],
             'total_completed' => $stats['total_completed'],
             'total_carried_over' => $stats['total_carried_over'],
-            'category_breakdown' => $categoryBreakdown,
+            'category_breakdown' => $boardColumnBreakdown,
         ]);
 
         if ($stats['total_planned'] > 0) {
@@ -45,8 +45,8 @@ class WeeklyReviewService
             $comparison = $this->computeWeekComparison($review, $previousReview);
 
             try {
-                $summary = $this->generateAiSummary($review, $incompleteTasks->toArray(), $categoryBreakdown, $comparison);
-                $focusAreas = $this->generateAiFocusAreas($review, $incompleteTasks->toArray(), $categoryBreakdown);
+                $summary = $this->generateAiSummary($review, $incompleteTasks->toArray(), $boardColumnBreakdown, $comparison);
+                $focusAreas = $this->generateAiFocusAreas($review, $incompleteTasks->toArray(), $boardColumnBreakdown);
 
                 if ($summary || $focusAreas) {
                     $review->update([
@@ -63,11 +63,15 @@ class WeeklyReviewService
         return $review;
     }
 
-    public function computeWeekStats(int $userId, Carbon $weekStart, Carbon $weekEnd): array
+    public function computeWeekStats(int $userId, Carbon $weekStart, Carbon $weekEnd, ?int $boardId = null): array
     {
-        $query = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$weekStart->toDateString(), $weekEnd->toDateString()]);
+            ->forDateRange($weekStart, $weekEnd);
+
+        if ($boardId) {
+            $query->forBoard($boardId);
+        }
 
         $totalPlanned = $query->count();
         $totalCompleted = (clone $query)->completed()->count();
@@ -80,53 +84,63 @@ class WeeklyReviewService
         ];
     }
 
-    public function computeCategoryBreakdown(int $userId, Carbon $weekStart, Carbon $weekEnd): array
+    public function computeBoardColumnBreakdown(int $userId, Carbon $weekStart, Carbon $weekEnd, ?int $boardId = null): array
     {
-        $tasks = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
-            ->get();
+            ->forDateRange($weekStart, $weekEnd)
+            ->with(['board', 'column']);
 
-        $categories = TaskCategory::all()->keyBy('id');
-        $breakdown = [];
-
-        $grouped = $tasks->groupBy('category_id');
-
-        foreach ($grouped as $categoryId => $categoryTasks) {
-            if ($categoryId && $categories->has($categoryId)) {
-                $category = $categories->get($categoryId);
-                $breakdown[] = [
-                    'category_id' => $categoryId,
-                    'category_name' => $category->name,
-                    'color' => $category->color,
-                    'planned' => $categoryTasks->count(),
-                    'completed' => $categoryTasks->where('status', 'completed')->count(),
-                ];
-            } else {
-                $breakdown[] = [
-                    'category_id' => null,
-                    'category_name' => 'Uncategorized',
-                    'color' => '#6b7280',
-                    'planned' => $categoryTasks->count(),
-                    'completed' => $categoryTasks->where('status', 'completed')->count(),
-                ];
-            }
+        if ($boardId) {
+            $query->forBoard($boardId);
         }
 
-        usort($breakdown, fn ($a, $b) => $b['planned'] <=> $a['planned']);
+        $tasks = $query->get();
+
+        $boardGroups = $tasks->groupBy('board_id');
+
+        $breakdown = [];
+        foreach ($boardGroups as $bId => $boardTasks) {
+            $board = $boardTasks->first()->board;
+            $columnGroups = $boardTasks->groupBy('column_id');
+
+            $columns = [];
+            foreach ($columnGroups as $columnTasks) {
+                $column = $columnTasks->first()->column;
+                $columns[] = [
+                    'column_name' => $column?->name ?? 'Unknown',
+                    'color' => $column?->color ?? '#7c3aed',
+                    'planned' => $columnTasks->count(),
+                    'completed' => $columnTasks->whereNotNull('completed_at')->count(),
+                ];
+            }
+
+            $breakdown[] = [
+                'board_id' => $bId,
+                'board_name' => $board?->name ?? 'Unknown Board',
+                'columns' => $columns,
+                'total_planned' => $boardTasks->count(),
+                'total_completed' => $boardTasks->whereNotNull('completed_at')->count(),
+            ];
+        }
 
         return $breakdown;
     }
 
-    public function getIncompleteTasks(int $userId, Carbon $weekStart, Carbon $weekEnd): Collection
+    public function getIncompleteTasks(int $userId, Carbon $weekStart, Carbon $weekEnd, ?int $boardId = null): Collection
     {
-        return Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+            ->forDateRange($weekStart, $weekEnd)
             ->pending()
-            ->with('category')
-            ->byPriority()
-            ->get();
+            ->with(['board', 'column'])
+            ->byPriority();
+
+        if ($boardId) {
+            $query->forBoard($boardId);
+        }
+
+        return $query->get();
     }
 
     public function getPreviousWeekReview(int $userId, Carbon $currentWeekStart): ?WeeklyReview
@@ -159,7 +173,42 @@ class WeeklyReviewService
         ];
     }
 
-    public function generateAiSummary(WeeklyReview $review, array $incompleteTasks, array $categoryBreakdown, ?array $comparison): ?string
+    public function getBoards(int $userId): Collection
+    {
+        return ProjectBoard::query()->forUser($userId)->ordered()->get();
+    }
+
+    public function computePerBoardAnalytics(int $userId, Carbon $weekStart, Carbon $weekEnd): array
+    {
+        $boards = ProjectBoard::query()->forUser($userId)->ordered()->get();
+        $analytics = [];
+
+        foreach ($boards as $board) {
+            $query = ProjectTask::query()
+                ->forUser($userId)
+                ->forBoard($board->id)
+                ->forDateRange($weekStart, $weekEnd);
+
+            $total = $query->count();
+            $completed = (clone $query)->completed()->count();
+            $overdue = (clone $query)->pending()
+                ->where('target_date', '<', Carbon::today())
+                ->count();
+
+            $analytics[] = [
+                'board_id' => $board->id,
+                'board_name' => $board->name,
+                'total' => $total,
+                'completed' => $completed,
+                'overdue' => $overdue,
+                'completion_rate' => $total > 0 ? round(($completed / $total) * 100) : 0,
+            ];
+        }
+
+        return $analytics;
+    }
+
+    public function generateAiSummary(WeeklyReview $review, array $incompleteTasks, array $boardColumnBreakdown, ?array $comparison): ?string
     {
         $apiKey = $this->getAiApiKey($review->user_id);
 
@@ -167,12 +216,12 @@ class WeeklyReviewService
             return null;
         }
 
-        $prompt = $this->buildSummaryPrompt($review, $incompleteTasks, $categoryBreakdown, $comparison);
+        $prompt = $this->buildSummaryPrompt($review, $incompleteTasks, $boardColumnBreakdown, $comparison);
 
         return $this->callAiApi($apiKey['key'], $apiKey['provider'], $prompt);
     }
 
-    public function generateAiFocusAreas(WeeklyReview $review, array $incompleteTasks, array $categoryBreakdown): ?array
+    public function generateAiFocusAreas(WeeklyReview $review, array $incompleteTasks, array $boardColumnBreakdown): ?array
     {
         $apiKey = $this->getAiApiKey($review->user_id);
 
@@ -180,7 +229,7 @@ class WeeklyReviewService
             return null;
         }
 
-        $prompt = $this->buildFocusAreasPrompt($review, $incompleteTasks, $categoryBreakdown);
+        $prompt = $this->buildFocusAreasPrompt($review, $incompleteTasks, $boardColumnBreakdown);
 
         $response = $this->callAiApi($apiKey['key'], $apiKey['provider'], $prompt);
 
@@ -229,7 +278,7 @@ class WeeklyReviewService
         $weekEnd = $weekStart->copy()->endOfWeek(Carbon::SUNDAY);
 
         $stats = $this->computeWeekStats($userId, $weekStart, $weekEnd);
-        $categoryBreakdown = $this->computeCategoryBreakdown($userId, $weekStart, $weekEnd);
+        $boardColumnBreakdown = $this->computeBoardColumnBreakdown($userId, $weekStart, $weekEnd);
 
         $review = WeeklyReview::updateOrCreate(
             ['user_id' => $userId, 'week_start' => $weekStart->toDateString()],
@@ -238,7 +287,7 @@ class WeeklyReviewService
                 'total_planned' => $stats['total_planned'],
                 'total_completed' => $stats['total_completed'],
                 'total_carried_over' => $stats['total_carried_over'],
-                'category_breakdown' => $categoryBreakdown,
+                'category_breakdown' => $boardColumnBreakdown,
             ]
         );
 
@@ -248,8 +297,8 @@ class WeeklyReviewService
             $comparison = $this->computeWeekComparison($review, $previousReview);
 
             try {
-                $summary = $this->generateAiSummary($review, $incompleteTasks->toArray(), $categoryBreakdown, $comparison);
-                $focusAreas = $this->generateAiFocusAreas($review, $incompleteTasks->toArray(), $categoryBreakdown);
+                $summary = $this->generateAiSummary($review, $incompleteTasks->toArray(), $boardColumnBreakdown, $comparison);
+                $focusAreas = $this->generateAiFocusAreas($review, $incompleteTasks->toArray(), $boardColumnBreakdown);
 
                 $review->update([
                     'ai_summary' => $summary,
@@ -264,7 +313,7 @@ class WeeklyReviewService
         return $review->fresh();
     }
 
-    private function buildSummaryPrompt(WeeklyReview $review, array $incompleteTasks, array $categoryBreakdown, ?array $comparison): string
+    private function buildSummaryPrompt(WeeklyReview $review, array $incompleteTasks, array $boardColumnBreakdown, ?array $comparison): string
     {
         $prompt = "You are a productivity coach. Provide a concise 2-3 paragraph weekly summary based on these task statistics.\n\n";
         $prompt .= "Week: {$review->week_start->format('M j')} - {$review->week_end->format('M j, Y')}\n";
@@ -273,11 +322,15 @@ class WeeklyReviewService
         $prompt .= "Completion Rate: {$review->completion_percentage}%\n";
         $prompt .= "Carried Over: {$review->total_carried_over}\n\n";
 
-        if (! empty($categoryBreakdown)) {
-            $prompt .= "Category Breakdown:\n";
-            foreach ($categoryBreakdown as $cat) {
-                $catRate = $cat['planned'] > 0 ? round(($cat['completed'] / $cat['planned']) * 100) : 0;
-                $prompt .= "- {$cat['category_name']}: {$cat['completed']}/{$cat['planned']} completed ({$catRate}%)\n";
+        if (! empty($boardColumnBreakdown)) {
+            $prompt .= "Board/Column Breakdown:\n";
+            foreach ($boardColumnBreakdown as $board) {
+                $boardRate = $board['total_planned'] > 0 ? round(($board['total_completed'] / $board['total_planned']) * 100) : 0;
+                $prompt .= "- Board \"{$board['board_name']}\": {$board['total_completed']}/{$board['total_planned']} completed ({$boardRate}%)\n";
+                foreach ($board['columns'] as $col) {
+                    $colRate = $col['planned'] > 0 ? round(($col['completed'] / $col['planned']) * 100) : 0;
+                    $prompt .= "  - Column \"{$col['column_name']}\": {$col['completed']}/{$col['planned']} ({$colRate}%)\n";
+                }
             }
             $prompt .= "\n";
         }
@@ -303,16 +356,19 @@ class WeeklyReviewService
         return $prompt;
     }
 
-    private function buildFocusAreasPrompt(WeeklyReview $review, array $incompleteTasks, array $categoryBreakdown): string
+    private function buildFocusAreasPrompt(WeeklyReview $review, array $incompleteTasks, array $boardColumnBreakdown): string
     {
         $prompt = "Based on this week's task data, suggest 3-5 specific, actionable focus areas for next week. Keep each focus area to one sentence.\n\n";
         $prompt .= "Completion Rate: {$review->completion_percentage}%\n";
         $prompt .= "Carried Over: {$review->total_carried_over} tasks\n\n";
 
-        if (! empty($categoryBreakdown)) {
-            $prompt .= "Categories worked on:\n";
-            foreach ($categoryBreakdown as $cat) {
-                $prompt .= "- {$cat['category_name']}: {$cat['completed']}/{$cat['planned']} completed\n";
+        if (! empty($boardColumnBreakdown)) {
+            $prompt .= "Boards worked on:\n";
+            foreach ($boardColumnBreakdown as $board) {
+                $prompt .= "- {$board['board_name']}: {$board['total_completed']}/{$board['total_planned']} completed\n";
+                foreach ($board['columns'] as $col) {
+                    $prompt .= "  - {$col['column_name']}: {$col['completed']}/{$col['planned']} completed\n";
+                }
             }
             $prompt .= "\n";
         }

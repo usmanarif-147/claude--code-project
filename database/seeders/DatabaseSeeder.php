@@ -231,8 +231,5 @@ class DatabaseSeeder extends Seeder
 
         BlogPostTag::create(['blog_post_id' => $post2->id, 'tag' => 'Performance']);
         BlogPostTag::create(['blog_post_id' => $post2->id, 'tag' => 'Database']);
-
-        // Tasks Module
-        $this->call(TasksSeeder::class);
     }
 }

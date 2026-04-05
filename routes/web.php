@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\SharedProjectController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\FileManager;
 use App\Livewire\Admin\Login;
@@ -15,6 +16,8 @@ Route::get('/resume/download/{template?}', [PortfolioController::class, 'downloa
 Route::post('/chatbot/message', [ChatbotController::class, 'sendMessage'])
     ->middleware('throttle:20,1')
     ->name('chatbot.message');
+
+Route::get('/shared/project/{token}', [SharedProjectController::class, 'show'])->name('shared.project.show');
 
 // routes
 Route::prefix('admin')->group(function () {

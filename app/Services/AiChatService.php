@@ -198,28 +198,28 @@ class AiChatService
     {
         $context = [];
 
-        // Tasks context
+        // Project tasks context
         try {
-            if (Schema::hasTable('tasks')) {
-                $taskModel = \App\Models\Task\Task::class;
-                $pendingCount = $taskModel::query()->where('user_id', $userId)->where('status', 'pending')->count();
-                $overdueCount = $taskModel::query()->where('user_id', $userId)->where('status', 'pending')
-                    ->whereDate('due_date', '<', now()->toDateString())->count();
+            if (Schema::hasTable('project_tasks')) {
+                $taskModel = \App\Models\ProjectManagement\ProjectTask::class;
+                $pendingCount = $taskModel::query()->where('user_id', $userId)->whereNull('completed_at')->count();
+                $overdueCount = $taskModel::query()->where('user_id', $userId)->whereNull('completed_at')
+                    ->whereDate('target_date', '<', now()->toDateString())->count();
                 $todayCount = $taskModel::query()->where('user_id', $userId)
-                    ->whereDate('due_date', now()->toDateString())->count();
+                    ->whereDate('target_date', now()->toDateString())->count();
 
-                $context[] = "TASKS: {$pendingCount} pending tasks, {$overdueCount} overdue, {$todayCount} due today.";
+                $context[] = "PROJECT TASKS: {$pendingCount} pending tasks, {$overdueCount} overdue, {$todayCount} due today.";
 
-                $recentTasks = $taskModel::query()->where('user_id', $userId)->where('status', 'pending')
-                    ->orderByDesc('created_at')->limit(5)->get(['title', 'priority', 'due_date', 'status']);
+                $recentTasks = $taskModel::query()->where('user_id', $userId)->whereNull('completed_at')
+                    ->orderByDesc('created_at')->limit(5)->get(['title', 'priority', 'target_date', 'completed_at']);
 
                 if ($recentTasks->isNotEmpty()) {
-                    $taskList = $recentTasks->map(fn ($t) => "- {$t->title} (priority: {$t->priority}, due: ".($t->due_date ?? 'none').')')->implode("\n");
+                    $taskList = $recentTasks->map(fn ($t) => "- {$t->title} (priority: {$t->priority}, due: ".($t->target_date ?? 'none').')')->implode("\n");
                     $context[] = "Recent pending tasks:\n{$taskList}";
                 }
             }
         } catch (\Throwable) {
-            $context[] = 'TASKS: No task data available.';
+            $context[] = 'PROJECT TASKS: No task data available.';
         }
 
         // Emails context

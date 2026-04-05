@@ -90,7 +90,7 @@
             <div class="bg-dark-800 border border-dark-700 rounded-xl p-6">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Today's Tasks</h2>
-                    <a href="{{ route('admin.tasks.planner.index') }}" wire:navigate class="text-xs text-primary-light hover:underline">View All</a>
+                    <a href="{{ route('admin.project-management.project-board.index') }}" wire:navigate class="text-xs text-primary-light hover:underline">View All</a>
                 </div>
 
                 @if ($todayTasks->isNotEmpty())
@@ -98,17 +98,17 @@
                         @foreach ($todayTasks as $task)
                             <div class="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-dark-700/50 transition-colors group">
                                 {{-- Checkbox --}}
-                                <button wire:click="completeTask({{ $task->id }})" class="shrink-0 w-5 h-5 rounded border transition-colors flex items-center justify-center {{ $task->status === 'completed' ? 'bg-emerald-500 border-emerald-500' : 'border-dark-600 hover:border-primary group-hover:border-gray-500' }}">
-                                    @if ($task->status === 'completed')
+                                <button wire:click="completeTask({{ $task->id }})" class="shrink-0 w-5 h-5 rounded border transition-colors flex items-center justify-center {{ $task->completed_at ? 'bg-emerald-500 border-emerald-500' : 'border-dark-600 hover:border-primary group-hover:border-gray-500' }}">
+                                    @if ($task->completed_at)
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                     @endif
                                 </button>
 
                                 {{-- Task Info --}}
                                 <div class="flex-1 min-w-0">
-                                    <span class="text-sm {{ $task->status === 'completed' ? 'text-gray-500 line-through' : 'text-white' }}">{{ $task->title }}</span>
-                                    @if ($task->category)
-                                        <span class="text-xs text-gray-500 ml-2">{{ $task->category->name }}</span>
+                                    <span class="text-sm {{ $task->completed_at ? 'text-gray-500 line-through' : 'text-white' }}">{{ $task->title }}</span>
+                                    @if ($task->board)
+                                        <span class="text-xs text-gray-500 ml-2">{{ $task->board->name }}</span>
                                     @endif
                                 </div>
 
@@ -131,7 +131,7 @@
                     <div class="text-center py-8">
                         <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         <p class="text-gray-500 text-sm">No tasks for today. Enjoy your free time!</p>
-                        <a href="{{ route('admin.tasks.planner.index') }}" wire:navigate class="text-xs text-primary-light hover:underline mt-2 inline-block">Go to Daily Planner</a>
+                        <a href="{{ route('admin.project-management.project-board.index') }}" wire:navigate class="text-xs text-primary-light hover:underline mt-2 inline-block">Go to Project Board</a>
                     </div>
                 @endif
             </div>

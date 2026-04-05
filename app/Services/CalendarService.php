@@ -2,15 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Task\Task;
-use App\Models\Task\TaskCategory;
+use App\Models\ProjectManagement\ProjectBoard;
+use App\Models\ProjectManagement\ProjectTask;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 class CalendarService
 {
-    public function getTasksForMonth(int $userId, int $year, int $month): Collection
+    public function getTasksForMonth(int $userId, int $year, int $month, ?int $boardId = null): Collection
     {
         $firstOfMonth = Carbon::create($year, $month, 1);
 
@@ -18,129 +17,82 @@ class CalendarService
         $gridStart = $firstOfMonth->copy()->subDays($firstOfMonth->dayOfWeekIso - 1)->startOfDay();
         $gridEnd = $gridStart->copy()->addDays(41)->endOfDay();
 
-        $personalTasks = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$gridStart, $gridEnd])
-            ->with('category')
-            ->byPriority()
-            ->ordered()
-            ->orderBy('created_at')
-            ->get()
-            ->groupBy(fn ($task) => $task->due_date->format('Y-m-d'));
+            ->whereBetween('target_date', [$gridStart, $gridEnd])
+            ->with(['board', 'column'])
+            ->ordered();
 
-        if (Schema::hasTable('project_tasks') && class_exists(\App\Models\Task\ProjectTask::class)) {
-            $projectTasks = \App\Models\Task\ProjectTask::query()
-                ->forUser($userId)
-                ->whereBetween('target_date', [$gridStart, $gridEnd])
-                ->get()
-                ->groupBy(fn ($task) => $task->target_date->format('Y-m-d'));
-
-            // Merge project tasks into personal tasks collection, keyed by date
-            foreach ($projectTasks as $date => $tasks) {
-                $existing = $personalTasks->get($date, collect());
-                $personalTasks[$date] = $existing->concat($tasks);
-            }
+        if ($boardId) {
+            $query->forBoard($boardId);
         }
 
-        return $personalTasks;
+        return $query->get()
+            ->groupBy(fn ($task) => $task->target_date->format('Y-m-d'));
     }
 
-    public function getTasksForWeek(int $userId, Carbon $weekStart): Collection
+    public function getTasksForWeek(int $userId, Carbon $weekStart, ?int $boardId = null): Collection
     {
         $weekEnd = $weekStart->copy()->addDays(6)->endOfDay();
 
-        $personalTasks = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$weekStart->copy()->startOfDay(), $weekEnd])
-            ->with('category')
-            ->byPriority()
-            ->ordered()
-            ->orderBy('created_at')
-            ->get()
-            ->groupBy(fn ($task) => $task->due_date->format('Y-m-d'));
+            ->whereBetween('target_date', [$weekStart->copy()->startOfDay(), $weekEnd])
+            ->with(['board', 'column'])
+            ->ordered();
 
-        if (Schema::hasTable('project_tasks') && class_exists(\App\Models\Task\ProjectTask::class)) {
-            $projectTasks = \App\Models\Task\ProjectTask::query()
-                ->forUser($userId)
-                ->whereBetween('target_date', [$weekStart->copy()->startOfDay(), $weekEnd])
-                ->get()
-                ->groupBy(fn ($task) => $task->target_date->format('Y-m-d'));
-
-            foreach ($projectTasks as $date => $tasks) {
-                $existing = $personalTasks->get($date, collect());
-                $personalTasks[$date] = $existing->concat($tasks);
-            }
+        if ($boardId) {
+            $query->forBoard($boardId);
         }
 
-        return $personalTasks;
+        return $query->get()
+            ->groupBy(fn ($task) => $task->target_date->format('Y-m-d'));
     }
 
-    public function getTasksForDate(int $userId, string $date): array
+    public function getTasksForDate(int $userId, string $date, ?int $boardId = null): array
     {
         $carbonDate = Carbon::parse($date);
 
-        $personalTasks = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->forDate($carbonDate)
-            ->with('category')
-            ->byPriority()
-            ->ordered()
-            ->orderBy('created_at')
-            ->get();
+            ->whereDate('target_date', $carbonDate)
+            ->with(['board', 'column'])
+            ->ordered();
 
-        $projectTasks = collect();
-
-        if (Schema::hasTable('project_tasks') && class_exists(\App\Models\Task\ProjectTask::class)) {
-            $projectTasks = \App\Models\Task\ProjectTask::query()
-                ->forUser($userId)
-                ->whereDate('target_date', $carbonDate)
-                ->with(['board', 'column'])
-                ->ordered()
-                ->get();
+        if ($boardId) {
+            $query->forBoard($boardId);
         }
 
+        $projectTasks = $query->get();
+
         return [
-            'personal' => $personalTasks,
+            'personal' => collect(),
             'project' => $projectTasks,
         ];
     }
 
-    public function getCalendarStats(int $userId, Carbon $periodStart, Carbon $periodEnd): array
+    public function getCalendarStats(int $userId, Carbon $periodStart, Carbon $periodEnd, ?int $boardId = null): array
     {
-        $tasks = Task::query()
+        $query = ProjectTask::query()
             ->forUser($userId)
-            ->whereBetween('due_date', [$periodStart->copy()->startOfDay(), $periodEnd->copy()->endOfDay()])
-            ->get();
+            ->whereBetween('target_date', [$periodStart->copy()->startOfDay(), $periodEnd->copy()->endOfDay()]);
+
+        if ($boardId) {
+            $query->forBoard($boardId);
+        }
+
+        $tasks = $query->get();
 
         $total = $tasks->count();
-        $completed = $tasks->where('status', 'completed')->count();
+        $completed = $tasks->whereNotNull('completed_at')->count();
         $overdue = $tasks->filter(function ($task) {
-            return $task->status !== 'completed' && $task->due_date->lt(Carbon::today());
+            return $task->completed_at === null && $task->target_date->lt(Carbon::today());
         })->count();
-
-        // Include project tasks in stats if table exists
-        if (Schema::hasTable('project_tasks') && class_exists(\App\Models\Task\ProjectTask::class)) {
-            $projectTasks = \App\Models\Task\ProjectTask::query()
-                ->forUser($userId)
-                ->whereBetween('target_date', [$periodStart->copy()->startOfDay(), $periodEnd->copy()->endOfDay()])
-                ->get();
-
-            $total += $projectTasks->count();
-            $completed += $projectTasks->where('status', 'done')->count();
-            $overdue += $projectTasks->filter(function ($task) {
-                return $task->status !== 'done' && $task->target_date->lt(Carbon::today());
-            })->count();
-
-            // Merge for busiest day calculation
-            $tasks = $tasks->concat($projectTasks);
-        }
 
         $busiestDay = null;
         if ($total > 0) {
             $grouped = $tasks->groupBy(function ($task) {
-                $dateField = $task->due_date ?? $task->target_date;
-
-                return $dateField->format('Y-m-d');
+                return $task->target_date->format('Y-m-d');
             });
             $maxCount = 0;
             foreach ($grouped->sortKeys() as $date => $dateTasks) {
@@ -159,15 +111,14 @@ class CalendarService
         ];
     }
 
-    public function getCategories(): Collection
+    public function getBoards(int $userId): Collection
     {
-        return TaskCategory::query()->ordered()->get();
+        return ProjectBoard::query()->forUser($userId)->ordered()->get();
     }
 
     public function buildMonthGrid(int $year, int $month, Collection $tasksByDate): array
     {
         $firstOfMonth = Carbon::create($year, $month, 1);
-        $lastOfMonth = $firstOfMonth->copy()->endOfMonth();
 
         // ISO weekday: Monday = 1, Sunday = 7
         $startDayOfWeek = $firstOfMonth->dayOfWeekIso;

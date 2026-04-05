@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Task\ProjectBoard;
+use App\Models\ProjectManagement\ProjectBoard;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
@@ -34,7 +34,7 @@ class ProjectBoardExportService
 
         $filename = str_replace(' ', '_', $board->name).'_Export.pdf';
 
-        return Pdf::loadView('tasks.pdf.project-board', $data)
+        return Pdf::loadView('project-management.pdf.project-board', $data)
             ->setPaper('a4')
             ->setOption('isRemoteEnabled', true)
             ->download($filename);
@@ -52,7 +52,7 @@ class ProjectBoardExportService
         return new StreamedResponse(function () use ($board) {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Title', 'Status (Column)', 'Priority', 'Target Date', 'Category', 'Tags', 'Completed']);
+            fputcsv($handle, ['Title', 'Status (Column)', 'Priority', 'Target Date', 'Tags', 'Completed']);
 
             foreach ($board->columns as $column) {
                 foreach ($column->tasks as $task) {
@@ -61,7 +61,6 @@ class ProjectBoardExportService
                         $column->name,
                         ucfirst($task->priority ?? ''),
                         $task->target_date?->format('Y-m-d') ?? '',
-                        $task->category?->name ?? '',
                         is_array($task->tags) ? implode(', ', $task->tags) : '',
                         $task->completed_at !== null ? 'Yes' : 'No',
                     ]);
@@ -113,9 +112,6 @@ class ProjectBoardExportService
                     if ($task->target_date) {
                         $details[] = 'Due: '.$task->target_date->format('Y-m-d');
                     }
-                    if ($task->category) {
-                        $details[] = 'Category: '.$task->category->name;
-                    }
                     if (is_array($task->tags) && count($task->tags) > 0) {
                         $details[] = 'Tags: '.implode(', ', $task->tags);
                     }
@@ -156,7 +152,7 @@ class ProjectBoardExportService
             ->with([
                 'columns' => fn ($q) => $q->orderBy('sort_order'),
                 'columns.tasks' => fn ($q) => $q->orderBy('position'),
-                'columns.tasks.category',
+                'columns.tasks',
             ])
             ->findOrFail($boardId);
     }

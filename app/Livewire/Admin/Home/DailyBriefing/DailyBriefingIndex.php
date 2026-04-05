@@ -3,9 +3,8 @@
 namespace App\Livewire\Admin\Home\DailyBriefing;
 
 use App\Models\Email\RecruiterAlert;
-use App\Models\Task\Task;
+use App\Models\ProjectManagement\ProjectTask;
 use App\Services\DailyBriefingService;
-use App\Services\TaskService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -43,10 +42,10 @@ class DailyBriefingIndex extends Component
         $this->jobSearchStats = $service->getJobSearchStats();
     }
 
-    public function completeTask(TaskService $taskService, DailyBriefingService $briefingService, int $taskId): void
+    public function completeTask(DailyBriefingService $briefingService, int $taskId): void
     {
-        $task = Task::where('user_id', auth()->id())->findOrFail($taskId);
-        $taskService->toggleComplete($task);
+        $task = ProjectTask::where('user_id', auth()->id())->findOrFail($taskId);
+        $task->update(['completed_at' => $task->completed_at ? null : now()]);
 
         $userId = auth()->id();
         $this->todayTasks = $briefingService->getTodayTasks($userId);

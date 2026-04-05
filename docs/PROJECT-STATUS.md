@@ -133,78 +133,63 @@ Sidebar: Settings group with Profile Settings, API Keys, Job Search Filters
 
 ---
 
-### Tasks (module group: tasks)
+### Project Management (module group: project-management, formerly tasks)
 Completed: 2026-04-01
-Last updated: 2026-04-04 (Project Board: SweetAlert confirmations, column drag-drop reorder, column edit name/color, adjacent-column task restriction, board export PDF/CSV/MD, removed cross-board movement)
-Features: 13 (Task Categories, Daily Planner, Quick Capture, Calendar View, Recurring Tasks, Weekly Review, AI Prioritization, Project Board, TXT Import, PDF Download, AI Category Identification, Calendar Day Modal, Board Export)
-Side: ADMIN
+Last updated: 2026-04-05 (Major restructure: removed unused features, renamed Tasks → Project Management, added Design Board with Mermaid.js diagrams and AI generation, added multi-project support with board filters, added UUID-based project sharing)
+Features: 7 (Project Board, Design Board, Calendar View, Weekly Review, Board Export, Diagram PDF Export, Project Sharing)
+Side: ADMIN + PUBLIC (shared links)
 
 Routes:
-  - GET /admin/tasks/categories → admin.tasks.categories.index
-  - GET /admin/tasks/categories/create → admin.tasks.categories.create
-  - GET /admin/tasks/categories/{taskCategory}/edit → admin.tasks.categories.edit
-  - GET /admin/tasks/planner → admin.tasks.planner.index
-  - GET /admin/tasks/calendar → admin.tasks.calendar.index
-  - GET /admin/tasks/recurring-tasks → admin.tasks.recurring.index
-  - GET /admin/tasks/recurring-tasks/create → admin.tasks.recurring.create
-  - GET /admin/tasks/recurring-tasks/{recurringTask}/edit → admin.tasks.recurring.edit
-  - GET /admin/tasks/weekly-review → admin.tasks.weekly-review.index
-  - GET /admin/tasks/ai-prioritization → admin.tasks.ai-prioritization.index
-  - GET /admin/tasks/project-board → admin.tasks.project-board.index
-  - GET /admin/tasks/project-board/export/{format}/{boardId} → admin.tasks.project-board.export
-  - GET /admin/tasks/pdf/download → admin.tasks.pdf.download
+  - GET /admin/project-management/project-board → admin.project-management.project-board.index
+  - GET /admin/project-management/project-board/export/{format}/{boardId} → admin.project-management.project-board.export
+  - GET /admin/project-management/design-board → admin.project-management.design-board.index
+  - GET /admin/project-management/design-board/export/diagram/{diagram} → admin.project-management.design-board.export-diagram
+  - GET /admin/project-management/design-board/export/all/{boardId} → admin.project-management.design-board.export-all
+  - GET /admin/project-management/calendar → admin.project-management.calendar.index
+  - GET /admin/project-management/weekly-review → admin.project-management.weekly-review.index
+  - GET /shared/project/{token} → shared.project.show (public, no auth)
 
 Models:
-  - Task → app/Models/Task/Task.php
-  - TaskCategory → app/Models/Task/TaskCategory.php
-  - RecurringTask → app/Models/Task/RecurringTask.php
-  - WeeklyReview → app/Models/Task/WeeklyReview.php
-  - ProjectBoard → app/Models/Task/ProjectBoard.php
-  - ProjectBoardColumn → app/Models/Task/ProjectBoardColumn.php
-  - ProjectTask → app/Models/Task/ProjectTask.php
-  - ProjectTaskImage → app/Models/Task/ProjectTaskImage.php
+  - ProjectBoard → app/Models/ProjectManagement/ProjectBoard.php (added share_token, is_shared, diagrams/requirements relationships)
+  - ProjectBoardColumn → app/Models/ProjectManagement/ProjectBoardColumn.php
+  - ProjectTask → app/Models/ProjectManagement/ProjectTask.php (removed category_id)
+  - ProjectTaskImage → app/Models/ProjectManagement/ProjectTaskImage.php
+  - WeeklyReview → app/Models/ProjectManagement/WeeklyReview.php
+  - Diagram → app/Models/ProjectManagement/Diagram.php (NEW)
+  - ProjectRequirement → app/Models/ProjectManagement/ProjectRequirement.php (NEW)
 
 Services:
-  - TaskService → app/Services/TaskService.php (updated: AI auto-categorize on create)
-  - TaskCategoryService → app/Services/TaskCategoryService.php
-  - RecurringTaskService → app/Services/RecurringTaskService.php
-  - WeeklyReviewService → app/Services/WeeklyReviewService.php
-  - CalendarService → app/Services/CalendarService.php (updated: dual-query personal + project tasks, day modal support)
-  - AiTaskPrioritizationService → app/Services/AiTaskPrioritizationService.php
   - ProjectBoardService → app/Services/ProjectBoardService.php
-  - ProjectTaskService → app/Services/ProjectTaskService.php (updated: removed moveToBoard)
+  - ProjectTaskService → app/Services/ProjectTaskService.php
   - ProjectBoardExportService → app/Services/ProjectBoardExportService.php
-  - TaskImportService → app/Services/TaskImportService.php
-  - TaskPdfService → app/Services/TaskPdfService.php
-  - AiCategoryIdentificationService → app/Services/AiCategoryIdentificationService.php
+  - DesignBoardService → app/Services/DesignBoardService.php (NEW: diagram/requirements CRUD, AI generation, PDF export)
+  - WeeklyReviewService → app/Services/WeeklyReviewService.php (rewritten: uses ProjectTask, board/column breakdown)
+  - CalendarService → app/Services/CalendarService.php (rewritten: project tasks only, board filter)
 
 Controllers:
-  - TaskPdfController → app/Http/Controllers/TaskPdfController.php
   - ProjectBoardExportController → app/Http/Controllers/ProjectBoardExportController.php
+  - DiagramExportController → app/Http/Controllers/DiagramExportController.php (NEW)
+  - SharedProjectController → app/Http/Controllers/SharedProjectController.php (NEW: public shared view)
 
 Livewire Components:
-  - TaskCategoryIndex → app/Livewire/Admin/Tasks/Categories/TaskCategoryIndex.php
-  - TaskCategoryForm → app/Livewire/Admin/Tasks/Categories/TaskCategoryForm.php
-  - DailyPlannerIndex → app/Livewire/Admin/Tasks/DailyPlanner/DailyPlannerIndex.php (updated: TXT import, PDF download, AI auto-categorize)
-  - QuickCapture → app/Livewire/Admin/Tasks/QuickCapture/QuickCapture.php
-  - CalendarIndex → app/Livewire/Admin/Tasks/Calendar/CalendarIndex.php (updated: day modal replaces redirect)
-  - RecurringTaskIndex → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskIndex.php
-  - RecurringTaskForm → app/Livewire/Admin/Tasks/RecurringTasks/RecurringTaskForm.php
-  - WeeklyReviewIndex → app/Livewire/Admin/Tasks/WeeklyReview/WeeklyReviewIndex.php
-  - AiPrioritizationIndex → app/Livewire/Admin/Tasks/AiPrioritization/AiPrioritizationIndex.php
-  - ProjectBoardIndex → app/Livewire/Admin/Tasks/ProjectBoard/ProjectBoardIndex.php (updated: SweetAlert, column edit/reorder, adjacent-column restriction, export dropdown, removed cross-board move)
+  - ProjectBoardIndex → app/Livewire/Admin/ProjectManagement/ProjectBoard/ProjectBoardIndex.php (added sharing toggle)
+  - DesignBoardIndex → app/Livewire/Admin/ProjectManagement/DesignBoard/DesignBoardIndex.php (NEW: Mermaid.js editor, AI diagram/requirements/task generation)
+  - CalendarIndex → app/Livewire/Admin/ProjectManagement/Calendar/CalendarIndex.php (added board filter)
+  - WeeklyReviewIndex → app/Livewire/Admin/ProjectManagement/WeeklyReview/WeeklyReviewIndex.php (added board filter, per-board analytics)
 
 Database Tables:
-  - task_categories — task grouping with color and icon
-  - tasks — daily tasks with priority, status, due date, category
-  - recurring_tasks — repeating task templates with frequency
-  - weekly_reviews — weekly summary snapshots
-  - project_boards — kanban boards with name and description
+  - project_boards — kanban boards with name, description, share_token, is_shared
   - project_board_columns — columns per board with color and sort order
-  - project_tasks — kanban tasks with board, column, priority, tags, target date
+  - project_tasks — kanban tasks with board, column, priority, tags, target date (category_id removed)
   - project_task_images — image attachments for project tasks
+  - weekly_reviews — weekly summary snapshots with board/column breakdown
+  - diagrams — Mermaid.js diagrams per project board (NEW)
+  - project_requirements — functional/non-functional requirements per project board (NEW)
+  - DROPPED: tasks, task_categories, recurring_tasks
 
-Sidebar: Tasks group with Daily Planner, Categories, Recurring Tasks, Project Board, Calendar, AI Prioritization, Weekly Review
+Sidebar: Project Management group with Project Board, Design Board, Calendar, Weekly Review
+
+Removed features: Daily Planner, Task Categories, Recurring Tasks, Quick Capture, AI Prioritization, Task Import, PDF Download
 
 ---
 

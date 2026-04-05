@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Task\ProjectBoard;
-use App\Models\Task\ProjectBoardColumn;
+use App\Models\ProjectManagement\ProjectBoard;
+use App\Models\ProjectManagement\ProjectBoardColumn;
 use Illuminate\Support\Collection;
 
 class ProjectBoardService
@@ -25,7 +25,7 @@ class ProjectBoardService
     public function getBoard(int $boardId): ProjectBoard
     {
         return ProjectBoard::with([
-            'columns.tasks.category',
+            'columns.tasks',
             'columns.tasks.images',
         ])->findOrFail($boardId);
     }

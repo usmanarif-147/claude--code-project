@@ -5,14 +5,13 @@ namespace App\Services;
 use App\Models\Email\RecruiterAlert;
 use App\Models\Goal;
 use App\Models\JobSearch\JobListing;
-use App\Models\Task\Task;
+use App\Models\ProjectManagement\ProjectTask;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class DailyBriefingService
 {
     public function __construct(
-        protected TaskService $taskService,
         protected EmailInboxService $emailInboxService,
         protected ApplicationStatsService $applicationStatsService,
         protected GoalService $goalService,
@@ -38,7 +37,7 @@ class DailyBriefingService
     {
         $startOfWeek = now()->startOfWeek();
 
-        $tasksCompletedThisWeek = Task::query()
+        $tasksCompletedThisWeek = ProjectTask::query()
             ->forUser($userId)
             ->completed()
             ->whereBetween('completed_at', [$startOfWeek, now()])
@@ -67,8 +66,14 @@ class DailyBriefingService
 
     public function getTodayTasks(int $userId): Collection
     {
-        return $this->taskService->getTasksForDate($userId, Carbon::today())
-            ->take(5);
+        return ProjectTask::query()
+            ->forUser($userId)
+            ->whereDate('target_date', Carbon::today())
+            ->with(['board', 'column'])
+            ->pending()
+            ->byPriority()
+            ->take(5)
+            ->get();
     }
 
     public function getNewJobMatches(int $userId): Collection

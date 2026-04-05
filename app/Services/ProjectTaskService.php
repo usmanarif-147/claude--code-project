@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Task\ProjectBoardColumn;
-use App\Models\Task\ProjectTask;
-use App\Models\Task\ProjectTaskImage;
+use App\Models\ProjectManagement\ProjectBoardColumn;
+use App\Models\ProjectManagement\ProjectTask;
+use App\Models\ProjectManagement\ProjectTaskImage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -113,7 +113,7 @@ class ProjectTaskService
         return ProjectTask::query()
             ->forUser($userId)
             ->forDate($date)
-            ->with(['board', 'column', 'category', 'images'])
+            ->with(['board', 'column', 'images'])
             ->ordered()
             ->get();
     }
@@ -126,7 +126,7 @@ class ProjectTaskService
         return ProjectTask::query()
             ->forUser($userId)
             ->forDateRange($start, $end)
-            ->with(['board', 'column', 'category', 'images'])
+            ->with(['board', 'column', 'images'])
             ->ordered()
             ->get();
     }
