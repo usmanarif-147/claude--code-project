@@ -233,28 +233,38 @@
                             {{-- Split View: Editor + Preview --}}
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                                  x-data="{
-                                     syntax: @entangle('editorMermaidSyntax'),
                                      renderCount: 0,
                                      ready: false,
+                                     rendering: false,
+                                     lastSvg: '',
                                      async renderDiagram() {
-                                         if (!this.ready) return;
+                                         if (!this.ready || this.rendering) return;
+                                         const syntax = this.$refs.syntaxInput?.value || '';
                                          const el = this.$refs.preview;
-                                         if (!this.syntax || !this.syntax.trim()) {
+                                         if (!syntax.trim()) {
                                              el.innerHTML = '<p class=\'text-gray-500 text-sm\'>Enter Mermaid syntax to see preview</p>';
+                                             this.lastSvg = '';
                                              return;
                                          }
                                          try {
-                                             el.innerHTML = '';
+                                             this.rendering = true;
                                              this.renderCount++;
                                              const id = 'diagram-preview-' + this.renderCount;
-                                             const { svg } = await mermaid.render(id, this.syntax);
+                                             const { svg } = await mermaid.render(id, syntax);
+                                             this.lastSvg = svg;
                                              el.innerHTML = svg;
                                          } catch (e) {
                                              el.innerHTML = '<p class=\'text-red-400 text-sm\'>Invalid Mermaid syntax: ' + e.message + '</p>';
+                                         } finally {
+                                             this.rendering = false;
+                                         }
+                                     },
+                                     restorePreview() {
+                                         if (this.lastSvg) {
+                                             this.$refs.preview.innerHTML = this.lastSvg;
                                          }
                                      }
                                  }"
-                                 x-effect="renderDiagram()"
                                  x-init="
                                      const waitForMermaid = setInterval(() => {
                                          if (typeof mermaid !== 'undefined') {
@@ -264,12 +274,15 @@
                                              renderDiagram();
                                          }
                                      }, 100);
+                                     $wire.on('mermaidRender', () => { $nextTick(() => renderDiagram()) });
+                                     Livewire.hook('morph.updated', ({ el }) => { $nextTick(() => restorePreview()) });
                                  ">
                                 {{-- Text Editor --}}
                                 <div>
                                     <label class="text-sm font-medium text-gray-300 mb-2 block">Mermaid Syntax</label>
-                                    <textarea x-model="syntax"
+                                    <textarea x-ref="syntaxInput"
                                               wire:model.live.debounce.500ms="editorMermaidSyntax"
+                                              @input.debounce.500ms="renderDiagram()"
                                               rows="15"
                                               placeholder="Enter Mermaid.js syntax here..."
                                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm font-mono placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
@@ -277,7 +290,7 @@
                                 {{-- Mermaid Preview --}}
                                 <div>
                                     <label class="text-sm font-medium text-gray-300 mb-2 block">Preview</label>
-                                    <div x-ref="preview" class="bg-dark-700 border border-dark-600 rounded-lg p-4 min-h-[300px] overflow-auto">
+                                    <div wire:ignore x-ref="preview" class="bg-dark-700 border border-dark-600 rounded-lg p-4 min-h-[300px] overflow-auto">
                                         <p class="text-gray-500 text-sm">Enter Mermaid syntax to see preview</p>
                                     </div>
                                 </div>
