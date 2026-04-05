@@ -158,23 +158,38 @@
                             {{-- Action Buttons --}}
                             @if($status === 'active')
                                 <div class="flex flex-col gap-2">
-                                    <button type="button" wire:click="markCompleted" wire:confirm="Mark this goal as completed?"
-                                            class="inline-flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200">
+                                    <x-admin.confirm-button
+                                        title="Mark Goal as Completed?"
+                                        text="This goal will be marked as completed."
+                                        action="$wire.markCompleted"
+                                        confirm-text="Yes, mark completed"
+                                        class="inline-flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200"
+                                    >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                         Mark Completed
-                                    </button>
-                                    <button type="button" wire:click="markAbandoned" wire:confirm="Abandon this goal?"
-                                            class="inline-flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200">
+                                    </x-admin.confirm-button>
+                                    <x-admin.confirm-button
+                                        title="Abandon Goal?"
+                                        text="This goal will be marked as abandoned."
+                                        action="$wire.markAbandoned"
+                                        confirm-text="Yes, abandon it"
+                                        class="inline-flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200"
+                                    >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                                         Abandon
-                                    </button>
+                                    </x-admin.confirm-button>
                                 </div>
                             @elseif($status === 'completed' || $status === 'abandoned')
-                                <button type="button" wire:click="reopen" wire:confirm="Reopen this goal?"
-                                        class="inline-flex items-center justify-center gap-2 w-full bg-primary/10 hover:bg-primary/20 text-primary-light hover:text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200">
+                                <x-admin.confirm-button
+                                    title="Reopen Goal?"
+                                    text="This goal will be moved back to active status."
+                                    action="$wire.reopen"
+                                    confirm-text="Yes, reopen it"
+                                    class="inline-flex items-center justify-center gap-2 w-full bg-primary/10 hover:bg-primary/20 text-primary-light hover:text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200"
+                                >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                     Reopen
-                                </button>
+                                </x-admin.confirm-button>
                             @endif
                         </div>
                     </div>

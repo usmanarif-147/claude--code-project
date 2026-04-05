@@ -30,10 +30,13 @@
                 <span wire:loading wire:target="scoreAllUnscored">Scoring...</span>
             </button>
 
-            <button wire:click="rescoreAll"
+            <x-admin.confirm-button
+                    title="Re-Score All Jobs?"
+                    text="Re-score all jobs? This will overwrite existing scores."
+                    action="$wire.rescoreAll()"
+                    confirm-text="Yes, re-score all"
                     wire:loading.attr="disabled"
                     wire:target="rescoreAll"
-                    wire:confirm="Re-score all jobs? This will overwrite existing scores."
                     @if(!$this->provider) disabled @endif
                     class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-sm font-medium rounded-lg px-5 py-2.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 <span wire:loading.remove wire:target="rescoreAll">
@@ -44,7 +47,7 @@
                 </span>
                 <span wire:loading.remove wire:target="rescoreAll">Re-Score All</span>
                 <span wire:loading wire:target="rescoreAll">Re-Scoring...</span>
-            </button>
+            </x-admin.confirm-button>
         </div>
     </div>
 

@@ -104,10 +104,15 @@
                             <div class="relative">
                                 <img src="{{ Storage::url($existing_image) }}" alt="Profile"
                                      class="w-full aspect-square object-cover rounded-lg">
-                                <button type="button" wire:click="removeImage" wire:confirm="Remove profile image?"
-                                        class="absolute top-2 right-2 bg-dark-900/80 text-gray-400 hover:text-red-400 rounded-lg p-1.5 transition-colors">
+                                <x-admin.confirm-button
+                                    title="Remove Profile Image?"
+                                    text="Remove profile image?"
+                                    action="$wire.removeImage()"
+                                    confirm-text="Yes, remove it"
+                                    class="absolute top-2 right-2 bg-dark-900/80 text-gray-400 hover:text-red-400 rounded-lg p-1.5 transition-colors"
+                                >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
+                                </x-admin.confirm-button>
                             </div>
                         @else
                             <div class="w-full aspect-square bg-dark-700 rounded-lg flex items-center justify-center">

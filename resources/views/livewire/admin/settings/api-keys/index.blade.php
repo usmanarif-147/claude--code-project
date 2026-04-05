@@ -150,13 +150,15 @@
                             <span wire:loading wire:target="testKey('{{ $providerKey }}')">Testing...</span>
                         </button>
 
-                        <button
-                            wire:click="deleteKey('{{ $providerKey }}')"
-                            wire:confirm="Are you sure you want to delete this API key?"
+                        <x-admin.confirm-button
+                            title="Delete API Key?"
+                            text="Are you sure you want to delete this API key?"
+                            action="$wire.deleteKey('{{ $providerKey }}')"
+                            confirm-text="Yes, delete it"
                             class="bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg px-3 py-2 text-sm transition-colors"
                         >
                             Delete
-                        </button>
+                        </x-admin.confirm-button>
                     @endif
                 </div>
 

@@ -79,20 +79,24 @@
             {{-- Action Buttons --}}
             @if ($selectedFile)
                 <div class="flex items-center gap-2 shrink-0">
-                    <button
-                        wire:click="clearFile"
-                        wire:confirm="Are you sure you want to clear this log file? This cannot be undone."
+                    <x-admin.confirm-button
+                        title="Clear Log File?"
+                        text="Are you sure you want to clear this log file? This cannot be undone."
+                        action="$wire.clearFile()"
+                        confirm-text="Yes, clear logs"
                         class="bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
                     >
                         Clear
-                    </button>
-                    <button
-                        wire:click="deleteFile"
-                        wire:confirm="Are you sure you want to delete this log file? This cannot be undone."
+                    </x-admin.confirm-button>
+                    <x-admin.confirm-button
+                        title="Delete Log File?"
+                        text="Are you sure you want to delete this log file? This cannot be undone."
+                        action="$wire.deleteFile()"
+                        confirm-text="Yes, delete it"
                         class="bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
                     >
                         Delete
-                    </button>
+                    </x-admin.confirm-button>
                     <button
                         wire:click="downloadFile"
                         class="bg-primary hover:bg-primary-hover text-white rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"

@@ -131,11 +131,16 @@
             Download PDF
         </a>
         @if($isCustomTemplate)
-            <button wire:click="deleteCustomTemplate('{{ $currentTemplateName }}')" wire:confirm="Delete this custom template?"
-                    class="inline-flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200">
+            <x-admin.confirm-button
+                title="Delete Custom Template?"
+                text="Delete this custom template?"
+                action="$wire.deleteCustomTemplate('{{ $currentTemplateName }}')"
+                confirm-text="Yes, delete it"
+                class="inline-flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-all duration-200"
+            >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 Delete Template
-            </button>
+            </x-admin.confirm-button>
         @endif
     </div>
 
@@ -304,7 +309,7 @@
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <button wire:click="editExperienceItem({{ $exp->id }})" class="p-2 text-gray-400 hover:text-primary-light hover:bg-primary/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                            <button wire:click="deleteExperience({{ $exp->id }})" wire:confirm="Delete this experience?" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                            <x-admin.confirm-button title="Delete Experience?" text="Delete this experience?" action="$wire.deleteExperience({{ $exp->id }})" confirm-text="Yes, delete it" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></x-admin.confirm-button>
                                         </div>
                                     </div>
                                 @endforeach
@@ -386,7 +391,7 @@
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <button wire:click="editEducationItem({{ $edu->id }})" class="p-2 text-gray-400 hover:text-primary-light hover:bg-primary/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                            <button wire:click="deleteEducation({{ $edu->id }})" wire:confirm="Delete this entry?" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                            <x-admin.confirm-button title="Delete Education Entry?" text="Delete this entry?" action="$wire.deleteEducation({{ $edu->id }})" confirm-text="Yes, delete it" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></x-admin.confirm-button>
                                         </div>
                                     </div>
                                 @endforeach
@@ -556,7 +561,7 @@
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <button wire:click="editProjectItem({{ $proj->id }})" class="p-2 text-gray-400 hover:text-primary-light hover:bg-primary/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                            <button wire:click="deleteProject({{ $proj->id }})" wire:confirm="Delete this project?" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                            <x-admin.confirm-button title="Delete Project?" text="Delete this project?" action="$wire.deleteProject({{ $proj->id }})" confirm-text="Yes, delete it" class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></x-admin.confirm-button>
                                         </div>
                                     </div>
                                 @endforeach
