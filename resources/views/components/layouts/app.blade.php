@@ -18,5 +18,7 @@
 <body class="landing bg-dark-950 text-gray-400 font-sans antialiased">
     {{ $slot }}
     @livewireScripts
+    <!-- <script src="http://localhost:3000/widget.js" data-business-id="309a84ca-93ff-4740-b441-c579609f3051"></script> -->
+     <script src="http://localhost:3000/widget.js" data-business-id="309a84ca-93ff-4740-b441-c579609f3051"></script>
 </body>
 </html>
