@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog\BlogPost;
+use App\Models\Education;
 use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\Technology;
 use App\Models\Testimonial;
 use App\Models\User;
@@ -25,8 +26,8 @@ class PortfolioController extends Controller
             'profile' => $profile,
             'skills' => Skill::query()->active()->ordered()->get(),
             'technologies' => Technology::groupedByCategory(),
-            'workExperiences' => Experience::query()->active()->ordered()->work()->with('responsibilities')->get(),
-            'education' => Experience::query()->active()->ordered()->education()->get(),
+            'workExperiences' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
+            'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->active()->ordered()->get(),
             'testimonials' => Testimonial::query()->visible()->ordered()->get(),
             'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),

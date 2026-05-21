@@ -116,6 +116,15 @@ class ProjectForm extends Component
 
     public function save(ProjectService $service): void
     {
+        $keptExistingCount = count($this->existingImages) - count(array_unique($this->removedImageIds));
+        $totalAfterSave = $keptExistingCount + count($this->galleryImages);
+
+        if ($totalAfterSave > 8) {
+            $this->addError('galleryImages', 'Gallery can have at most 8 images. Currently selected: '.$totalAfterSave.'.');
+
+            return;
+        }
+
         $validated = $this->validate([
             'title' => 'required|string|max:200',
             'short_description' => 'required|string|max:500',
@@ -128,6 +137,7 @@ class ProjectForm extends Component
             'is_active' => 'boolean',
             'completed_at' => 'nullable|date',
             'coverImage' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
+            'galleryImages' => 'array|max:8',
             'galleryImages.*' => 'image|max:2048|mimes:jpg,jpeg,png,webp',
         ]);
 

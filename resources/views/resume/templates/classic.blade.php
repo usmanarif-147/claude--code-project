@@ -245,15 +245,12 @@
                     <table class="exp-top-row" cellpadding="0" cellspacing="0">
                         <tr>
                             <td>
-                                <div class="edu-degree">{{ $edu->degree ?? $edu->role }}</div>
-                                @if($edu->field_of_study)
-                                    <div class="edu-field">{{ $edu->field_of_study }}</div>
-                                @endif
-                                <div class="edu-school">{{ $edu->company }}</div>
+                                <div class="edu-degree">{{ $edu->degree_title }}</div>
+                                <div class="edu-school">{{ $edu->institution }}</div>
                             </td>
                             <td class="exp-date">
-                                {{ $edu->start_date->format('M Y') }} —
-                                {{ $edu->is_current ? 'Present' : $edu->end_date?->format('M Y') }}
+                                {{ $edu->start_date?->format('M Y') ?? '' }} —
+                                {{ $edu->end_date?->format('M Y') ?? 'Present' }}
                             </td>
                         </tr>
                     </table>

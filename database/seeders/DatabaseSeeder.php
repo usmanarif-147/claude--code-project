@@ -4,16 +4,19 @@ namespace Database\Seeders;
 
 use App\Models\Blog\BlogPost;
 use App\Models\Blog\BlogPostTag;
+use App\Models\Category;
+use App\Models\Education;
 use App\Models\Experience\Experience;
 use App\Models\Experience\ExperienceResponsibility;
 use App\Models\Profile;
 use App\Models\Project\Project;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\Technology;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -40,6 +43,18 @@ class DatabaseSeeder extends Seeder
             'availability_status' => 'Open to opportunities',
         ]);
 
+        // Categories (shared by Skills + Technologies)
+        $categoryMap = [];
+        foreach ([
+            ['name' => 'Soft Skills', 'sort_order' => 0],
+            ['name' => 'Frontend', 'sort_order' => 1],
+            ['name' => 'Backend', 'sort_order' => 2],
+            ['name' => 'Database & Tools', 'sort_order' => 3],
+        ] as $cat) {
+            $category = Category::create($cat + ['slug' => Str::slug($cat['name'])]);
+            $categoryMap[$category->name] = $category->id;
+        }
+
         // Skills (soft skills / strengths)
         $skills = [
             ['title' => 'Problem Solving', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'sort_order' => 0],
@@ -49,40 +64,41 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($skills as $skill) {
-            Skill::create($skill);
+            Skill::create($skill + ['category_id' => $categoryMap['Soft Skills']]);
         }
 
         // Technologies
         $technologies = [
-            // Frontend
-            ['name' => 'HTML5', 'category' => 'frontend', 'sort_order' => 0],
-            ['name' => 'CSS3', 'category' => 'frontend', 'sort_order' => 1],
-            ['name' => 'JavaScript', 'category' => 'frontend', 'sort_order' => 2],
-            ['name' => 'Alpine.js', 'category' => 'frontend', 'sort_order' => 3],
-            ['name' => 'Livewire', 'category' => 'frontend', 'sort_order' => 4],
-            ['name' => 'Tailwind CSS', 'category' => 'frontend', 'sort_order' => 5],
-            ['name' => 'Bootstrap', 'category' => 'frontend', 'sort_order' => 6],
-            ['name' => 'jQuery', 'category' => 'frontend', 'sort_order' => 7],
-            // Backend
-            ['name' => 'PHP', 'category' => 'backend', 'sort_order' => 0],
-            ['name' => 'Laravel', 'category' => 'backend', 'sort_order' => 1],
-            ['name' => 'Filament', 'category' => 'backend', 'sort_order' => 2],
-            ['name' => 'REST APIs', 'category' => 'backend', 'sort_order' => 3],
-            ['name' => 'Python', 'category' => 'backend', 'sort_order' => 4],
-            ['name' => 'Node.js', 'category' => 'backend', 'sort_order' => 5],
-            // Database & Tools
-            ['name' => 'MySQL', 'category' => 'database_tools', 'sort_order' => 0],
-            ['name' => 'PostgreSQL', 'category' => 'database_tools', 'sort_order' => 1],
-            ['name' => 'Redis', 'category' => 'database_tools', 'sort_order' => 2],
-            ['name' => 'Git', 'category' => 'database_tools', 'sort_order' => 3],
-            ['name' => 'Docker', 'category' => 'database_tools', 'sort_order' => 4],
-            ['name' => 'Linux', 'category' => 'database_tools', 'sort_order' => 5],
-            ['name' => 'AWS', 'category' => 'database_tools', 'sort_order' => 6],
-            ['name' => 'CI/CD', 'category' => 'database_tools', 'sort_order' => 7],
+            ['name' => 'HTML5', 'category' => 'Frontend', 'sort_order' => 0],
+            ['name' => 'CSS3', 'category' => 'Frontend', 'sort_order' => 1],
+            ['name' => 'JavaScript', 'category' => 'Frontend', 'sort_order' => 2],
+            ['name' => 'Alpine.js', 'category' => 'Frontend', 'sort_order' => 3],
+            ['name' => 'Livewire', 'category' => 'Frontend', 'sort_order' => 4],
+            ['name' => 'Tailwind CSS', 'category' => 'Frontend', 'sort_order' => 5],
+            ['name' => 'Bootstrap', 'category' => 'Frontend', 'sort_order' => 6],
+            ['name' => 'jQuery', 'category' => 'Frontend', 'sort_order' => 7],
+            ['name' => 'PHP', 'category' => 'Backend', 'sort_order' => 0],
+            ['name' => 'Laravel', 'category' => 'Backend', 'sort_order' => 1],
+            ['name' => 'Filament', 'category' => 'Backend', 'sort_order' => 2],
+            ['name' => 'REST APIs', 'category' => 'Backend', 'sort_order' => 3],
+            ['name' => 'Python', 'category' => 'Backend', 'sort_order' => 4],
+            ['name' => 'Node.js', 'category' => 'Backend', 'sort_order' => 5],
+            ['name' => 'MySQL', 'category' => 'Database & Tools', 'sort_order' => 0],
+            ['name' => 'PostgreSQL', 'category' => 'Database & Tools', 'sort_order' => 1],
+            ['name' => 'Redis', 'category' => 'Database & Tools', 'sort_order' => 2],
+            ['name' => 'Git', 'category' => 'Database & Tools', 'sort_order' => 3],
+            ['name' => 'Docker', 'category' => 'Database & Tools', 'sort_order' => 4],
+            ['name' => 'Linux', 'category' => 'Database & Tools', 'sort_order' => 5],
+            ['name' => 'AWS', 'category' => 'Database & Tools', 'sort_order' => 6],
+            ['name' => 'CI/CD', 'category' => 'Database & Tools', 'sort_order' => 7],
         ];
 
         foreach ($technologies as $tech) {
-            Technology::create($tech);
+            Technology::create([
+                'name' => $tech['name'],
+                'category_id' => $categoryMap[$tech['category']],
+                'sort_order' => $tech['sort_order'],
+            ]);
         }
 
         // Experiences
@@ -129,14 +145,11 @@ class DatabaseSeeder extends Seeder
         }
 
         // Education
-        Experience::create([
-            'role' => 'B.S. Software Engineering',
-            'company' => 'University of Management and Technology (UMT)',
-            'description' => 'Lahore, Pakistan',
+        Education::create([
+            'degree_title' => 'B.S. Software Engineering',
+            'institution' => 'University of Management and Technology (UMT)',
             'start_date' => '2016-09-01',
             'end_date' => '2021-06-01',
-            'is_current' => false,
-            'type' => 'education',
             'sort_order' => 0,
         ]);
 

@@ -331,14 +331,14 @@ class ResumeGenerator extends Component
 
     public function editEducationItem(int $id): void
     {
-        $edu = \App\Models\Experience\Experience::findOrFail($id);
+        $edu = \App\Models\Education::findOrFail($id);
         $this->editEducationId = $edu->id;
-        $this->editEduDegree = $edu->degree ?? $edu->role ?? '';
-        $this->editEduField = $edu->field_of_study ?? '';
-        $this->editEduCompany = $edu->company ?? '';
+        $this->editEduDegree = $edu->degree_title ?? '';
+        $this->editEduField = '';
+        $this->editEduCompany = $edu->institution ?? '';
         $this->editEduStartDate = $edu->start_date?->format('Y-m-d') ?? '';
         $this->editEduEndDate = $edu->end_date?->format('Y-m-d') ?? '';
-        $this->editEduIsCurrent = (bool) $edu->is_current;
+        $this->editEduIsCurrent = false;
     }
 
     public function newEducationItem(): void
@@ -350,20 +350,16 @@ class ResumeGenerator extends Component
     {
         $this->validate([
             'editEduDegree' => 'required|string|max:255',
-            'editEduField' => 'nullable|string|max:255',
             'editEduCompany' => 'required|string|max:255',
-            'editEduStartDate' => 'required|date',
+            'editEduStartDate' => 'nullable|date',
             'editEduEndDate' => 'nullable|date',
-            'editEduIsCurrent' => 'boolean',
         ]);
 
         $service->saveEducationItem([
-            'degree' => $this->editEduDegree,
-            'field_of_study' => $this->editEduField,
-            'company' => $this->editEduCompany,
-            'start_date' => $this->editEduStartDate,
-            'end_date' => $this->editEduEndDate,
-            'is_current' => $this->editEduIsCurrent,
+            'degree_title' => $this->editEduDegree,
+            'institution' => $this->editEduCompany,
+            'start_date' => $this->editEduStartDate ?: null,
+            'end_date' => $this->editEduEndDate ?: null,
         ], $this->editEducationId);
 
         session()->flash('success', $this->editEducationId ? 'Education updated.' : 'Education added.');
@@ -373,7 +369,7 @@ class ResumeGenerator extends Component
 
     public function deleteEducation(int $id, ResumeService $service): void
     {
-        \App\Models\Experience\Experience::findOrFail($id)->delete();
+        \App\Models\Education::findOrFail($id)->delete();
         session()->flash('success', 'Education entry deleted.');
         $this->refreshPreview($service);
     }
@@ -385,7 +381,7 @@ class ResumeGenerator extends Component
         $this->editSkills = $data['skills']->map(fn ($s) => [
             'id' => $s->id,
             'title' => $s->title,
-            'category' => $s->category ?? '',
+            'category' => $s->category?->name ?? '',
             'proficiency' => $s->proficiency ?? 80,
         ])->toArray();
         $this->newSkillTitle = '';
@@ -411,7 +407,7 @@ class ResumeGenerator extends Component
     public function removeSkill(int $index): void
     {
         if (isset($this->editSkills[$index]['id'])) {
-            \App\Models\Skill::where('id', $this->editSkills[$index]['id'])->delete();
+            \App\Models\Skill\Skill::where('id', $this->editSkills[$index]['id'])->delete();
         }
         unset($this->editSkills[$index]);
         $this->editSkills = array_values($this->editSkills);
@@ -435,7 +431,7 @@ class ResumeGenerator extends Component
                 $allTechs[] = [
                     'id' => $tech->id,
                     'name' => $tech->name,
-                    'category' => $tech->category ?? $category,
+                    'category' => $tech->category?->name ?? $category,
                 ];
             }
         }

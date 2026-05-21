@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Livewire\Admin\Portfolio\Technologies;
+namespace App\Livewire\Admin\Portfolio\Categories;
 
 use App\Models\Category;
-use App\Models\Technology;
-use App\Services\TechnologyService;
+use App\Services\CategoryService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('components.layouts.admin')]
-class TechnologyIndex extends Component
+class CategoryIndex extends Component
 {
     use WithPagination;
 
@@ -20,9 +19,6 @@ class TechnologyIndex extends Component
 
     #[Url]
     public string $activeFilter = 'all';
-
-    #[Url]
-    public string $categoryFilter = 'all';
 
     public function updatingSearch(): void
     {
@@ -34,20 +30,25 @@ class TechnologyIndex extends Component
         $this->resetPage();
     }
 
-    public function updatingCategoryFilter(): void
+    public function delete(CategoryService $service, int $id): void
     {
-        $this->resetPage();
-    }
+        $category = Category::findOrFail($id);
 
-    public function delete(TechnologyService $service, int $id): void
-    {
-        $service->delete(Technology::findOrFail($id));
-        session()->flash('success', 'Technology deleted successfully.');
+        if ($category->skills()->exists() || $category->technologies()->exists()) {
+            session()->flash('error', 'Cannot delete a category that still has skills or technologies assigned to it.');
+
+            return;
+        }
+
+        $service->delete($category);
+        session()->flash('success', 'Category deleted successfully.');
     }
 
     public function render()
     {
-        $query = Technology::query()->with('category')->ordered();
+        $query = Category::query()
+            ->withCount(['skills', 'technologies'])
+            ->ordered();
 
         if ($this->search) {
             $query->where('name', 'like', '%'.$this->search.'%');
@@ -59,13 +60,8 @@ class TechnologyIndex extends Component
             $query->where('is_active', false);
         }
 
-        if ($this->categoryFilter !== 'all') {
-            $query->where('category_id', $this->categoryFilter);
-        }
-
-        return view('livewire.admin.portfolio.technologies.index', [
-            'technologies' => $query->paginate(10),
-            'categories' => Category::ordered()->get(),
+        return view('livewire.admin.portfolio.categories.index', [
+            'categories' => $query->paginate(10),
         ]);
     }
 }

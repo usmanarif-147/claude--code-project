@@ -2,14 +2,14 @@
     <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
         <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-300 transition-colors">Dashboard</a>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        <a href="{{ route('admin.technologies.index') }}" wire:navigate class="hover:text-gray-300 transition-colors">Technologies</a>
+        <a href="{{ route('admin.categories.index') }}" wire:navigate class="hover:text-gray-300 transition-colors">Categories</a>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        <span class="text-gray-300">{{ $technology ? 'Edit' : 'Create' }} Technology</span>
+        <span class="text-gray-300">{{ $category ? 'Edit' : 'Create' }} Category</span>
     </div>
 
     <div class="mb-8">
-        <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">{{ $technology ? 'Edit Technology' : 'Create Technology' }}</h1>
-        <p class="text-gray-500 mt-1">{{ $technology ? 'Update technology details.' : 'Add a new technology to your stack.' }}</p>
+        <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">{{ $category ? 'Edit Category' : 'Create Category' }}</h1>
+        <p class="text-gray-500 mt-1">{{ $category ? 'Update category details.' : 'Add a new category. Used by Skills and Technologies (e.g. Backend, Frontend).' }}</p>
     </div>
 
     <form wire:submit="save" class="max-w-2xl">
@@ -18,32 +18,9 @@
                 <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">Name <span class="text-red-400">*</span></label>
                 <input type="text" id="name" wire:model="name"
                        class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
-                       placeholder="e.g. React">
+                       placeholder="e.g. Backend">
+                <p class="mt-1 text-xs text-gray-500">A URL-friendly slug will be generated automatically.</p>
                 @error('name') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label for="category_id" class="block text-sm font-medium text-gray-300 mb-1.5">Category <span class="text-red-400">*</span></label>
-                @if ($categories->isEmpty())
-                    <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-lg px-4 py-3 text-sm">
-                        No categories yet.
-                        <a href="{{ route('admin.categories.create') }}" wire:navigate class="underline hover:text-amber-200">Create one first</a>
-                        before adding technologies.
-                    </div>
-                @else
-                    <select id="category_id" wire:model="category_id"
-                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
-                        <option value="">— Select a category —</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                    <p class="mt-1 text-xs text-gray-500">
-                        Need a new category?
-                        <a href="{{ route('admin.categories.index') }}" wire:navigate class="text-primary-light hover:underline">Manage categories</a>.
-                    </p>
-                @endif
-                @error('category_id') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -67,13 +44,13 @@
         <div class="mt-6 flex items-center gap-3">
             <button type="submit"
                     class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
-                <span wire:loading.remove wire:target="save">{{ $technology ? 'Update Technology' : 'Create Technology' }}</span>
+                <span wire:loading.remove wire:target="save">{{ $category ? 'Update Category' : 'Create Category' }}</span>
                 <span wire:loading wire:target="save" class="flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                     Saving...
                 </span>
             </button>
-            <a href="{{ route('admin.technologies.index') }}" wire:navigate
+            <a href="{{ route('admin.categories.index') }}" wire:navigate
                class="text-gray-400 hover:text-white font-medium rounded-lg px-6 py-2.5 transition-colors">
                 Cancel
             </a>

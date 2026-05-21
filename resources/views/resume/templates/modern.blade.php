@@ -290,14 +290,11 @@
                             <div class="section-title">Education</div>
                             @foreach($education as $edu)
                                 <div class="exp-item">
-                                    <div class="edu-degree">{{ $edu->degree ?? $edu->role }}</div>
-                                    @if($edu->field_of_study)
-                                        <div class="edu-field">{{ $edu->field_of_study }}</div>
-                                    @endif
-                                    <div class="edu-school">{{ $edu->company }}</div>
+                                    <div class="edu-degree">{{ $edu->degree_title }}</div>
+                                    <div class="edu-school">{{ $edu->institution }}</div>
                                     <div class="exp-date">
-                                        {{ $edu->start_date->format('M Y') }} —
-                                        {{ $edu->is_current ? 'Present' : $edu->end_date?->format('M Y') }}
+                                        {{ $edu->start_date?->format('M Y') ?? '' }} —
+                                        {{ $edu->end_date?->format('M Y') ?? 'Present' }}
                                     </div>
                                 </div>
                             @endforeach

@@ -276,7 +276,8 @@
         </section>
     @endif
 
-    {{-- ==================== TESTIMONIALS ==================== --}}
+    {{-- ==================== TESTIMONIALS (HIDDEN — re-enable by removing the wrapping Blade comment below) ==================== --}}
+    {{--
     @if($testimonials->isNotEmpty())
         <section id="testimonials" class="py-24 md:py-32">
             <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -319,6 +320,7 @@
             </div>
         </section>
     @endif
+    --}}
 
     {{-- ==================== EDUCATION ==================== --}}
     @if($education->isNotEmpty())
@@ -344,13 +346,10 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 class="text-xl font-bold text-white">{{ $edu->role }}</h3>
-                                        <p class="text-accent-light font-medium mt-1">{{ $edu->company }}</p>
-                                        @if($edu->description)
-                                            <p class="text-gray-400 text-sm mt-1">{{ $edu->description }}</p>
-                                        @endif
+                                        <h3 class="text-xl font-bold text-white">{{ $edu->degree_title }}</h3>
+                                        <p class="text-accent-light font-medium mt-1">{{ $edu->institution }}</p>
                                         <p class="text-gray-500 font-mono text-sm mt-2">
-                                            {{ $edu->start_date->format('Y') }} — {{ $edu->end_date ? $edu->end_date->format('Y') : 'Present' }}
+                                            {{ $edu->start_date?->format('Y') ?? '' }} — {{ $edu->end_date ? $edu->end_date->format('Y') : 'Present' }}
                                         </p>
                                     </div>
                                 </div>
@@ -362,7 +361,8 @@
         </section>
     @endif
 
-    {{-- ==================== BLOG ==================== --}}
+    {{-- ==================== BLOG (HIDDEN — re-enable by removing the wrapping Blade comment below) ==================== --}}
+    {{--
     @if($blogPosts->isNotEmpty())
         <section id="blog" class="py-24 md:py-32">
             <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -393,6 +393,7 @@
             </div>
         </section>
     @endif
+    --}}
 
     {{-- ==================== CONTACT ==================== --}}
     <section id="contact" class="py-24 md:py-32">

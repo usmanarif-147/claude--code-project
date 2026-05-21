@@ -7,7 +7,7 @@ use App\Models\Experience\Experience;
 use App\Models\JobSearch\CoverLetter;
 use App\Models\JobSearch\JobListing;
 use App\Models\Profile;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

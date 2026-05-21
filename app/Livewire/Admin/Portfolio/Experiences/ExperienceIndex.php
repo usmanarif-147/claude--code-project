@@ -20,20 +20,12 @@ class ExperienceIndex extends Component
     #[Url]
     public string $activeFilter = 'all';
 
-    #[Url]
-    public string $typeFilter = 'all';
-
     public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
     public function updatingActiveFilter(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingTypeFilter(): void
     {
         $this->resetPage();
     }
@@ -59,10 +51,6 @@ class ExperienceIndex extends Component
             $query->where('is_active', true);
         } elseif ($this->activeFilter === 'inactive') {
             $query->where('is_active', false);
-        }
-
-        if ($this->typeFilter !== 'all') {
-            $query->where('type', $this->typeFilter);
         }
 
         return view('livewire.admin.portfolio.experiences.index', [

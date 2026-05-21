@@ -24,11 +24,27 @@
 
             {{-- Category --}}
             <div>
-                <label for="category" class="block text-sm font-medium text-gray-300 mb-2">Category</label>
-                <input type="text" id="category" wire:model="category"
-                       placeholder="e.g. Frontend, Backend, DevOps, AI"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
-                @error('category') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Category <span class="text-red-400">*</span></label>
+                @if ($categories->isEmpty())
+                    <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-lg px-4 py-3 text-sm">
+                        No categories yet.
+                        <a href="{{ route('admin.categories.create') }}" wire:navigate class="underline hover:text-amber-200">Create one first</a>
+                        before adding skills.
+                    </div>
+                @else
+                    <select id="category_id" wire:model="category_id"
+                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                        <option value="">— Select a category —</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Need a new category?
+                        <a href="{{ route('admin.categories.index') }}" wire:navigate class="text-primary-light hover:underline">Manage categories</a>.
+                    </p>
+                @endif
+                @error('category_id') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
             {{-- Proficiency --}}

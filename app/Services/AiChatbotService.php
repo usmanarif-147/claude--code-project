@@ -7,7 +7,7 @@ use App\Models\Chatbot\ChatbotConversation;
 use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\Technology;
 use App\Models\Testimonial;
 use App\Models\User;
@@ -65,18 +65,18 @@ class AiChatbotService
                 $context .= "\n";
             }
 
-            $technologies = Technology::all();
+            $technologies = Technology::with('category')->get();
             if ($technologies->isNotEmpty()) {
                 $context .= "\n=== TECHNOLOGIES ===\n";
                 $context .= $technologies->map(function ($tech) {
-                    $category = $tech->category ? "[{$tech->category}] " : '';
+                    $category = $tech->category ? "[{$tech->category->name}] " : '';
 
                     return "- {$category}{$tech->name}";
                 })->implode("\n");
                 $context .= "\n";
             }
 
-            $experiences = Experience::query()->active()->ordered()->work()->with('responsibilities')->get();
+            $experiences = Experience::query()->active()->ordered()->with('responsibilities')->get();
             if ($experiences->isNotEmpty()) {
                 $context .= "\n=== WORK EXPERIENCE ===\n";
                 $context .= $experiences->map(function ($exp) {

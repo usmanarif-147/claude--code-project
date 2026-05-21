@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Admin\Portfolio\Skills;
 
-use App\Models\Skill;
+use App\Models\Category;
+use App\Models\Skill\Skill;
 use App\Services\SkillService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -14,7 +15,7 @@ class SkillForm extends Component
 
     public string $title = '';
 
-    public string $category = '';
+    public ?int $category_id = null;
 
     public int $proficiency = 0;
 
@@ -29,7 +30,7 @@ class SkillForm extends Component
         if ($skill && $skill->exists) {
             $this->skill = $skill;
             $this->title = $skill->title;
-            $this->category = $skill->category ?? '';
+            $this->category_id = $skill->category_id;
             $this->proficiency = $skill->proficiency ?? 0;
             $this->icon = $skill->icon ?? '';
             $this->sort_order = $skill->sort_order ?? 0;
@@ -41,7 +42,7 @@ class SkillForm extends Component
     {
         $validated = $this->validate([
             'title' => 'required|string|max:255',
-            'category' => 'nullable|string|max:100',
+            'category_id' => 'required|integer|exists:categories,id',
             'proficiency' => 'integer|min:0|max:100',
             'icon' => 'nullable|string|max:5000',
             'sort_order' => 'integer|min:0',
@@ -62,6 +63,8 @@ class SkillForm extends Component
 
     public function render()
     {
-        return view('livewire.admin.portfolio.skills.form');
+        return view('livewire.admin.portfolio.skills.form', [
+            'categories' => Category::active()->ordered()->get(),
+        ]);
     }
 }

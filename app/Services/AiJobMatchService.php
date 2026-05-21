@@ -7,7 +7,7 @@ use App\Models\JobSearch\JobListing;
 use App\Models\JobSearch\JobMatchScore;
 use App\Models\JobSearchFilter;
 use App\Models\Profile;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;

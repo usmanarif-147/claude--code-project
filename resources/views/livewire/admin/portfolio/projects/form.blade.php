@@ -132,8 +132,17 @@
             </div>
 
             {{-- Gallery Images --}}
+            @php
+                $keptExistingCount = count($existingImages) - count(array_unique($removedImageIds));
+                $totalSelected = $keptExistingCount + count($galleryImages);
+                $remainingSlots = max(0, 8 - $totalSelected);
+            @endphp
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1.5">Gallery Images</label>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="block text-sm font-medium text-gray-300">Gallery Images</label>
+                    <span class="text-xs font-mono {{ $totalSelected > 8 ? 'text-red-400' : 'text-gray-500' }}">{{ $totalSelected }} / 8</span>
+                </div>
+                <p class="text-xs text-gray-500 mb-3">Up to 8 images. JPG, PNG or WebP, max 2&nbsp;MB each.</p>
 
                 {{-- Existing gallery images --}}
                 @if (count($existingImages) > 0)
@@ -166,7 +175,12 @@
                 @endif
 
                 <input type="file" wire:model="galleryImages" multiple accept="image/*"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary-light hover:file:bg-primary/20">
+                       @disabled($remainingSlots === 0)
+                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary-light hover:file:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                @if ($remainingSlots === 0 && $totalSelected <= 8)
+                    <p class="mt-1 text-xs text-amber-400">Gallery full. Remove an image to add another.</p>
+                @endif
+                @error('galleryImages') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                 @error('galleryImages.*') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
         </div>

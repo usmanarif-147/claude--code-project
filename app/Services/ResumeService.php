@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\ApiKey;
+use App\Models\Category;
+use App\Models\Education;
 use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\ResumeDownload;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\Technology;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -30,8 +32,8 @@ class ResumeService
             'profile' => $profile,
             'skills' => Skill::query()->active()->ordered()->get(),
             'technologies' => Technology::groupedByCategory(),
-            'workExperience' => Experience::query()->active()->ordered()->work()->with('responsibilities')->get(),
-            'education' => Experience::query()->active()->ordered()->education()->get(),
+            'workExperience' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
+            'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->active()->ordered()->get(),
         ];
     }
@@ -182,7 +184,6 @@ class ResumeService
     public function saveExperienceItem(array $data, ?int $id = null): Experience
     {
         $attrs = [
-            'type' => 'work',
             'role' => $data['role'],
             'company' => $data['company'],
             'start_date' => $data['start_date'],
@@ -214,47 +215,44 @@ class ResumeService
         return $experience;
     }
 
-    public function saveEducationItem(array $data, ?int $id = null): Experience
+    public function saveEducationItem(array $data, ?int $id = null): Education
     {
         $attrs = [
-            'type' => 'education',
-            'role' => $data['degree'] ?? '',
-            'company' => $data['company'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['is_current'] ? null : ($data['end_date'] ?? null),
-            'is_current' => $data['is_current'] ?? false,
-            'degree' => $data['degree'] ?? null,
-            'field_of_study' => $data['field_of_study'] ?? null,
-            'is_active' => true,
+            'degree_title' => $data['degree_title'] ?? '',
+            'institution' => $data['institution'] ?? '',
+            'start_date' => $data['start_date'] ?? null,
+            'end_date' => $data['end_date'] ?? null,
         ];
 
         if ($id) {
-            $experience = Experience::findOrFail($id);
-            $experience->update($attrs);
+            $education = Education::findOrFail($id);
+            $education->update($attrs);
         } else {
-            $attrs['sort_order'] = Experience::max('sort_order') + 1;
-            $experience = Experience::create($attrs);
+            $attrs['sort_order'] = (Education::max('sort_order') ?? 0) + 1;
+            $education = Education::create($attrs);
         }
 
-        return $experience;
+        return $education;
     }
 
     public function syncSkills(array $skills): void
     {
         foreach ($skills as $skillData) {
+            $categoryId = $this->resolveCategoryId($skillData['category'] ?? null);
+
             if (isset($skillData['id'])) {
                 Skill::where('id', $skillData['id'])->update([
                     'title' => $skillData['title'],
-                    'category' => $skillData['category'] ?? null,
+                    'category_id' => $categoryId,
                     'proficiency' => $skillData['proficiency'] ?? 80,
                 ]);
             } else {
                 Skill::create([
                     'title' => $skillData['title'],
-                    'category' => $skillData['category'] ?? null,
+                    'category_id' => $categoryId,
                     'proficiency' => $skillData['proficiency'] ?? 80,
                     'is_active' => true,
-                    'sort_order' => Skill::max('sort_order') + 1,
+                    'sort_order' => (Skill::max('sort_order') ?? 0) + 1,
                 ]);
             }
         }
@@ -263,20 +261,31 @@ class ResumeService
     public function syncTechnologies(array $technologies): void
     {
         foreach ($technologies as $techData) {
+            $categoryId = $this->resolveCategoryId($techData['category'] ?? null);
+
             if (isset($techData['id'])) {
                 Technology::where('id', $techData['id'])->update([
                     'name' => $techData['name'],
-                    'category' => $techData['category'],
+                    'category_id' => $categoryId,
                 ]);
             } else {
                 Technology::create([
                     'name' => $techData['name'],
-                    'category' => $techData['category'],
+                    'category_id' => $categoryId,
                     'is_active' => true,
-                    'sort_order' => Technology::max('sort_order') + 1,
+                    'sort_order' => (Technology::max('sort_order') ?? 0) + 1,
                 ]);
             }
         }
+    }
+
+    private function resolveCategoryId(?string $name): ?int
+    {
+        if (! $name) {
+            return null;
+        }
+
+        return Category::query()->where('name', $name)->value('id');
     }
 
     public function saveProjectItem(array $data, ?int $id = null): Project
@@ -458,10 +467,10 @@ class ResumeService
                 if (! $existing) {
                     Skill::create([
                         'title' => $skill['title'],
-                        'category' => $skill['category'] ?? null,
+                        'category_id' => $this->resolveCategoryId($skill['category'] ?? null),
                         'proficiency' => $skill['proficiency'] ?? 80,
                         'is_active' => true,
-                        'sort_order' => Skill::max('sort_order') + 1,
+                        'sort_order' => (Skill::max('sort_order') ?? 0) + 1,
                     ]);
                     $count++;
                 }
@@ -474,15 +483,16 @@ class ResumeService
         if (! empty($data['technologies'])) {
             $count = 0;
             foreach ($data['technologies'] as $tech) {
+                $categoryId = $this->resolveCategoryId($tech['category'] ?? null);
                 $existing = Technology::where('name', $tech['name'])
-                    ->where('category', $tech['category'] ?? '')
+                    ->where('category_id', $categoryId)
                     ->first();
                 if (! $existing) {
                     Technology::create([
                         'name' => $tech['name'],
-                        'category' => $tech['category'] ?? 'Other',
+                        'category_id' => $categoryId,
                         'is_active' => true,
-                        'sort_order' => Technology::max('sort_order') + 1,
+                        'sort_order' => (Technology::max('sort_order') ?? 0) + 1,
                     ]);
                     $count++;
                 }
@@ -512,13 +522,12 @@ class ResumeService
         if (! empty($data['education'])) {
             $count = 0;
             foreach ($data['education'] as $edu) {
+                $degreeTitle = trim(($edu['degree'] ?? $edu['title'] ?? '').(! empty($edu['field_of_study']) ? ' in '.$edu['field_of_study'] : ''));
                 $this->saveEducationItem([
-                    'degree' => $edu['degree'] ?? $edu['title'] ?? '',
-                    'field_of_study' => $edu['field_of_study'] ?? $edu['field'] ?? null,
-                    'company' => $edu['company'] ?? $edu['institution'] ?? '',
-                    'start_date' => $edu['start_date'] ?? now()->format('Y-m-d'),
+                    'degree_title' => $degreeTitle,
+                    'institution' => $edu['institution'] ?? $edu['company'] ?? '',
+                    'start_date' => $edu['start_date'] ?? null,
                     'end_date' => $edu['end_date'] ?? null,
-                    'is_current' => $edu['is_current'] ?? false,
                 ]);
                 $count++;
             }

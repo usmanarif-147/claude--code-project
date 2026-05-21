@@ -6,7 +6,7 @@ use App\Models\Blog\BlogPost;
 use App\Models\Experience\Experience;
 use App\Models\PortfolioVisitor;
 use App\Models\Project\Project;
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 use App\Models\Technology;
 use App\Models\Testimonial;
 use Livewire\Attributes\Layout;

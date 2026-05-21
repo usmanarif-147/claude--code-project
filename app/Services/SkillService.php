@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Skill;
+use App\Models\Skill\Skill;
 
 class SkillService
 {

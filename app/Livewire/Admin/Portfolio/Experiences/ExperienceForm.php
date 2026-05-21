@@ -12,8 +12,6 @@ class ExperienceForm extends Component
 {
     public ?Experience $experience = null;
 
-    public string $type = 'work';
-
     public string $role = '';
 
     public string $company = '';
@@ -26,10 +24,6 @@ class ExperienceForm extends Component
 
     public string $description = '';
 
-    public string $degree = '';
-
-    public string $field_of_study = '';
-
     public int $sort_order = 0;
 
     public bool $is_active = true;
@@ -40,15 +34,12 @@ class ExperienceForm extends Component
     {
         if ($experience && $experience->exists) {
             $this->experience = $experience;
-            $this->type = $experience->type ?? 'work';
             $this->role = $experience->role;
             $this->company = $experience->company;
             $this->start_date = $experience->start_date?->format('Y-m-d');
             $this->end_date = $experience->end_date?->format('Y-m-d');
             $this->is_current = $experience->is_current;
             $this->description = $experience->description ?? '';
-            $this->degree = $experience->degree ?? '';
-            $this->field_of_study = $experience->field_of_study ?? '';
             $this->sort_order = $experience->sort_order ?? 0;
             $this->is_active = $experience->is_active;
 
@@ -80,34 +71,26 @@ class ExperienceForm extends Component
 
     public function save(ExperienceService $service): void
     {
-        $rules = [
-            'type' => 'required|in:work,education',
+        $validated = $this->validate([
             'role' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'is_current' => 'boolean',
             'description' => 'nullable|string|max:500',
-            'degree' => 'required_if:type,education|nullable|string|max:255',
-            'field_of_study' => 'required_if:type,education|nullable|string|max:255',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
-        ];
-
-        if ($this->type !== 'education') {
-            $rules['responsibilities'] = 'array';
-            $rules['responsibilities.*.description'] = 'required|string|max:1000';
-            $rules['responsibilities.*.sort_order'] = 'integer|min:0';
-        }
-
-        $validated = $this->validate($rules);
+            'responsibilities' => 'array',
+            'responsibilities.*.description' => 'required|string|max:1000',
+            'responsibilities.*.sort_order' => 'integer|min:0',
+        ]);
 
         if ($this->is_current) {
             $validated['end_date'] = null;
         }
 
         $experienceData = collect($validated)->except('responsibilities')->toArray();
-        $responsibilities = $this->type === 'education' ? [] : ($validated['responsibilities'] ?? []);
+        $responsibilities = $validated['responsibilities'] ?? [];
 
         if ($this->experience) {
             $service->update($this->experience, $experienceData, $responsibilities);

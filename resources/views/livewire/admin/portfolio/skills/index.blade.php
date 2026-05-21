@@ -28,7 +28,7 @@
                     class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <option value="all">All Categories</option>
                 @foreach($categories as $cat)
-                    <option value="{{ $cat }}">{{ $cat }}</option>
+                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                 @endforeach
             </select>
             <select wire:model.live="activeFilter"
@@ -62,7 +62,7 @@
                             <td class="px-6 py-4 text-sm text-gray-400">
                                 @if($skill->category)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">
-                                        {{ $skill->category }}
+                                        {{ $skill->category->name }}
                                     </span>
                                 @else
                                     <span class="text-gray-600">—</span>

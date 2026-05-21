@@ -386,8 +386,8 @@
                                 @foreach($educationList as $edu)
                                     <div class="flex items-center justify-between bg-dark-700 rounded-lg px-4 py-3">
                                         <div>
-                                            <p class="text-sm font-medium text-white">{{ $edu->degree ?? $edu->role }}</p>
-                                            <p class="text-xs text-gray-400">{{ $edu->company }} &middot; {{ $edu->start_date->format('Y') }} — {{ $edu->is_current ? 'Present' : ($edu->end_date?->format('Y') ?? '') }}</p>
+                                            <p class="text-sm font-medium text-white">{{ $edu->degree_title }}</p>
+                                            <p class="text-xs text-gray-400">{{ $edu->institution }} &middot; {{ $edu->start_date?->format('Y') ?? '' }} — {{ $edu->end_date?->format('Y') ?? 'Present' }}</p>
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <button wire:click="editEducationItem({{ $edu->id }})" class="p-2 text-gray-400 hover:text-primary-light hover:bg-primary/10 rounded-lg transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>

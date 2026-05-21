@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Admin\Portfolio\Skills;
 
-use App\Models\Skill;
+use App\Models\Category;
+use App\Models\Skill\Skill;
 use App\Services\SkillService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -46,7 +47,7 @@ class SkillIndex extends Component
 
     public function render()
     {
-        $query = Skill::query()->ordered();
+        $query = Skill::query()->with('category')->ordered();
 
         if ($this->search) {
             $query->where('title', 'like', '%'.$this->search.'%');
@@ -59,17 +60,12 @@ class SkillIndex extends Component
         }
 
         if ($this->categoryFilter !== 'all') {
-            $query->where('category', $this->categoryFilter);
+            $query->where('category_id', $this->categoryFilter);
         }
-
-        $categories = Skill::whereNotNull('category')
-            ->where('category', '!=', '')
-            ->distinct()
-            ->pluck('category');
 
         return view('livewire.admin.portfolio.skills.index', [
             'skills' => $query->paginate(10),
-            'categories' => $categories,
+            'categories' => Category::ordered()->get(),
         ]);
     }
 }

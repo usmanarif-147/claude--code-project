@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 class Technology extends Model
 {
     protected $fillable = [
         'name',
-        'category',
+        'category_id',
         'sort_order',
         'is_active',
     ];
@@ -20,6 +21,11 @@ class Technology extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function scopeActive(Builder $query): Builder
@@ -32,13 +38,18 @@ class Technology extends Model
         return $query->orderBy('sort_order');
     }
 
-    public function scopeByCategory(Builder $query, string $category): Builder
+    public function scopeByCategory(Builder $query, int $categoryId): Builder
     {
-        return $query->where('category', $category);
+        return $query->where('category_id', $categoryId);
     }
 
     public static function groupedByCategory(): Collection
     {
-        return static::active()->ordered()->get()->groupBy('category');
+        return static::query()
+            ->with('category')
+            ->active()
+            ->ordered()
+            ->get()
+            ->groupBy(fn (self $tech) => $tech->category?->name ?? 'Uncategorized');
     }
 }
