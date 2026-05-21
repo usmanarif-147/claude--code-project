@@ -19,7 +19,11 @@ return new class extends Migration
             $table->string('location', 255)->nullable();
             $table->string('linkedin_url', 255)->nullable();
             $table->string('github_url', 255)->nullable();
+            $table->string('fiverr_url', 255)->nullable();
+            $table->string('youtube_url', 255)->nullable();
             $table->string('availability_status', 100)->nullable();
+            $table->string('timezone', 100)->nullable()->default('UTC');
+            $table->string('language', 10)->nullable()->default('en');
             $table->timestamps();
         });
     }

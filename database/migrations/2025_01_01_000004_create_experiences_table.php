@@ -15,6 +15,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->boolean('is_current')->default(false);
+            $table->string('description', 500)->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

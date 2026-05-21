@@ -11,6 +11,11 @@ return new class extends Migration
         Schema::create('skills', function (Blueprint $table) {
             $table->id();
             $table->string('title', 100);
+            $table->foreignId('category_id')
+                ->nullable()
+                ->constrained('categories')
+                ->nullOnDelete();
+            $table->unsignedTinyInteger('proficiency')->default(0);
             $table->text('icon')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
