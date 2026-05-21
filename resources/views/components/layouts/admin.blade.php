@@ -98,7 +98,7 @@
                     request()->routeIs('admin.educations.*') ||
                     request()->routeIs('admin.categories.*') ||
                     request()->routeIs('admin.skills.*') ||
-                    request()->routeIs('admin.technologies.*') ||
+                    request()->routeIs('admin.strengths.*') ||
                     request()->routeIs('admin.experiences.*') ||
                     request()->routeIs('admin.projects.*') ||
                     request()->routeIs('admin.analytics') ||
@@ -161,13 +161,13 @@
                         Skills
                     </a>
 
-                    <a href="{{ route('admin.technologies.index') }}"
-                        class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.technologies.*') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                    <a href="{{ route('admin.strengths.index') }}"
+                        class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.strengths.*') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        Technologies
+                        Strengths
                     </a>
 
                     <a href="{{ route('admin.experiences.index') }}"

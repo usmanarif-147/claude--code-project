@@ -31,6 +31,11 @@ class Skill extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function getNameAttribute(): string
+    {
+        return (string) $this->title;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

@@ -77,13 +77,6 @@ class ResumeGenerator extends Component
 
     public string $newSkillCategory = '';
 
-    // Technologies
-    public array $editTechnologies = [];
-
-    public string $newTechName = '';
-
-    public string $newTechCategory = '';
-
     // Projects
     public ?int $editProjectId = null;
 
@@ -167,7 +160,6 @@ class ResumeGenerator extends Component
             'experience' => $this->resetExperienceForm(),
             'education' => $this->resetEducationForm(),
             'skills' => $this->loadSkills($data),
-            'technologies' => $this->loadTechnologies($data),
             'projects' => $this->resetProjectForm(),
             default => null,
         };
@@ -421,57 +413,6 @@ class ResumeGenerator extends Component
         $this->closeModal();
     }
 
-    // ─── Technologies ────────────────────────────────────────────
-
-    private function loadTechnologies(array $data): void
-    {
-        $allTechs = [];
-        foreach ($data['technologies'] as $category => $techs) {
-            foreach ($techs as $tech) {
-                $allTechs[] = [
-                    'id' => $tech->id,
-                    'name' => $tech->name,
-                    'category' => $tech->category?->name ?? $category,
-                ];
-            }
-        }
-        $this->editTechnologies = $allTechs;
-        $this->newTechName = '';
-        $this->newTechCategory = '';
-    }
-
-    public function addTechnology(ResumeService $service): void
-    {
-        $this->validate([
-            'newTechName' => 'required|string|max:255',
-            'newTechCategory' => 'required|string|max:100',
-        ]);
-
-        $this->editTechnologies[] = [
-            'name' => $this->newTechName,
-            'category' => $this->newTechCategory,
-        ];
-        $this->newTechName = '';
-        $this->newTechCategory = '';
-    }
-
-    public function removeTechnology(int $index): void
-    {
-        if (isset($this->editTechnologies[$index]['id'])) {
-            \App\Models\Technology::where('id', $this->editTechnologies[$index]['id'])->delete();
-        }
-        unset($this->editTechnologies[$index]);
-        $this->editTechnologies = array_values($this->editTechnologies);
-    }
-
-    public function saveTechnologies(ResumeService $service): void
-    {
-        $service->syncTechnologies($this->editTechnologies);
-        session()->flash('success', 'Technologies updated.');
-        $this->refreshPreview($service);
-        $this->closeModal();
-    }
-
     // ─── Projects ────────────────────────────────────────────────
 
     private function resetProjectForm(): void
@@ -611,7 +552,7 @@ class ResumeGenerator extends Component
         try {
             // Filter out nulls from removed items
             $data = $this->parsedResumeData;
-            foreach (['skills', 'technologies', 'experiences', 'education', 'projects'] as $key) {
+            foreach (['skills', 'experiences', 'education', 'projects'] as $key) {
                 if (isset($data[$key])) {
                     $data[$key] = array_values(array_filter($data[$key]));
                 }
@@ -660,7 +601,6 @@ class ResumeGenerator extends Component
             'currentTemplateName' => $templateKeys[$this->currentTemplateIndex] ?? 'modern',
             'isCustomTemplate' => ! $service->isBuiltInTemplate($templateKeys[$this->currentTemplateIndex] ?? 'modern'),
             'skillCount' => $data['skills']->count(),
-            'technologyCount' => count($data['technologies'], COUNT_RECURSIVE) - count($data['technologies']),
             'experienceCount' => $data['workExperience']->count(),
             'educationCount' => $data['education']->count(),
             'projectCount' => $data['projects']->count(),

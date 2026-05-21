@@ -1,27 +1,92 @@
 # Resume Builder — Plan
 
-> Status: **Draft** — awaiting user approval. Iterate this file until both sides agree before any implementation begins.
+> Status: **Draft v2** — awaiting user approval. Iterate this file until both sides agree before any implementation begins.
 
 ---
 
 ## 1. Context
 
-The user wants a brand‑new admin feature: a **dynamic resume builder** where the resume page starts as an **empty skeleton** showing only 8 fixed sections, each with a `+` icon. Clicking `+` opens a modal where the user enters that section's details. As sections fill, a live HTML preview renders the resume in **the exact same layout and blue two‑column style as `Usman_Arif_Laravel_Resume.pdf`**. A "Download PDF" button exports the same layout to PDF.
+The user wants a new admin feature: a **dynamic resume builder** where the resume page starts as an **empty skeleton** showing only 8 fixed sections, each with a `+` icon. Clicking `+` opens a modal where the user enters that section's details. As sections fill, the **same page acts as the live preview** rendered in the exact same blue two‑column style as `Usman_Arif_Laravel_Resume.pdf`. A "Download PDF" button exports the same layout to PDF.
 
 **Why this is being built:**
-- The existing admin **Resume Generator** pre‑populates from portfolio tables. The user wants a separate, dedicated builder where the resume is composed section‑by‑section via modals — independent of existing portfolio data.
+- A single place where the user can visually compose a resume and see the result instantly, without bouncing between separate CRUD pages.
 - Visual fidelity to the supplied PDF is required (fixed layout, no template picker).
 
 **Intended outcome:**
-- New page at `/admin/portfolio/resume-builder` showing the empty skeleton on first load.
+- New page at `/admin/portfolio/resume-builder` showing the empty skeleton on first load **when no data exists** in the relevant existing tables.
 - Each of the 8 sections has its own modal for adding / editing data.
-- Data persists in dedicated DB tables (single‑user app, but each table keeps `user_id` per the user's explicit acceptance).
-- Live HTML preview renders the same blue two‑column layout from the reference PDF.
+- The modal **reads from and writes back to the existing portfolio tables** — **no new migrations**, **no new models**. Two‑way binding with the same data the existing admin CRUD pages use.
+- Live HTML preview renders the blue two‑column layout from the reference PDF on the same page.
 - "Download PDF" button exports the preview to PDF.
 
 ---
 
-## 2. Reference layout (from the supplied PDF)
+## 2. ⚠️ Key architecture change (v2)
+
+The previous draft proposed 11 new tables. **Discard that.** This feature is a **new UI on top of existing tables** — nothing else.
+
+| Section            | Existing table(s) reused                                                       | Existing service to call            |
+|--------------------|--------------------------------------------------------------------------------|-------------------------------------|
+| Header             | `users` (name, email) + `profiles` (tagline, phone, location, github_url)      | `ProfileSettingsService`            |
+| Profile summary    | `profiles` (`bio` column)                                                      | `ProfileSettingsService`            |
+| Work Experience    | `experiences` + `experience_responsibilities` (filter `type = 'work'`)         | `ExperienceService`                 |
+| Key Projects       | `projects` (+ `tech_stack` JSON column)                                        | `ProjectService`                    |
+| Skills             | `skills` (with `category`, `proficiency`) — grouped by `category` in the UI    | `SkillService`                      |
+| Strengths          | `strengths`                                                                    | `StrengthService`                   |
+| Key Achievements   | **No table exists yet** — see §10 open questions                               | TBD                                 |
+| Education          | `educations`                                                                   | `EducationService`                  |
+
+Resume builder Livewire components **delegate all DB writes to the existing services**. No new service class is required for sections that already have one. (Only exception is Key Achievements — pending the user's decision in §10.)
+
+---
+
+## 3. Existing table columns (verified from migrations)
+
+```
+profiles                                  experiences
+  user_id (unique FK)                       type            ('work' / 'education')
+  tagline                                   role
+  bio                                       company
+  profile_image                             start_date
+  secondary_email                           end_date
+  phone                                     is_current
+  location                                  description
+  linkedin_url                              degree
+  github_url                                field_of_study
+  fiverr_url                                sort_order
+  youtube_url                               is_active
+  availability_status
+  timezone                                experience_responsibilities
+  language                                  experience_id (FK)
+                                            description
+                                            sort_order
+projects
+  title                                   skills
+  slug                                      title
+  short_description                         icon
+  description                               category
+  cover_image                               proficiency
+  tech_stack (JSON)                         sort_order
+  demo_url                                  is_active
+  github_url
+  is_featured                             strengths
+  sort_order                                title
+  is_active                                 icon
+  completed_at                              sort_order
+                                            is_active
+educations
+  degree_title
+  institution
+  start_date
+  end_date
+  sort_order
+```
+
+> No `user_id` columns on the per‑item tables — they're single‑user implicit. The builder respects that pattern and does not introduce one.
+
+---
+
+## 4. Reference layout (from the supplied PDF)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -30,45 +95,28 @@ The user wants a brand‑new admin feature: a **dynamic resume builder** where t
 │  ✆ phone   ✉ email   📍 location   ⌂ github                              │
 └──────────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────────┐  ┌────────────────────────────────┐
-│ PROFILE                            │  │ SKILLS                         │
-│ paragraph summary…                 │  │ Backend & Frontend             │
-│                                    │  │  [PHP] [Laravel] [Livewire]…   │
-│                                    │  │ Real‑Time                      │
-│                                    │  │  [WebSocket] [WebRTC]…         │
-│                                    │  │ Architecture & Databases       │
-│                                    │  │  [Microservices] [Kafka]…      │
-│ WORK EXPERIENCE                    │  │ DevOps & Testing               │
-│ JSYS Tech              Aug 2025 –  │  │  [Docker] [Nginx]…             │
-│ Software Engineer — Full Stack     │  │ Tools & PM                     │
-│ • bullet                           │  │  [Git] [GitHub]…               │
-│ • bullet                           │  │                                │
-│ Horizam                2022 – Aug  │  │ STRENGTHS                      │
-│ Software Engineer — Full Stack     │  │  ★ API Design  ★ Problem Solv. │
-│ • bullet                           │  │  ★ Clean Code  ★ Real‑Time…    │
+│ PROFILE                            │  │ SKILLS (grouped by `category`) │
+│ paragraph summary (profiles.bio)   │  │   Backend & Frontend           │
+│                                    │  │     [PHP] [Laravel] …          │
+│ WORK EXPERIENCE                    │  │   Real‑Time                    │
+│ Company  Start–End                 │  │     [WebSocket] [WebRTC]…      │
+│ Role                               │  │                                │
+│ • bullet  (experience_resp.)       │  │ STRENGTHS                      │
+│ • bullet                           │  │   ★ title  ★ title …           │
 │                                    │  │                                │
-│ Softenica              2021 – 2022 │  │ KEY ACHIEVEMENTS               │
-│ Junior Laravel Developer           │  │  • Delivered 7 full‑cycle…     │
-│ • bullet                           │  │  • Contributed to a real‑time… │
-│                                    │  │  • Migrated 2 legacy CI apps…  │
-│ KEY PROJECTS                       │  │  • 10+ freelance projects…     │
-│ RehabSuite — Real‑Time Chat …      │  │                                │
-│ JSYS Tech · Multi‑tenant…          │  │ EDUCATION                      │
-│ • bullet  • bullet                 │  │  B.S. Software Engineering     │
-│ Tech: Laravel 12, Rust/Axum…       │  │  University of Management…     │
-│                                    │  │  2016 – 2021                   │
-│ Autotheory — Multi‑Vendor…         │  │                                │
-│ autotheory.com                     │  │                                │
-│ • bullet                           │  │                                │
-│ Tech: Laravel, Livewire…           │  │                                │
+│ KEY PROJECTS                       │  │ KEY ACHIEVEMENTS               │
+│ Project — short_description        │  │   • …                          │
+│ company_or_url                     │  │                                │
+│ • bullet                           │  │ EDUCATION                      │
+│ Tech: …                            │  │   degree_title                 │
+│                                    │  │   institution                  │
+│                                    │  │   start_date – end_date        │
 └────────────────────────────────────┘  └────────────────────────────────┘
-                                            (blue accent color throughout)
 ```
-
-Two columns. Left ~60% (Profile, Work Experience, Key Projects). Right ~40% (Skills, Strengths, Key Achievements, Education). Header is full‑width above both columns.
 
 ---
 
-## 3. Initial empty state (what the user sees first)
+## 5. Initial empty state (what the user sees first)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -77,7 +125,7 @@ Two columns. Left ~60% (Profile, Work Experience, Key Projects). Right ~40% (Ski
 └──────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────┐  ┌────────────────────────────────┐
 │ PROFILE                  [ + ] │  │ SKILLS                  [ + ]  │
-│ (empty — summary paragraph)    │  │ (empty — skill groups + tags)  │
+│ (empty — summary paragraph)    │  │ (empty — skills grouped by cat)│
 └────────────────────────────────┘  └────────────────────────────────┘
 ┌────────────────────────────────┐  ┌────────────────────────────────┐
 │ WORK EXPERIENCE          [ + ] │  │ STRENGTHS               [ + ]  │
@@ -92,64 +140,64 @@ Two columns. Left ~60% (Profile, Work Experience, Key Projects). Right ~40% (Ski
 │ (empty — project + bullets …)  │  │ (empty — degree / school …)    │
 └────────────────────────────────┘  └────────────────────────────────┘
 
-                       ┌───────────────────────────────┐
-                       │ Top action bar:               │
-                       │  [ Reset all ]  [ Download PDF ] │
-                       └───────────────────────────────┘
+                       Top action bar:   [ Download PDF ]
 ```
 
 Each section card shows:
 - Section title (top‑left)
-- `+` button (top‑right) when section is empty
-- Faint placeholder text describing what the section will contain
-- Once filled, the `+` becomes a small `✎ Edit` button and the placeholder is replaced with the actual rendered content.
+- `+` button (top‑right) when the underlying table has no data for that section
+- Faint placeholder text describing the section content
+- Once data exists, the placeholder is replaced by the rendered content and the `+` becomes a small `✎ Edit` button.
+
+> Two‑way binding rule: emptiness is decided per section, not globally. If `profiles` exists but `experiences` is empty, only the Work Experience section shows the `+` placeholder — the rest already shows live data pulled from existing CRUD.
 
 ---
 
-## 4. Modal flows — one per section
+## 6. Modal flows — one per section
 
-### 4.1 Header modal
+Each modal reads / writes the **same fields** that the existing CRUD pages do, so data flows through one source of truth.
+
+### 6.1 Header modal → `users` + `profiles`
 ```
 ┌─────────────────────────────────────────┐
-│  Add Header Details              [ × ]  │
+│  Header Details                  [ × ]  │
 │ ─────────────────────────────────────── │
-│  Full Name      [______________________]│
-│  Tagline        [______________________]│
-│  Phone          [______________________]│
-│  Email          [______________________]│
-│  Location       [______________________]│
-│  GitHub URL     [______________________]│
+│  Full Name      [______________________]│  ← users.name
+│  Email          [______________________]│  ← users.email
+│  Tagline        [______________________]│  ← profiles.tagline
+│  Phone          [______________________]│  ← profiles.phone
+│  Location       [______________________]│  ← profiles.location
+│  GitHub URL     [______________________]│  ← profiles.github_url
 │                                         │
 │                   [ Cancel ]  [ Save ]  │
 └─────────────────────────────────────────┘
 ```
+Updates the authenticated user row + their single `profiles` row.
 
-### 4.2 Profile modal
+### 6.2 Profile summary modal → `profiles.bio`
 ```
 ┌─────────────────────────────────────────┐
-│  Add Profile Summary             [ × ]  │
+│  Profile Summary                 [ × ]  │
 │ ─────────────────────────────────────── │
 │  Summary                                │
 │  ┌─────────────────────────────────────┐│
-│  │                                     ││
-│  │  (textarea, ~4–6 lines)             ││
-│  │                                     ││
+│  │ (textarea — profiles.bio)           ││
 │  └─────────────────────────────────────┘│
 │                   [ Cancel ]  [ Save ]  │
 └─────────────────────────────────────────┘
 ```
 
-### 4.3 Work Experience modal (repeatable rows)
+### 6.3 Work Experience modal → `experiences` (`type=work`) + `experience_responsibilities`
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Add Work Experience                          [ × ]  │
+│  Work Experience                              [ × ]  │
 │ ──────────────────────────────────────────────────── │
-│  ── Job #1 ──────────────────────────── [ remove ]  │
-│  Company        [____________________]               │
-│  Role           [____________________]               │
-│  Start date     [______]   End date  [______]        │
-│  Bullets:                                            │
-│   • [_________________________________] [ x ]        │
+│  ── Job #1 ──────────────────────────── [ remove ]   │
+│  Company        [____________________]    ← company  │
+│  Role           [____________________]    ← role     │
+│  Start          [______]   End  [______]  ← dates    │
+│  ☐ Current                             ← is_current  │
+│  Bullets:                              ← experience_responsibilities.description │
 │   • [_________________________________] [ x ]        │
 │   [ + add bullet ]                                   │
 │                                                      │
@@ -158,222 +206,119 @@ Each section card shows:
 └──────────────────────────────────────────────────────┘
 ```
 
-### 4.4 Key Projects modal (repeatable rows)
+### 6.4 Key Projects modal → `projects`
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Add Key Projects                              [ × ] │
+│  Key Projects                                  [ × ] │
 │ ──────────────────────────────────────────────────── │
-│  ── Project #1 ─────────────────────── [ remove ]   │
-│  Name             [____________________]             │
-│  Company / URL    [____________________]             │
-│  Bullets:                                            │
-│   • [_________________________________] [ x ]        │
-│   [ + add bullet ]                                   │
-│  Tech stack       [Laravel, Rust, Kafka, …       ]   │
-│                                                      │
-│  [ + add another project ]                           │
-│                          [ Cancel ]  [ Save ]        │
+│  ── Project #1 ─────────────────────── [ remove ]    │
+│  Title              [_____________________] ← title          │
+│  Short description  [_____________________] ← short_description │
+│  Description        [_____________________] ← description (used for bullets — see §10) │
+│  Demo URL           [_____________________] ← demo_url        │
+│  GitHub URL         [_____________________] ← github_url      │
+│  Tech stack         [Laravel, Rust, Kafka, …] ← tech_stack (JSON) │
+│                                                                  │
+│  [ + add another project ]                                       │
+│                          [ Cancel ]  [ Save ]                    │
 └──────────────────────────────────────────────────────┘
 ```
 
-### 4.5 Skills modal (grouped tags)
+### 6.5 Skills modal → `skills` (grouped by `category`)
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Add Skills                                    [ × ] │
+│  Skills                                        [ × ] │
 │ ──────────────────────────────────────────────────── │
-│  ── Group #1 ──────────────────────── [ remove ]    │
-│  Group name      [Backend & Frontend       ]         │
-│  Tags            [PHP] [Laravel] [Livewire]  + add   │
+│  ── Group #1 ──────────────────────── [ remove ]     │
+│  Category name   [Backend & Frontend       ] ← skills.category  │
+│  Skills          [PHP][Laravel][Livewire]     ← skills.title    │
+│                  + add skill (with proficiency 0–100) │
 │                                                      │
-│  [ + add another group ]                             │
+│  [ + add another category ]                          │
 │                          [ Cancel ]  [ Save ]        │
 └──────────────────────────────────────────────────────┘
 ```
+Adding a tag inserts a `skills` row with that `category`. Removing a tag deletes the row.
 
-### 4.6 Strengths modal (flat list)
+### 6.6 Strengths modal → `strengths`
 ```
 ┌─────────────────────────────────────────┐
-│  Add Strengths                   [ × ]  │
+│  Strengths                       [ × ]  │
 │ ─────────────────────────────────────── │
-│  • [API Design                ] [ x ]   │
-│  • [Problem Solving           ] [ x ]   │
-│  • [Clean Code                ] [ x ]   │
+│  • [API Design                ] [ x ]   ← strengths.title
+│  • [Problem Solving           ] [ x ]
 │  [ + add strength ]                     │
 │                   [ Cancel ]  [ Save ]  │
 └─────────────────────────────────────────┘
 ```
 
-### 4.7 Key Achievements modal (flat list)
-```
-┌─────────────────────────────────────────┐
-│  Add Key Achievements            [ × ]  │
-│ ─────────────────────────────────────── │
-│  • [Delivered 7 full‑cycle…   ] [ x ]   │
-│  • [Contributed to real‑time… ] [ x ]   │
-│  [ + add achievement ]                  │
-│                   [ Cancel ]  [ Save ]  │
-└─────────────────────────────────────────┘
-```
+### 6.7 Key Achievements modal → see §10
+Decision pending: either a new `achievements` table (one‑off migration), or store as JSON on `profiles`, or reuse an existing field.
 
-### 4.8 Education modal (repeatable)
+### 6.8 Education modal → `educations`
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Add Education                                 [ × ] │
+│  Education                                     [ × ] │
 │ ──────────────────────────────────────────────────── │
-│  ── Entry #1 ─────────────────────── [ remove ]     │
-│  Degree         [B.S. Software Engineering         ] │
-│  Institution    [University of Management & Tech.  ] │
-│  Start year     [2016]    End year   [2021]          │
-│                                                      │
-│  [ + add another ]                                   │
-│                          [ Cancel ]  [ Save ]        │
+│  ── Entry #1 ─────────────────────── [ remove ]      │
+│  Degree title   [B.S. Software Engineering        ] ← degree_title   │
+│  Institution    [University of Management & Tech. ] ← institution    │
+│  Start date     [______]   End date  [______]       ← start_/end_date │
+│                                                                       │
+│  [ + add another ]                                                    │
+│                          [ Cancel ]  [ Save ]                         │
 └──────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 5. Filled state (what it looks like after sections are populated)
+## 7. Architecture (follows `CLAUDE.md` rules)
 
-The same skeleton, but each section now renders the entered data in the blue two‑column PDF style. The `+` icon becomes a small `✎ Edit` button. Clicking `✎ Edit` reopens the same modal pre‑filled with the existing values.
+### 7.1 Module placement
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│  USMAN ARIF                                                  [ ✎ ]  │
-│  SOFTWARE ENGINEER | LARAVEL & FULL‑STACK DEVELOPMENT               │
-│  ✆ +92 33642...   ✉ usmanarif…@gmail.com   📍 Lahore   ⌂ github…    │
-└──────────────────────────────────────────────────────────────────────┘
-┌────────────────────────────────┐  ┌────────────────────────────────┐
-│ PROFILE                 [ ✎ ]  │  │ SKILLS                  [ ✎ ]  │
-│ Software Engineer with 5+ …    │  │ Backend & Frontend             │
-│                                │  │  [PHP] [Laravel] [Livewire]…   │
-└────────────────────────────────┘  │ Real‑Time                      │
-                                    │  [WebSocket] [WebRTC]…         │
-┌────────────────────────────────┐  └────────────────────────────────┘
-│ WORK EXPERIENCE         [ ✎ ]  │  ┌────────────────────────────────┐
-│ JSYS Tech       Aug 2025 – Now │  │ STRENGTHS               [ ✎ ]  │
-│ Software Engineer — Full Stack │  │  ★ API Design   ★ Problem Solv │
-│  • bullet                      │  │  ★ Clean Code   ★ Real‑Time…   │
-│  • bullet                      │  └────────────────────────────────┘
-│ Horizam         2022 – Aug 2025│  ┌────────────────────────────────┐
-│ …                              │  │ KEY ACHIEVEMENTS        [ ✎ ]  │
-└────────────────────────────────┘  │  • Delivered 7 full‑cycle…     │
-┌────────────────────────────────┐  │  • Contributed to real‑time…   │
-│ KEY PROJECTS            [ ✎ ]  │  └────────────────────────────────┘
-│ RehabSuite — Real‑Time Chat…   │  ┌────────────────────────────────┐
-│  • bullet                      │  │ EDUCATION               [ ✎ ]  │
-│  Tech: Laravel 12, Rust/Axum…  │  │  B.S. Software Engineering     │
-└────────────────────────────────┘  │  University of Management…     │
-                                    │  2016 – 2021                   │
-                                    └────────────────────────────────┘
-                       [ Reset all ]  [ Download PDF ]
-```
-
----
-
-## 6. Architecture (follows `CLAUDE.md` rules)
-
-### 6.1 Module placement
-
-The builder is a Portfolio sub‑feature (sits under the Portfolio sidebar group, alongside the existing `Resume Generator` which stays untouched).
+The builder is a Portfolio sub‑feature.
 
 | Concern        | Path                                                                  |
 |----------------|-----------------------------------------------------------------------|
 | Livewire root  | `app/Livewire/Admin/Portfolio/ResumeBuilder/`                         |
 | Views root     | `resources/views/livewire/admin/portfolio/resume-builder/`            |
-| Service        | `app/Services/ResumeBuilderService.php`                               |
 | Routes         | `routes/admin/portfolio/resume-builder.php` (auto‑discovered)         |
 | Sidebar entry  | nested inside Portfolio group as "Resume Builder"                     |
+| Service        | **None** — reuse existing `ProfileSettingsService`, `ExperienceService`, `ProjectService`, `SkillService`, `StrengthService`, `EducationService` |
+| Migrations     | **None** (unless §10 lands on a new `achievements` table)             |
+| Models         | **None** — reuse `Profile`, `Experience\Experience`, `Experience\ExperienceResponsibility`, `Project\Project`, `Skill\Skill`, `Strength`, `Education`, `User` |
 
-### 6.2 Livewire components
+### 7.2 Livewire components (only 2)
 
-| Component                                   | Responsibility                                                                                            |
-|---------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| `ResumeBuilderIndex`                        | The page. Loads current resume data, renders empty/filled skeleton, manages which modal is open, action bar |
-| `SectionModal`                              | A single modal component that receives a `section` prop (`header`/`profile`/`work`/…) and renders the matching form. Emits `section-saved` event on save. |
+| Component                                   | Responsibility                                                                                                          |
+|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `ResumeBuilderIndex`                        | The page. Loads existing data from all tables, renders empty/filled state per section, manages which modal is open, exposes Download PDF |
+| `SectionModal`                              | One modal component, switches form by `section` prop. On save it calls the **matching existing service**. Emits `section-saved` so the parent re-pulls fresh data. |
 
-### 6.3 Service
+### 7.3 Live preview
 
-`ResumeBuilderService` (single class, all business logic per CLAUDE.md):
+A Blade partial — `_preview.blade.php` — renders the resume in the blue two‑column PDF layout. Same view is the editor and the preview. Empty sections show `+`; filled sections show rendered content with `✎ Edit`.
 
-```php
-public function getResumeFor(User $user): array;
-public function saveSection(string $section, User $user, array $data): void;
-public function resetAll(User $user): void;
-```
+Preview wrapped in `bg-white text-slate-900` so it looks like paper inside the dark admin chrome.
 
-Save logic for repeatable sections: transactional **wipe + re‑insert** in `position` order. This keeps the implementation simple and avoids stale‑row bugs from partial updates.
-
-### 6.4 Data model
-
-11 new tables, flat migrations under `database/migrations/`:
-
-| Table                                | Purpose                                |
-|--------------------------------------|----------------------------------------|
-| `resume_headers`                     | one row per user                       |
-| `resume_profiles`                    | one row per user                       |
-| `resume_work_experiences`            | many per user (ordered)                |
-| `resume_work_experience_bullets`     | many per experience (ordered)          |
-| `resume_projects`                    | many per user (ordered)                |
-| `resume_project_bullets`             | many per project (ordered)             |
-| `resume_skill_groups`                | many per user (ordered)                |
-| `resume_skill_tags`                  | many per skill group (ordered)         |
-| `resume_strengths`                   | many per user (ordered)                |
-| `resume_achievements`                | many per user (ordered)                |
-| `resume_education`                   | many per user (ordered)                |
-
-Models grouped under `app/Models/Resume/` (CLAUDE.md rule: ≥2 related models → subfolder).
-
-### 6.5 Live preview
-
-A Blade partial — `_preview.blade.php` — renders the resume in the blue two‑column PDF layout. It is **the same view** the user is editing: the builder page IS the preview. Empty sections show the `+` placeholder; filled sections show the rendered content with `✎ Edit`.
-
-The preview container is wrapped in `bg-white text-slate-900` so it looks like paper even though the rest of the admin UI is dark.
-
-### 6.6 PDF export
+### 7.4 PDF export
 
 - Route: `GET /admin/portfolio/resume-builder/download`
-- Handler: a thin controller `ResumeBuilderDownloadController` (binary stream, not a Livewire interaction)
+- Handler: thin controller `ResumeBuilderDownloadController` (binary stream)
 - Template: new print‑optimized blade at `resources/views/resume/templates/builder.blade.php` (A4, blue accent, two‑column)
-- Uses the **same PDF library already present in the project** (whichever the existing `ResumeService` uses — left untouched)
+- Uses the existing PDF library in the project (whichever `ResumeService` already uses)
 
 ---
 
-## 7. Files to create
+## 8. Files to create
 
 ```
 app/
   Livewire/Admin/Portfolio/ResumeBuilder/
     ResumeBuilderIndex.php
     SectionModal.php
-  Models/Resume/
-    ResumeHeader.php
-    ResumeProfile.php
-    ResumeWorkExperience.php
-    ResumeWorkExperienceBullet.php
-    ResumeProject.php
-    ResumeProjectBullet.php
-    ResumeSkillGroup.php
-    ResumeSkillTag.php
-    ResumeStrength.php
-    ResumeAchievement.php
-    ResumeEducation.php
-  Services/
-    ResumeBuilderService.php
   Http/Controllers/
     ResumeBuilderDownloadController.php
-
-database/migrations/
-  2026_05_22_000001_create_resume_headers_table.php
-  2026_05_22_000002_create_resume_profiles_table.php
-  2026_05_22_000003_create_resume_work_experiences_table.php
-  2026_05_22_000004_create_resume_work_experience_bullets_table.php
-  2026_05_22_000005_create_resume_projects_table.php
-  2026_05_22_000006_create_resume_project_bullets_table.php
-  2026_05_22_000007_create_resume_skill_groups_table.php
-  2026_05_22_000008_create_resume_skill_tags_table.php
-  2026_05_22_000009_create_resume_strengths_table.php
-  2026_05_22_000010_create_resume_achievements_table.php
-  2026_05_22_000011_create_resume_education_table.php
 
 resources/views/
   livewire/admin/portfolio/resume-builder/
@@ -387,40 +332,44 @@ routes/admin/portfolio/
   resume-builder.php
 ```
 
-Plus one tiny edit to `resources/views/components/layouts/admin.blade.php` to add a sidebar link inside the existing Portfolio group.
+Plus one tiny edit to `resources/views/components/layouts/admin.blade.php` for the sidebar link.
+
+**Zero new migrations. Zero new models. Zero new services.** (Subject to the Key Achievements decision in §10.)
 
 ---
 
-## 8. Verification
+## 9. Verification
 
-1. `php artisan migrate` — all 11 tables created without error.
-2. Visit `/admin/portfolio/resume-builder` — the empty skeleton renders exactly like §3, all 8 `+` buttons visible.
-3. Click `+` on **Header**, fill all fields, save → header renders the filled state and `+` becomes `✎ Edit`.
-4. Repeat for all 7 remaining sections; verify each renders in the correct column and visually matches the supplied PDF.
-5. Add multiple Work Experiences, Projects, Skill groups, Education entries — confirm ordering stays stable via `position`.
-6. Click **Download PDF** → produces an A4 PDF that visually matches the live preview AND the supplied reference PDF.
-7. Click **Reset all**, confirm → page returns to empty skeleton; DB rows for that user are gone.
-8. Reload page → state persists.
-9. `./vendor/bin/pint` passes; `php artisan test` passes.
-
----
-
-## 9. Out of scope
-
-- Multiple resume templates / template switcher.
-- Multi‑user resume management.
-- Pre‑filling from existing portfolio tables (Profile, Experience, Project, Skill).
-- Touching the existing `ResumeGenerator` component or `ResumeService`.
+1. Visit `/admin/portfolio/resume-builder` with empty tables → every section shows `+`.
+2. Click `+` on Header, fill name/email/tagline/phone/location/github → `users` + `profiles` rows updated; section renders the filled state with `✎ Edit`.
+3. Open the existing **Profile** admin page → see the same data populated (two‑way binding confirmed).
+4. Repeat for each section: add data via the builder modal, then verify the existing CRUD pages (`/admin/portfolio/experiences`, `/projects`, `/skills`, `/strengths`, `/educations`) show the same rows.
+5. Conversely: add a new experience via the existing experiences admin page → return to the resume builder → it appears in the Work Experience section without any extra action.
+6. Add multiple experiences / projects / skills — confirm `sort_order` is respected in the preview.
+7. Click **Download PDF** → produces an A4 PDF that visually matches the live preview AND the supplied reference PDF.
+8. `./vendor/bin/pint` passes; `php artisan test` passes.
 
 ---
 
 ## 10. Open questions for the user
 
-1. **`+` placement** — top‑right corner of each empty section card (most common pattern), or centered in the middle of the empty area (more prominent for first‑time use)? Mockups in §3 show top‑right.
-2. **Auto‑save vs explicit Save button** — modals currently use explicit `Save`. OK? (Auto‑save on field blur is also possible.)
-3. **Repeatable sections — single big modal vs per‑item modal** — current design: one modal where all jobs/projects/etc. for that section are managed together. Alternative: a list inside the section card with a `+ Add` that opens a single‑item modal. Which feels better?
-4. **Delete a section's data** — should each section have its own clear/reset button, or only the global `Reset all`?
+1. **Key Achievements — there is no `achievements` table today.** Three options, pick one:
+   - (a) Create a **single** new migration `achievements` (`id`, `text`, `sort_order`, `is_active`) — only one new table.
+   - (b) Reuse an existing JSON field on `profiles` (add nothing, store achievements as a JSON array of strings).
+   - (c) Hide / skip the Key Achievements section entirely.
+   > Recommendation: **(a)** — keeps the data model clean and matches the pattern of `strengths`.
+
+2. **Reset / clear button** — earlier draft had a global "Reset all". Since data now lives in the shared portfolio tables, a Reset would wipe data used by the public portfolio too. **Removed from v2.** Confirm OK.
+
+3. **Project bullets** — the supplied PDF shows multiple bullet points under each project, but `projects` has no per‑bullet child table. Either:
+   - (a) Treat `projects.description` as Markdown / newline‑separated bullets and render lines as `<li>` (no schema change).
+   - (b) Create a small `project_highlights` table (similar to `experience_responsibilities`).
+   > Recommendation: **(a)** — no migrations, matches v2's "reuse existing tables" rule.
+
+4. **Skills grouping** — group by `skills.category` (existing column). Empty `category` falls under a default "Other" group. Confirm OK.
+
+5. **`+` placement** — top‑right corner of each empty section card (current mockups). Confirm OK.
 
 ---
 
-> ✏️ **Next step:** read this plan and tell me what to change. I will update **this same file** on each iteration. When you are happy, say so explicitly and I will then proceed to implementation.
+> ✏️ **Next step:** read this v2 plan and tell me what to change — especially answers to §10. I will update **this same file** until you give explicit approval, only then will I start implementation.

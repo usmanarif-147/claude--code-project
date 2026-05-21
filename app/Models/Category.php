@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+
 class Category extends Model
 {
     protected $fillable = [
@@ -37,11 +38,6 @@ class Category extends Model
     public function skills(): HasMany
     {
         return $this->hasMany(Skill::class, 'category_id');
-    }
-
-    public function technologies(): HasMany
-    {
-        return $this->hasMany(Technology::class, 'category_id');
     }
 
     public function scopeActive(Builder $query): Builder

@@ -69,17 +69,6 @@
         </div>
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 hover:border-dark-600 transition-colors">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                </div>
-                <div>
-                    <p class="text-xl font-bold text-white">{{ $technologyCount }}</p>
-                    <p class="text-xs text-gray-500">Technologies</p>
-                </div>
-            </div>
-        </div>
-        <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 hover:border-dark-600 transition-colors">
-            <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                     <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </div>
@@ -155,7 +144,6 @@
                 'experience' => ['Work Experience', 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
                 'education' => ['Education', 'M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z'],
                 'skills' => ['Skills', 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'],
-                'technologies' => ['Technologies', 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'],
                 'projects' => ['Projects', 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
             ] as $key => [$label, $icon])
                 <button wire:click="openModal('{{ $key }}')"
@@ -196,7 +184,7 @@
 
                 {{-- Mobile Edit Buttons --}}
                 <div class="lg:hidden flex flex-wrap gap-2 px-5 py-3 border-b border-dark-700">
-                    @foreach(['personal' => 'Personal', 'about' => 'About', 'experience' => 'Experience', 'education' => 'Education', 'skills' => 'Skills', 'technologies' => 'Tech', 'projects' => 'Projects'] as $key => $label)
+                    @foreach(['personal' => 'Personal', 'about' => 'About', 'experience' => 'Experience', 'education' => 'Education', 'skills' => 'Skills', 'projects' => 'Projects'] as $key => $label)
                         <button wire:click="openModal('{{ $key }}')"
                                 class="text-xs text-gray-400 hover:text-primary-light bg-dark-700 hover:bg-primary/10 px-2.5 py-1.5 rounded-lg transition-all">
                             {{ $label }}
@@ -491,59 +479,6 @@
                     </div>
                 @endif
 
-                {{-- ── Technologies Modal ── --}}
-                @if($activeModal === 'technologies')
-                    <div class="px-6 py-4 border-b border-dark-700 flex items-center justify-between">
-                        <h2 class="text-base font-mono font-semibold text-white uppercase tracking-wider">Technologies</h2>
-                        <button wire:click="closeModal" class="p-1 text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                    </div>
-                    <div class="p-6 space-y-5">
-                        {{-- Grouped by category --}}
-                        @php
-                            $grouped = collect($editTechnologies)->groupBy('category');
-                        @endphp
-                        @foreach($grouped as $category => $techs)
-                            <div>
-                                <p class="text-xs font-mono font-medium text-gray-500 uppercase tracking-widest mb-2">{{ $category }}</p>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($techs as $tech)
-                                        @php $origIndex = array_search($tech, $editTechnologies); @endphp
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-dark-700 text-gray-300 border border-dark-600">
-                                            {{ $tech['name'] }}
-                                            <button wire:click="removeTechnology({{ $origIndex !== false ? $origIndex : 0 }})" class="ml-1 text-gray-500 hover:text-red-400 transition-colors">&times;</button>
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-
-                        {{-- Add new technology --}}
-                        <div class="flex items-end gap-3">
-                            <div class="flex-1">
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Technology Name <span class="text-red-400">*</span></label>
-                                <input type="text" wire:model="newTechName" placeholder="e.g. React" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                @error('newTechName') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                            </div>
-                            <div class="flex-1">
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Category <span class="text-red-400">*</span></label>
-                                <input type="text" wire:model="newTechCategory" placeholder="e.g. Frontend" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                @error('newTechCategory') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                            </div>
-                            <button wire:click="addTechnology" class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                    <div class="px-6 py-4 border-t border-dark-700 flex items-center justify-end gap-3">
-                        <button wire:click="closeModal" class="inline-flex items-center gap-2 bg-dark-700 hover:bg-dark-600 border border-dark-600 text-gray-300 text-sm font-medium rounded-lg px-5 py-2.5 transition-colors">Cancel</button>
-                        <button wire:click="saveTechnologies" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-all shadow-lg shadow-primary/20">
-                            <span wire:loading.remove wire:target="saveTechnologies">Save All Technologies</span>
-                            <span wire:loading wire:target="saveTechnologies">Saving...</span>
-                        </button>
-                    </div>
-                @endif
-
                 {{-- ── Projects Modal ── --}}
                 @if($activeModal === 'projects')
                     <div class="px-6 py-4 border-b border-dark-700 flex items-center justify-between">
@@ -751,26 +686,6 @@ Portfolio Website - React + Tailwind CSS</pre>
                                             <input type="text" wire:model="parsedResumeData.skills.{{ $idx }}.title" placeholder="Skill name" class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                             <input type="text" wire:model="parsedResumeData.skills.{{ $idx }}.category" placeholder="Category" class="w-32 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                             <button wire:click="$set('parsedResumeData.skills.{{ $idx }}', null)" class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">&times;</button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Technologies Section --}}
-                        @if(!empty($parsedResumeData['technologies']))
-                            <div class="border border-dark-600 rounded-lg overflow-hidden">
-                                <div class="bg-dark-700 px-4 py-2.5 flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                                    <h3 class="text-sm font-mono font-semibold text-white uppercase tracking-wider">Technologies</h3>
-                                    <span class="text-xs text-gray-500">({{ count($parsedResumeData['technologies']) }} found)</span>
-                                </div>
-                                <div class="p-4 space-y-2">
-                                    @foreach($parsedResumeData['technologies'] as $idx => $tech)
-                                        <div class="flex items-center gap-2">
-                                            <input type="text" wire:model="parsedResumeData.technologies.{{ $idx }}.name" placeholder="Technology" class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                            <input type="text" wire:model="parsedResumeData.technologies.{{ $idx }}.category" placeholder="Category" class="w-36 bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                            <button wire:click="$set('parsedResumeData.technologies.{{ $idx }}', null)" class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">&times;</button>
                                         </div>
                                     @endforeach
                                 </div>

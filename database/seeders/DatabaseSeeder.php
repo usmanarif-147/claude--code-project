@@ -11,7 +11,7 @@ use App\Models\Experience\ExperienceResponsibility;
 use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\Skill\Skill;
-use App\Models\Technology;
+use App\Models\Strength;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -43,61 +43,62 @@ class DatabaseSeeder extends Seeder
             'availability_status' => 'Open to opportunities',
         ]);
 
-        // Categories (shared by Skills + Technologies)
+        // Categories (used by Skills only — Strengths have no category)
         $categoryMap = [];
         foreach ([
-            ['name' => 'Soft Skills', 'sort_order' => 0],
-            ['name' => 'Frontend', 'sort_order' => 1],
-            ['name' => 'Backend', 'sort_order' => 2],
-            ['name' => 'Database & Tools', 'sort_order' => 3],
+            ['name' => 'Frontend', 'sort_order' => 0],
+            ['name' => 'Backend', 'sort_order' => 1],
+            ['name' => 'Database & Tools', 'sort_order' => 2],
         ] as $cat) {
             $category = Category::create($cat + ['slug' => Str::slug($cat['name'])]);
             $categoryMap[$category->name] = $category->id;
         }
 
-        // Skills (soft skills / strengths)
-        $skills = [
+        // Strengths (soft attributes shown in About Me).
+        // Note: welcome.blade.php wraps {{ $skill->icon }} inside <path d="..."/>,
+        // so the icon column must hold just the SVG path data (the "M..." string).
+        $strengths = [
             ['title' => 'Problem Solving', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'sort_order' => 0],
             ['title' => 'Creativity', 'icon' => 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01', 'sort_order' => 1],
             ['title' => 'Adaptability', 'icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'sort_order' => 2],
             ['title' => 'Optimization', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'sort_order' => 3],
         ];
 
-        foreach ($skills as $skill) {
-            Skill::create($skill + ['category_id' => $categoryMap['Soft Skills']]);
+        foreach ($strengths as $strength) {
+            Strength::create($strength);
         }
 
-        // Technologies
-        $technologies = [
-            ['name' => 'HTML5', 'category' => 'Frontend', 'sort_order' => 0],
-            ['name' => 'CSS3', 'category' => 'Frontend', 'sort_order' => 1],
-            ['name' => 'JavaScript', 'category' => 'Frontend', 'sort_order' => 2],
-            ['name' => 'Alpine.js', 'category' => 'Frontend', 'sort_order' => 3],
-            ['name' => 'Livewire', 'category' => 'Frontend', 'sort_order' => 4],
-            ['name' => 'Tailwind CSS', 'category' => 'Frontend', 'sort_order' => 5],
-            ['name' => 'Bootstrap', 'category' => 'Frontend', 'sort_order' => 6],
-            ['name' => 'jQuery', 'category' => 'Frontend', 'sort_order' => 7],
-            ['name' => 'PHP', 'category' => 'Backend', 'sort_order' => 0],
-            ['name' => 'Laravel', 'category' => 'Backend', 'sort_order' => 1],
-            ['name' => 'Filament', 'category' => 'Backend', 'sort_order' => 2],
-            ['name' => 'REST APIs', 'category' => 'Backend', 'sort_order' => 3],
-            ['name' => 'Python', 'category' => 'Backend', 'sort_order' => 4],
-            ['name' => 'Node.js', 'category' => 'Backend', 'sort_order' => 5],
-            ['name' => 'MySQL', 'category' => 'Database & Tools', 'sort_order' => 0],
-            ['name' => 'PostgreSQL', 'category' => 'Database & Tools', 'sort_order' => 1],
-            ['name' => 'Redis', 'category' => 'Database & Tools', 'sort_order' => 2],
-            ['name' => 'Git', 'category' => 'Database & Tools', 'sort_order' => 3],
-            ['name' => 'Docker', 'category' => 'Database & Tools', 'sort_order' => 4],
-            ['name' => 'Linux', 'category' => 'Database & Tools', 'sort_order' => 5],
-            ['name' => 'AWS', 'category' => 'Database & Tools', 'sort_order' => 6],
-            ['name' => 'CI/CD', 'category' => 'Database & Tools', 'sort_order' => 7],
+        // Skills (technical — grouped by Category in the Skills & Tech section)
+        $skills = [
+            ['title' => 'HTML5', 'category' => 'Frontend', 'sort_order' => 0],
+            ['title' => 'CSS3', 'category' => 'Frontend', 'sort_order' => 1],
+            ['title' => 'JavaScript', 'category' => 'Frontend', 'sort_order' => 2],
+            ['title' => 'Alpine.js', 'category' => 'Frontend', 'sort_order' => 3],
+            ['title' => 'Livewire', 'category' => 'Frontend', 'sort_order' => 4],
+            ['title' => 'Tailwind CSS', 'category' => 'Frontend', 'sort_order' => 5],
+            ['title' => 'Bootstrap', 'category' => 'Frontend', 'sort_order' => 6],
+            ['title' => 'jQuery', 'category' => 'Frontend', 'sort_order' => 7],
+            ['title' => 'PHP', 'category' => 'Backend', 'sort_order' => 0],
+            ['title' => 'Laravel', 'category' => 'Backend', 'sort_order' => 1],
+            ['title' => 'Filament', 'category' => 'Backend', 'sort_order' => 2],
+            ['title' => 'REST APIs', 'category' => 'Backend', 'sort_order' => 3],
+            ['title' => 'Python', 'category' => 'Backend', 'sort_order' => 4],
+            ['title' => 'Node.js', 'category' => 'Backend', 'sort_order' => 5],
+            ['title' => 'MySQL', 'category' => 'Database & Tools', 'sort_order' => 0],
+            ['title' => 'PostgreSQL', 'category' => 'Database & Tools', 'sort_order' => 1],
+            ['title' => 'Redis', 'category' => 'Database & Tools', 'sort_order' => 2],
+            ['title' => 'Git', 'category' => 'Database & Tools', 'sort_order' => 3],
+            ['title' => 'Docker', 'category' => 'Database & Tools', 'sort_order' => 4],
+            ['title' => 'Linux', 'category' => 'Database & Tools', 'sort_order' => 5],
+            ['title' => 'AWS', 'category' => 'Database & Tools', 'sort_order' => 6],
+            ['title' => 'CI/CD', 'category' => 'Database & Tools', 'sort_order' => 7],
         ];
 
-        foreach ($technologies as $tech) {
-            Technology::create([
-                'name' => $tech['name'],
-                'category_id' => $categoryMap[$tech['category']],
-                'sort_order' => $tech['sort_order'],
+        foreach ($skills as $skill) {
+            Skill::create([
+                'title' => $skill['title'],
+                'category_id' => $categoryMap[$skill['category']],
+                'sort_order' => $skill['sort_order'],
             ]);
         }
 

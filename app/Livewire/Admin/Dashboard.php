@@ -7,7 +7,7 @@ use App\Models\Experience\Experience;
 use App\Models\PortfolioVisitor;
 use App\Models\Project\Project;
 use App\Models\Skill\Skill;
-use App\Models\Technology;
+use App\Models\Strength;
 use App\Models\Testimonial;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -37,7 +37,7 @@ class Dashboard extends Component
 
         $stats = [
             ['label' => 'Skills', 'value' => Skill::count(), 'icon' => 'lightbulb', 'bg' => 'bg-primary/10', 'text' => 'text-primary-light'],
-            ['label' => 'Technologies', 'value' => Technology::count(), 'icon' => 'code', 'bg' => 'bg-cyan-500/10', 'text' => 'text-cyan-400'],
+            ['label' => 'Strengths', 'value' => Strength::count(), 'icon' => 'code', 'bg' => 'bg-cyan-500/10', 'text' => 'text-cyan-400'],
             ['label' => 'Experiences', 'value' => Experience::count(), 'icon' => 'briefcase', 'bg' => 'bg-blue-500/10', 'text' => 'text-blue-400'],
             ['label' => 'Profile Complete', 'value' => $profileCompletion.'%', 'icon' => 'user', 'bg' => 'bg-emerald-500/10', 'text' => 'text-emerald-400'],
             ['label' => 'Projects', 'value' => Project::active()->count(), 'icon' => 'project', 'bg' => 'bg-fuchsia-500/10', 'text' => 'text-fuchsia-400'],

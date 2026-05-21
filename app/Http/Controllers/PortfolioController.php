@@ -8,7 +8,7 @@ use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\Skill\Skill;
-use App\Models\Technology;
+use App\Models\Strength;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Services\ResumeService;
@@ -24,8 +24,8 @@ class PortfolioController extends Controller
         return view('welcome', [
             'user' => $user,
             'profile' => $profile,
-            'skills' => Skill::query()->active()->ordered()->get(),
-            'technologies' => Technology::groupedByCategory(),
+            'skills' => Strength::query()->active()->ordered()->get(),
+            'technologies' => Skill::groupedByCategory(),
             'workExperiences' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
             'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->active()->ordered()->get(),

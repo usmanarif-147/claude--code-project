@@ -10,7 +10,7 @@ use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\ResumeDownload;
 use App\Models\Skill\Skill;
-use App\Models\Technology;
+use App\Models\Strength;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
@@ -30,8 +30,8 @@ class ResumeService
         return [
             'user' => $user,
             'profile' => $profile,
-            'skills' => Skill::query()->active()->ordered()->get(),
-            'technologies' => Technology::groupedByCategory(),
+            'skills' => Strength::query()->active()->ordered()->get(),
+            'technologies' => Skill::groupedByCategory(),
             'workExperience' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
             'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->active()->ordered()->get(),
@@ -258,27 +258,6 @@ class ResumeService
         }
     }
 
-    public function syncTechnologies(array $technologies): void
-    {
-        foreach ($technologies as $techData) {
-            $categoryId = $this->resolveCategoryId($techData['category'] ?? null);
-
-            if (isset($techData['id'])) {
-                Technology::where('id', $techData['id'])->update([
-                    'name' => $techData['name'],
-                    'category_id' => $categoryId,
-                ]);
-            } else {
-                Technology::create([
-                    'name' => $techData['name'],
-                    'category_id' => $categoryId,
-                    'is_active' => true,
-                    'sort_order' => (Technology::max('sort_order') ?? 0) + 1,
-                ]);
-            }
-        }
-    }
-
     private function resolveCategoryId(?string $name): ?int
     {
         if (! $name) {
@@ -477,28 +456,6 @@ class ResumeService
             }
             if ($count > 0) {
                 $summary[] = "{$count} skills added";
-            }
-        }
-
-        if (! empty($data['technologies'])) {
-            $count = 0;
-            foreach ($data['technologies'] as $tech) {
-                $categoryId = $this->resolveCategoryId($tech['category'] ?? null);
-                $existing = Technology::where('name', $tech['name'])
-                    ->where('category_id', $categoryId)
-                    ->first();
-                if (! $existing) {
-                    Technology::create([
-                        'name' => $tech['name'],
-                        'category_id' => $categoryId,
-                        'is_active' => true,
-                        'sort_order' => (Technology::max('sort_order') ?? 0) + 1,
-                    ]);
-                    $count++;
-                }
-            }
-            if ($count > 0) {
-                $summary[] = "{$count} technologies added";
             }
         }
 

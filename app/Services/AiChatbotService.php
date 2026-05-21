@@ -8,7 +8,7 @@ use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\Skill\Skill;
-use App\Models\Technology;
+use App\Models\Strength;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -65,14 +65,10 @@ class AiChatbotService
                 $context .= "\n";
             }
 
-            $technologies = Technology::with('category')->get();
-            if ($technologies->isNotEmpty()) {
-                $context .= "\n=== TECHNOLOGIES ===\n";
-                $context .= $technologies->map(function ($tech) {
-                    $category = $tech->category ? "[{$tech->category->name}] " : '';
-
-                    return "- {$category}{$tech->name}";
-                })->implode("\n");
+            $strengths = Strength::query()->active()->ordered()->get();
+            if ($strengths->isNotEmpty()) {
+                $context .= "\n=== STRENGTHS ===\n";
+                $context .= $strengths->map(fn ($s) => "- {$s->title}")->implode("\n");
                 $context .= "\n";
             }
 
