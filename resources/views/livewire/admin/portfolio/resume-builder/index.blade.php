@@ -9,13 +9,18 @@
                 Click <span class="accent">+</span> in any section to add details. Data is in-memory only and resets on page refresh.
             </p>
         </div>
-        <button type="button" wire:click="downloadPdf" class="rb-download-btn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download PDF
-        </button>
+        <div class="rb-header-actions">
+            <button type="button" wire:click="loadSampleData" class="rb-secondary-btn" title="Populate all sections with sample data for testing">
+                Load Sample Data
+            </button>
+            <button type="button" wire:click="downloadPdf" class="rb-download-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download PDF
+            </button>
+        </div>
     </div>
 
     {{-- ============ LIVE PREVIEW (same partial used by PDF) ============ --}}

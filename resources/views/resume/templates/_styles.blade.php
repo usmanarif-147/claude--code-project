@@ -350,6 +350,30 @@
         width: 16px;
         height: 16px;
     }
+    .rb-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .rb-secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        background: transparent;
+        color: #d1d5db;
+        font-weight: 500;
+        font-size: 13px;
+        padding: 9px 14px;
+        border-radius: 8px;
+        border: 1px solid #25253a;
+        cursor: pointer;
+        transition: background-color 150ms, color 150ms, border-color 150ms;
+        white-space: nowrap;
+    }
+    .rb-secondary-btn:hover {
+        background: #1a1a24;
+        color: #ffffff;
+        border-color: #7c3aed;
+    }
 
     /* ============================================================
        MODALS — overlay, panel, form controls, buttons.

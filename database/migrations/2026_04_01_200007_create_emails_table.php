@@ -24,6 +24,10 @@ return new class extends Migration
             $table->boolean('is_important')->default(false);
             $table->json('labels')->nullable();
             $table->string('category')->nullable();
+            $table->foreignId('category_id')
+                ->nullable()
+                ->constrained('email_categories')
+                ->nullOnDelete();
             $table->text('ai_summary')->nullable();
             $table->string('gmail_link')->nullable();
             $table->json('raw_payload')->nullable();
@@ -32,6 +36,7 @@ return new class extends Migration
             $table->index('received_at');
             $table->index('is_read');
             $table->index('category');
+            $table->index('category_id');
             $table->index('from_email');
         });
     }

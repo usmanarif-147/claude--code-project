@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
+            $table->uuid('share_token')->nullable()->unique();
+            $table->boolean('is_shared')->default(false);
             $table->timestamps();
         });
     }

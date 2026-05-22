@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('board_id')->constrained('project_boards')->cascadeOnDelete();
             $table->foreignId('column_id')->constrained('project_board_columns')->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained('task_categories')->nullOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();

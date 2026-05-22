@@ -399,6 +399,20 @@ class ResumeBuilderIndex extends Component
         ];
     }
 
+    public function loadSampleData(): void
+    {
+        $data = require __DIR__.'/sample-data.php';
+
+        $this->header = $data['header'] ?? [];
+        $this->profile = (string) ($data['profile'] ?? '');
+        $this->experiences = $data['experiences'] ?? [];
+        $this->projects = $data['projects'] ?? [];
+        $this->skillGroups = $data['skill_groups'] ?? [];
+        $this->strengths = $data['strengths'] ?? [];
+        $this->achievements = $data['achievements'] ?? [];
+        $this->educations = $data['educations'] ?? [];
+    }
+
     public function downloadPdf()
     {
         $pdf = Pdf::loadView('resume.templates.builder', [
