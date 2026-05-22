@@ -7,7 +7,14 @@
     <style>
         @page { margin: 18px 24px; }
         body { margin: 0; padding: 0; }
-        .resume-paper { box-shadow: none !important; max-width: none !important; padding: 0 !important; }
+        .resume-paper {
+            box-shadow: none !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
     </style>
     @include('resume.templates._styles')
 </head>

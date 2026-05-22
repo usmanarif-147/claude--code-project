@@ -9,9 +9,11 @@
         font-family: 'DejaVu Sans', sans-serif;
         font-size: 11px;
         line-height: 1.5;
-        padding: 40px 44px;
-        max-width: 850px;
+        width: 210mm;
+        height: 297mm;
+        padding: 14mm 16mm;
         margin: 0 auto;
+        box-sizing: border-box;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
