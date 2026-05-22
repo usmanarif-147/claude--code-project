@@ -6,9 +6,9 @@
     .resume-paper {
         background: #ffffff;
         color: #1f2937;
-        font-family: 'DejaVu Sans', sans-serif;
-        font-size: 11px;
-        line-height: 1.5;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 10.5px;
+        line-height: 1.45;
         width: 210mm;
         height: 297mm;
         padding: 14mm 16mm;
@@ -53,30 +53,27 @@
         padding: 6px 0;
     }
 
-    /* ---- Two-column body (float-based so DomPDF can paginate within columns) ---- */
-    .resume-paper .resume-body {
+    /* ---- Two-column body (table — only layout DomPDF reliably renders side-by-side) ---- */
+    .resume-paper table.resume-body {
         width: 100%;
+        border-collapse: collapse;
     }
-    .resume-paper .col-left {
-        float: left;
+    .resume-paper table.resume-body > tbody > tr > td {
+        vertical-align: top;
+    }
+    .resume-paper td.col-left {
         width: 60%;
         padding-right: 18px;
-        box-sizing: border-box;
     }
-    .resume-paper .col-right {
-        float: left;
+    .resume-paper td.col-right {
         width: 40%;
         padding-left: 18px;
-        box-sizing: border-box;
         border-left: 1px solid #e5e7eb;
-    }
-    .resume-paper .resume-clearfix {
-        clear: both;
     }
 
     /* ---- Section heading ---- */
     .resume-paper .section {
-        margin-bottom: 14px;
+        margin-bottom: 11px;
         position: relative;
     }
     .resume-paper .section-title-row {
@@ -113,7 +110,7 @@
 
     /* ---- Work experience ---- */
     .resume-paper .job {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .resume-paper .job .job-head {
         display: table;
@@ -159,7 +156,7 @@
 
     /* ---- Projects ---- */
     .resume-paper .project {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .resume-paper .project .title {
         font-size: 11px;
