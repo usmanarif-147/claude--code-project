@@ -376,6 +376,150 @@
     }
 
     /* ============================================================
+       FORMATTING TOOLBAR (Phase 2C)
+       ============================================================ */
+    .rb-toolbar {
+        background: #111118;
+        border: 1px solid #1a1a24;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 0 auto 16px auto;
+        max-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .rb-toolbar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2px;
+    }
+    .rb-toolbar-scope {
+        font-size: 12px;
+        color: #9ca3af;
+        font-family: 'Fira Code', monospace;
+        letter-spacing: 0.5px;
+    }
+    .rb-toolbar-scope strong {
+        color: #a78bfa;
+        font-weight: 600;
+    }
+    .rb-toolbar-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .rb-toolbar-label {
+        font-size: 12px;
+        color: #9ca3af;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: -2px;
+    }
+    .rb-select {
+        background: #1a1a24;
+        border: 1px solid #25253a;
+        border-radius: 6px;
+        padding: 6px 10px;
+        color: #ffffff;
+        font-size: 13px;
+        font-family: inherit;
+        cursor: pointer;
+    }
+    .rb-select:focus {
+        outline: none;
+        border-color: #7c3aed;
+    }
+    .rb-bold-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: #1a1a24;
+        border: 1px solid #25253a;
+        border-radius: 6px;
+        color: #d1d5db;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        transition: background-color 120ms, border-color 120ms, color 120ms;
+    }
+    .rb-bold-toggle:hover {
+        border-color: #7c3aed;
+        color: #ffffff;
+    }
+    .rb-bold-toggle-active {
+        background: #7c3aed;
+        border-color: #7c3aed;
+        color: #ffffff;
+    }
+    .rb-color-row,
+    .rb-align-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .rb-color-swatch {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: border-color 120ms, transform 120ms;
+    }
+    .rb-color-swatch:hover {
+        transform: scale(1.1);
+    }
+    .rb-color-swatch-active {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.35);
+    }
+    .rb-align-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        background: #1a1a24;
+        border: 1px solid #25253a;
+        border-radius: 6px;
+        color: #d1d5db;
+        cursor: pointer;
+        font-size: 15px;
+        font-family: inherit;
+        transition: background-color 120ms, border-color 120ms, color 120ms;
+    }
+    .rb-align-btn:hover {
+        border-color: #7c3aed;
+        color: #ffffff;
+    }
+    .rb-align-btn-active {
+        background: #7c3aed;
+        border-color: #7c3aed;
+        color: #ffffff;
+    }
+    .rb-reset-btn {
+        background: transparent;
+        border: 1px solid #25253a;
+        color: #9ca3af;
+        font-size: 12px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 120ms, color 120ms, border-color 120ms;
+    }
+    .rb-reset-btn:hover {
+        background: #1a1a24;
+        color: #ffffff;
+        border-color: #7c3aed;
+    }
+
+    /* ============================================================
        MODALS — overlay, panel, form controls, buttons.
        ============================================================ */
     .rb-modal-overlay {

@@ -51,6 +51,22 @@ class ResumeBuilderIndex extends Component
 
     public ?string $openModal = null;
 
+    // ----- Formatting (Phase 2C): applied to entire resume -----
+    public string $fontFamily = 'helvetica';
+
+    public string $fontSize = '9pt';
+
+    public bool $bold = false;
+
+    public string $textColor = 'black';
+
+    public string $textAlign = 'left';
+
+    public string $lineSpacing = 'normal';
+
+    public string $sectionSpacing = 'normal';
+    // -----------------------------------------------------------
+
     public array $header = [];
 
     public string $profile = '';
@@ -399,6 +415,17 @@ class ResumeBuilderIndex extends Component
         ];
     }
 
+    public function resetFormatting(): void
+    {
+        $this->fontFamily = 'helvetica';
+        $this->fontSize = '9pt';
+        $this->bold = false;
+        $this->textColor = 'black';
+        $this->textAlign = 'left';
+        $this->lineSpacing = 'normal';
+        $this->sectionSpacing = 'normal';
+    }
+
     public function loadSampleData(): void
     {
         $data = require __DIR__.'/sample-data.php';
@@ -424,6 +451,13 @@ class ResumeBuilderIndex extends Component
             'strengths' => $this->strengths,
             'achievements' => $this->achievements,
             'educations' => $this->educations,
+            'fontFamily' => $this->fontFamily,
+            'fontSize' => $this->fontSize,
+            'bold' => $this->bold,
+            'textColor' => $this->textColor,
+            'textAlign' => $this->textAlign,
+            'lineSpacing' => $this->lineSpacing,
+            'sectionSpacing' => $this->sectionSpacing,
         ])->setPaper('A4', 'portrait');
 
         $name = trim((string) ($this->header['name'] ?? ''));
@@ -441,5 +475,31 @@ class ResumeBuilderIndex extends Component
             'itemLimits' => self::ITEM_LIMITS,
             'fieldLimits' => self::FIELD_LIMITS,
         ]);
+    }
+
+    /**
+     * Limited-choice maps exposed to the toolbar view for rendering dropdowns / swatches.
+     */
+    public function formattingOptions(): array
+    {
+        return [
+            'fontFamilies' => [
+                'helvetica' => 'Helvetica',
+                'dejavu' => 'DejaVu Sans',
+                'times' => 'Times',
+                'courier' => 'Courier',
+            ],
+            'fontSizes' => ['9pt', '10pt', '11pt', '12pt'],
+            'textColors' => [
+                'black' => '#1f2937',
+                'gray' => '#4b5563',
+                'blue' => '#1d4ed8',
+                'red' => '#991b1b',
+                'green' => '#15803d',
+            ],
+            'alignments' => ['left', 'center', 'right', 'justify'],
+            'lineSpacings' => ['tight' => 'Tight', 'normal' => 'Normal', 'loose' => 'Loose'],
+            'sectionSpacings' => ['compact' => 'Compact', 'normal' => 'Normal', 'spacious' => 'Spacious'],
+        ];
     }
 }

@@ -17,6 +17,7 @@
         }
     </style>
     @include('resume.templates._styles')
+    @include('resume.templates._format_overrides')
 </head>
 <body>
     @include('resume.templates._body', ['interactive' => false])
