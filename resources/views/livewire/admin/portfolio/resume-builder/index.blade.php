@@ -37,7 +37,7 @@
             $formInvalid = ! $this->isFormValid();
         @endphp
 
-        <div class="rb-modal-overlay" wire:click.self="closeSection">
+        <div class="rb-modal-overlay">
             <div class="rb-modal-panel">
 
                 <div class="rb-modal-header">
@@ -130,12 +130,12 @@
                                         @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $job['role'] ?? '', 'limit' => $fieldLimits['job.role']])
                                     </div>
                                     <div>
-                                        <input type="text" placeholder="Start (e.g. 2022)" wire:model.live.debounce.250ms="form.jobs.{{ $jobIndex }}.start" maxlength="{{ $fieldLimits['job.start'][1] }}" class="rb-input rb-input-sm">
-                                        @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $job['start'] ?? '', 'limit' => $fieldLimits['job.start']])
+                                        <label class="rb-field-label-sm">Start</label>
+                                        <input type="month" wire:model.live.debounce.250ms="form.jobs.{{ $jobIndex }}.start" class="rb-input rb-input-sm">
                                     </div>
                                     <div>
-                                        <input type="text" placeholder="End (e.g. Aug 2025)" wire:model.live.debounce.250ms="form.jobs.{{ $jobIndex }}.end" maxlength="{{ $fieldLimits['job.end'][1] }}" class="rb-input rb-input-sm" @if ($job['is_current'] ?? false) disabled @endif>
-                                        @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $job['end'] ?? '', 'limit' => $fieldLimits['job.end']])
+                                        <label class="rb-field-label-sm">End</label>
+                                        <input type="month" wire:model.live.debounce.250ms="form.jobs.{{ $jobIndex }}.end" class="rb-input rb-input-sm" @if ($job['is_current'] ?? false) disabled @endif>
                                     </div>
                                 </div>
                                 <label class="rb-checkbox-label">
@@ -319,12 +319,12 @@
                                 </div>
                                 <div class="rb-grid-2">
                                     <div>
-                                        <input type="text" placeholder="Start year" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.start" maxlength="{{ $fieldLimits['education.start'][1] }}" class="rb-input rb-input-sm">
-                                        @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $entry['start'] ?? '', 'limit' => $fieldLimits['education.start']])
+                                        <label class="rb-field-label-sm">Start</label>
+                                        <input type="month" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.start" class="rb-input rb-input-sm">
                                     </div>
                                     <div>
-                                        <input type="text" placeholder="End year" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.end" maxlength="{{ $fieldLimits['education.end'][1] }}" class="rb-input rb-input-sm">
-                                        @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $entry['end'] ?? '', 'limit' => $fieldLimits['education.end']])
+                                        <label class="rb-field-label-sm">End</label>
+                                        <input type="month" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.end" class="rb-input rb-input-sm">
                                     </div>
                                 </div>
                             </div>

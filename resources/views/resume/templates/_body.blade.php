@@ -1,6 +1,21 @@
 @php
     $interactive = $interactive ?? false;
     $hasHeader = !empty($header['name'] ?? '') || !empty($header['tagline'] ?? '') || !empty($header['email'] ?? '') || !empty($header['phone'] ?? '');
+
+    // Convert a YYYY-MM month-picker value (e.g. "2022-02") into a display string
+    // like "2022-feb". If the value isn't in Y-m form, return it unchanged so
+    // legacy or partial values don't break the render.
+    $formatDate = function ($v) {
+        $v = trim((string) $v);
+        if ($v === '') {
+            return '';
+        }
+        try {
+            return strtolower(\Carbon\Carbon::createFromFormat('Y-m', $v)->format('Y-M'));
+        } catch (\Throwable) {
+            return $v;
+        }
+    };
 @endphp
 
 <div class="resume-paper">
@@ -56,7 +71,7 @@
                                 <div class="job-head">
                                     <span class="company">{{ $job['company'] ?? '' }}</span>
                                     <span class="dates">
-                                        {{ $job['start'] ?? '' }}{{ ($job['start'] ?? '') || ($job['end'] ?? '') ? ' – ' : '' }}{{ ($job['is_current'] ?? false) ? 'Present' : ($job['end'] ?? '') }}
+                                        {{ $formatDate($job['start'] ?? '') }}{{ ($job['start'] ?? '') || ($job['end'] ?? '') ? ' – ' : '' }}{{ ($job['is_current'] ?? false) ? 'Present' : $formatDate($job['end'] ?? '') }}
                                     </span>
                                 </div>
                                 @if (!empty($job['role'] ?? ''))
@@ -175,7 +190,7 @@
                             <div class="education-entry">
                                 <div class="degree">{{ $e['degree'] ?? '' }}</div>
                                 <div class="institution">{{ $e['institution'] ?? '' }}</div>
-                                <div class="dates">{{ $e['start'] ?? '' }}{{ ($e['start'] ?? '') || ($e['end'] ?? '') ? ' – ' : '' }}{{ $e['end'] ?? '' }}</div>
+                                <div class="dates">{{ $formatDate($e['start'] ?? '') }}{{ ($e['start'] ?? '') || ($e['end'] ?? '') ? ' – ' : '' }}{{ $formatDate($e['end'] ?? '') }}</div>
                             </div>
                         @endforeach
                     @elseif ($interactive)
