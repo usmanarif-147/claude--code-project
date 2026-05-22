@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin\Portfolio\ResumeBuilder;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -176,6 +178,28 @@ class ResumeBuilderIndex extends Component
             'start' => '',
             'end' => '',
         ];
+    }
+
+    public function downloadPdf()
+    {
+        $pdf = Pdf::loadView('resume.templates.builder', [
+            'header' => $this->header,
+            'profile' => $this->profile,
+            'experiences' => $this->experiences,
+            'projects' => $this->projects,
+            'skillGroups' => $this->skillGroups,
+            'strengths' => $this->strengths,
+            'achievements' => $this->achievements,
+            'educations' => $this->educations,
+        ])->setPaper('A4', 'portrait');
+
+        $name = trim((string) ($this->header['name'] ?? ''));
+        $filename = $name !== '' ? Str::slug($name).'.pdf' : 'resume.pdf';
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename
+        );
     }
 
     public function render()
