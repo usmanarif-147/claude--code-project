@@ -574,4 +574,50 @@
         width: 16px;
         height: 16px;
     }
+
+    /* ============================================================
+       LIMITS — counters & cap hints under modal inputs.
+       ============================================================ */
+    .rb-counter {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 4px;
+        line-height: 1.3;
+    }
+    .rb-counter-warn {
+        color: #d97706;
+    }
+    .rb-counter-over {
+        color: #dc2626;
+        font-weight: 600;
+    }
+    .rb-cap-hint {
+        font-size: 12px;
+        color: #6b7280;
+        margin-left: 10px;
+        font-style: italic;
+    }
+    .rb-modal-warning {
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        color: #fca5a5;
+        font-size: 13px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-right: auto;
+    }
+
+    /* ---- Disabled / inactive button states ---- */
+    .rb-btn-primary:disabled,
+    .rb-btn-link-blue:disabled,
+    .rb-btn-link-red:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+    .rb-btn-primary:disabled:hover {
+        background: #7c3aed;
+    }
+    .rb-btn-link-blue:disabled:hover {
+        color: #a78bfa;
+    }
 </style>
