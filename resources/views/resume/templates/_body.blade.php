@@ -47,10 +47,9 @@
     </div>
 
     {{-- ============ TWO-COLUMN BODY ============ --}}
-    <table class="resume-body">
-        <tr>
-            {{-- ===== LEFT COLUMN ===== --}}
-            <td class="col-left">
+    <div class="resume-body">
+        {{-- ===== LEFT COLUMN ===== --}}
+        <div class="col-left">
 
                 {{-- PROFILE --}}
                 <div class="section profile">
@@ -122,10 +121,10 @@
                     @endif
                 </div>
 
-            </td>
+        </div>
 
-            {{-- ===== RIGHT COLUMN ===== --}}
-            <td class="col-right">
+        {{-- ===== RIGHT COLUMN ===== --}}
+        <div class="col-right">
 
                 {{-- SKILLS --}}
                 <div class="section">
@@ -198,8 +197,9 @@
                     @endif
                 </div>
 
-            </td>
-        </tr>
-    </table>
+        </div>
+
+        <div class="resume-clearfix"></div>
+    </div>
 
 </div>

@@ -53,22 +53,25 @@
         padding: 6px 0;
     }
 
-    /* ---- Two-column body (table-based for DomPDF reliability) ---- */
-    .resume-paper table.resume-body {
+    /* ---- Two-column body (float-based so DomPDF can paginate within columns) ---- */
+    .resume-paper .resume-body {
         width: 100%;
-        border-collapse: collapse;
     }
-    .resume-paper table.resume-body > tbody > tr > td {
-        vertical-align: top;
-    }
-    .resume-paper td.col-left {
+    .resume-paper .col-left {
+        float: left;
         width: 60%;
         padding-right: 18px;
+        box-sizing: border-box;
     }
-    .resume-paper td.col-right {
+    .resume-paper .col-right {
+        float: left;
         width: 40%;
         padding-left: 18px;
+        box-sizing: border-box;
         border-left: 1px solid #e5e7eb;
+    }
+    .resume-paper .resume-clearfix {
+        clear: both;
     }
 
     /* ---- Section heading ---- */
