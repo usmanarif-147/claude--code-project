@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('social:publish-due')->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->command('blog-and-post:publish-due')->everyFifteenMinutes()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
