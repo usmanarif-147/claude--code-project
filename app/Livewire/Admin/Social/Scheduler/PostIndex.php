@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Social\Scheduler;
 
 use App\Models\Social\ScheduledPost;
 use App\Services\SocialPostService;
+use App\Services\SocialPublishingService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -34,6 +35,32 @@ class PostIndex extends Component
     {
         $service->delete(ScheduledPost::findOrFail($id));
         session()->flash('success', 'Scheduled post deleted successfully.');
+        $this->redirect(route('admin.social.scheduler.index'), navigate: true);
+    }
+
+    /**
+     * Re-attempt publishing a previously-failed post.
+     */
+    public function retry(SocialPublishingService $publisher, int $id): void
+    {
+        $post = ScheduledPost::findOrFail($id);
+
+        if ($post->status !== 'failed') {
+            session()->flash('error', 'Only failed posts can be retried.');
+
+            return;
+        }
+
+        $publisher->publish($post);
+        $post->refresh();
+
+        if ($post->status === 'posted') {
+            session()->flash('success', 'Post published to LinkedIn.');
+        } else {
+            session()->flash('error', 'Retry failed: '.($post->linkedin_error ?? 'unknown error'));
+        }
+
+        $this->redirect(route('admin.social.scheduler.index'), navigate: true);
     }
 
     public function render()

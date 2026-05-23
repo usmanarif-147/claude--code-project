@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Social\Scheduler;
 use App\Models\Social\ScheduledPost;
 use App\Services\SocialPdfRenderService;
 use App\Services\SocialPostService;
+use App\Services\SocialPublishingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
@@ -142,7 +143,14 @@ class PostForm extends Component
 
         $this->scheduledPost->refresh();
 
-        $relativePath = $renderer->renderPdfFromPost($this->scheduledPost);
+        try {
+            $relativePath = $renderer->renderPdfFromPost($this->scheduledPost);
+        } catch (\RuntimeException $e) {
+            session()->flash('error', 'Could not generate PDF: '.$e->getMessage());
+
+            return null;
+        }
+
         $absolutePath = Storage::disk('public')->path($relativePath);
 
         return response()->download($absolutePath, "post-{$this->scheduledPost->id}.pdf");
@@ -268,6 +276,52 @@ class PostForm extends Component
         $adjustment = $remainder < 8 ? -$remainder : (15 - $remainder);
 
         return $when->copy()->second(0)->addMinutes($adjustment);
+    }
+
+    /**
+     * Publish the current post to LinkedIn immediately, ignoring its schedule.
+     * Only available for already-saved posts.
+     */
+    public function publishNow(SocialPublishingService $publisher): void
+    {
+        if (! $this->scheduledPost?->exists) {
+            session()->flash('error', 'Save the post first before publishing.');
+
+            return;
+        }
+
+        // Save current form state via the service so the PDF cache invalidates
+        // before the publisher renders a fresh copy.
+        $service = app(SocialPostService::class);
+        $service->update($this->scheduledPost, [
+            'title' => $this->title,
+            'caption' => $this->caption,
+            'hashtags' => $this->hashtags,
+            'cover_page' => $this->cover_page,
+            'content_pages' => $this->content_pages,
+            'final_page' => $this->final_page,
+            'template_slug' => $this->template_slug ?: 'default',
+        ]);
+
+        $this->scheduledPost->refresh();
+
+        $publisher->publish($this->scheduledPost);
+        $this->scheduledPost->refresh();
+
+        if ($this->scheduledPost->status === 'posted') {
+            session()->flash(
+                'success',
+                'Published to LinkedIn: '.($this->scheduledPost->linkedin_post_url ?? 'success'),
+            );
+        } else {
+            session()->flash(
+                'error',
+                'Publish failed: '.($this->scheduledPost->linkedin_error ?? 'unknown error'),
+            );
+        }
+
+        // Redirect so the layout re-renders and the flash banner displays.
+        $this->redirect(route('admin.social.scheduler.index'), navigate: true);
     }
 
     public function render()

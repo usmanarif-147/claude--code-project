@@ -149,8 +149,35 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    @if ($post->status === 'posted' && $post->linkedin_post_url)
+                                        <a href="{{ $post->linkedin_post_url }}" target="_blank" rel="noopener"
+                                           class="inline-flex items-center justify-center text-gray-400 hover:text-[#7cb4ee] hover:bg-[#0a66c2]/10 rounded-lg p-1.5 transition-colors"
+                                           title="View on LinkedIn">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                                        </a>
+                                    @endif
+
+                                    @if ($post->status === 'failed')
+                                        <button wire:click="retry({{ $post->id }})"
+                                                wire:confirm="Retry publishing this post to LinkedIn?"
+                                                wire:loading.attr="disabled"
+                                                wire:target="retry({{ $post->id }})"
+                                                class="inline-flex items-center gap-1.5 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 text-fuchsia-400 hover:text-fuchsia-300 text-xs font-medium rounded-lg px-2.5 py-1.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                title="Retry publishing">
+                                            <span wire:loading.remove wire:target="retry({{ $post->id }})" class="inline-flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                Retry
+                                            </span>
+                                            <span wire:loading wire:target="retry({{ $post->id }})" class="inline-flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                                Retrying
+                                            </span>
+                                        </button>
+                                    @endif
+
                                     <a href="{{ route('admin.social.scheduler.edit', $post) }}" wire:navigate
-                                       class="text-gray-400 hover:text-primary-light transition-colors p-1">
+                                       class="text-gray-400 hover:text-primary-light transition-colors p-1.5 rounded-lg hover:bg-dark-700"
+                                       title="Edit">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
                                     <x-admin.confirm-button
@@ -158,7 +185,7 @@
                                         text="This post will be permanently removed."
                                         action="$wire.delete({{ $post->id }})"
                                         confirm-text="Yes, delete it"
-                                        class="text-gray-400 hover:text-red-400 transition-colors p-1"
+                                        class="text-gray-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-500/10"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </x-admin.confirm-button>

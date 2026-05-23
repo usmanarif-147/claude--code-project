@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use InvalidArgumentException;
+use RuntimeException;
 
 class SocialPdfRenderService
 {
@@ -79,7 +80,14 @@ class SocialPdfRenderService
         $this->ensureStorageDirectoryExists();
 
         $relativePath = self::PDF_DIRECTORY."/{$post->id}.pdf";
-        Storage::disk(self::PDF_DISK)->put($relativePath, $pdf->output());
+        $written = Storage::disk(self::PDF_DISK)->put($relativePath, $pdf->output());
+
+        if ($written === false) {
+            throw new RuntimeException(
+                "Failed to write rendered PDF to disk at '{$relativePath}'. ".
+                'Check directory permissions on storage/app/public/'.self::PDF_DIRECTORY.'.'
+            );
+        }
 
         // Persist cache path on the model so subsequent edits can invalidate it.
         $post->forceFill(['rendered_pdf_path' => $relativePath])->save();

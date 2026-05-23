@@ -50,27 +50,34 @@
     }
 
     /* ============================================================
-       COVER PAGE — bold purple-to-pink gradient with large title
+       COVER PAGE — bold flat purple with large title.
+       Flat color (not gradient) so the PDF render matches the
+       on-screen preview exactly. DomPDF's gradient support is
+       inconsistent across backends.
        ============================================================ */
     .page--cover {
-        background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 45%, #db2777 100%);
+        background: #4c1d95;
         text-align: center;
-        padding: 200px 110px 220px 110px;
+        padding: 160px 100px 160px 100px;
     }
 
+    /* Smaller font sizes than v1 so longer cover text still fits
+       inside 1200pt and DomPDF doesn't auto-paginate the cover. */
     .page--cover p {
-        font-size: 48pt;
-        font-weight: bold;
-        line-height: 1.25;
-        color: #ffffff;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
-        margin-bottom: 30px;
+        font-size: 22pt;
+        font-weight: normal;
+        line-height: 1.45;
+        color: #e9d5ff;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+        margin-bottom: 22px;
     }
 
     .page--cover p:first-child {
-        font-size: 58pt;
-        line-height: 1.12;
-        margin-bottom: 40px;
+        font-size: 40pt;
+        font-weight: bold;
+        line-height: 1.15;
+        color: #ffffff;
+        margin-bottom: 36px;
     }
 
     /* Decorative footer brand mark on the cover */
@@ -133,7 +140,7 @@
        FINAL / CTA PAGE — dark indigo with bordered card
        ============================================================ */
     .page--final {
-        background: linear-gradient(160deg, #111827 0%, #1e1b4b 100%);
+        background: #1e1b4b;
         text-align: center;
         padding: 180px 110px;
         border: 8px solid #7c3aed;

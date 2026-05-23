@@ -27,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackVisitor::class,
         ]);
     })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        $schedule->command('social:publish-due')->everyFifteenMinutes()->withoutOverlapping();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
