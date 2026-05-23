@@ -43,12 +43,36 @@
 @endphp
 <style>
     .resume-paper {
-        font-family: {{ $ff }};
+        font-family: {!! $ff !!};
         font-size: {{ $fs }};
         line-height: {{ $lh }};
         text-align: {{ $ta }};
-        color: {{ $tc }};
         @if ($isBold) font-weight: 700; @endif
     }
+
+    /* Text-color override — broad selector list so the picked color
+       actually propagates through body text and headings, not just `.resume-paper`
+       (descendants in _styles.blade.php have explicit colors with higher specificity). */
+    .resume-paper,
+    .resume-paper h1,
+    .resume-paper h2,
+    .resume-paper p,
+    .resume-paper li,
+    .resume-paper td,
+    .resume-paper .tagline,
+    .resume-paper .contact,
+    .resume-paper .contact span,
+    .resume-paper .company,
+    .resume-paper .role,
+    .resume-paper .dates,
+    .resume-paper .title,
+    .resume-paper .subtitle,
+    .resume-paper .tech,
+    .resume-paper .category,
+    .resume-paper .degree,
+    .resume-paper .institution {
+        color: {{ $tc }};
+    }
+
     .resume-paper .section { margin-bottom: {{ $sm }}; }
 </style>
