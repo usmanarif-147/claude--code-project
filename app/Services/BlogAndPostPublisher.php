@@ -47,6 +47,11 @@ class BlogAndPostPublisher
         $account = PlatformAccount::query()->where('platform', 'linkedin')->first();
 
         if (! $account || ! $account->access_token || ($account->token_expires_at && $account->token_expires_at->isPast())) {
+            Log::warning('Blog & post publish gated — LinkedIn not connected or token expired', [
+                'post_id' => $post->id,
+                'type' => $post->type,
+            ]);
+
             $post->forceFill([
                 'status' => 'failed',
                 'linkedin_error' => 'LinkedIn account not connected or token expired',
