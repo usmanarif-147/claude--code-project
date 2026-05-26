@@ -228,50 +228,27 @@
                     <h2 class="text-3xl md:text-4xl font-extrabold text-white text-center mb-16">Projects</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     @foreach ($projects as $project)
                         <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
-                             class="opacity-0 translate-y-8 transition-all duration-700 group"
+                             class="opacity-0 translate-y-8 transition-all duration-700"
                              style="transition-delay: {{ ($loop->index + 1) * 100 }}ms">
-                            <div class="bg-dark-800 border border-white/[0.04] rounded-2xl overflow-hidden hover:border-accent/20 transition-all duration-300 h-full flex flex-col">
-                                <div class="relative overflow-hidden">
-                                    @if($project->cover_image)
-                                        <img src="{{ asset('storage/' . $project->cover_image) }}" alt="{{ $project->title }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500">
-                                    @else
-                                        <div class="w-full h-48 bg-dark-700 flex items-center justify-center group-hover:bg-dark-600 transition-colors duration-500">
-                                            <svg class="w-12 h-12 text-accent/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-                                            </svg>
-                                        </div>
-                                    @endif
-                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-800 to-transparent"></div>
-                                    @if($project->is_featured)
-                                        <span class="absolute top-3 right-3 px-2.5 py-1 bg-accent/20 text-accent text-[10px] font-bold uppercase tracking-wider rounded-full border border-accent/20">Featured</span>
-                                    @endif
-                                </div>
-                                <div class="p-6 flex flex-col flex-1">
-                                    <h3 class="text-xl font-bold text-white mb-2">{{ $project->title }}</h3>
-                                    <p class="text-gray-400 text-sm mb-4 flex-1">{{ $project->short_description }}</p>
-                                    <div class="flex flex-wrap gap-2 mb-4">
-                                        @foreach($project->tech_stack ?? [] as $tech)
-                                            <span class="px-2 py-1 bg-accent/10 text-accent-light text-xs rounded-full">{{ $tech }}</span>
-                                        @endforeach
-                                    </div>
-                                    @if($project->demo_url || $project->github_url)
-                                        <div class="flex gap-3 pt-2 border-t border-white/[0.04]">
-                                            @if($project->demo_url)
-                                                <a href="{{ $project->demo_url }}" target="_blank" rel="noopener" class="text-sm text-accent hover:text-accent-light transition-colors">Live Demo &rarr;</a>
-                                            @endif
-                                            @if($project->github_url)
-                                                <a href="{{ $project->github_url }}" target="_blank" rel="noopener" class="text-sm text-gray-400 hover:text-white transition-colors">GitHub &rarr;</a>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
+                            <x-project-card :project="$project" />
                         </div>
                     @endforeach
                 </div>
+
+                @if($projectsHasMore ?? false)
+                    <div class="text-center mt-12">
+                        <a href="{{ route('projects.index') }}"
+                           class="inline-flex items-center gap-2 px-8 py-3.5 border border-accent/30 text-accent hover:bg-accent/10 font-semibold text-sm rounded-xl transition-all duration-300">
+                            See more projects
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                @endif
             </div>
         </section>
     @endif

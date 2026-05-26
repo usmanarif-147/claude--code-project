@@ -47,7 +47,7 @@
             </div>
 
             {{-- Body (HTML content) --}}
-            <div class="blog-prose">
+            <div class="article-prose">
                 {!! $post->content !!}
             </div>
 
@@ -66,34 +66,5 @@
 
     <x-public.footer />
 
-    {{-- Plain-CSS prose styling: build-free, themed for the dark public side. --}}
-    <style>
-        .blog-prose { color: #d1d5db; line-height: 1.8; font-size: 1.05rem; }
-        .blog-prose > * + * { margin-top: 1.25rem; }
-        .blog-prose h2 { color: #fff; font-size: 1.6rem; font-weight: 800; margin-top: 2.5rem; margin-bottom: 0.5rem; }
-        .blog-prose h3 { color: #fff; font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.5rem; }
-        .blog-prose p { color: #9ca3af; }
-        .blog-prose a { color: #a78bfa; text-decoration: underline; }
-        .blog-prose a:hover { color: #c4b5fd; }
-        .blog-prose strong { color: #fff; }
-        .blog-prose ul, .blog-prose ol { padding-left: 1.5rem; color: #9ca3af; }
-        .blog-prose ul { list-style: disc; }
-        .blog-prose ol { list-style: decimal; }
-        .blog-prose li { margin-top: 0.4rem; }
-        .blog-prose blockquote {
-            border-left: 3px solid #7c3aed; padding: 0.25rem 0 0.25rem 1.25rem;
-            color: #d1d5db; font-style: italic; margin-left: 0;
-        }
-        .blog-prose pre {
-            background: #111118; border: 1px solid #1a1a24; border-radius: 0.75rem;
-            padding: 1.25rem; overflow-x: auto; font-size: 0.9rem; line-height: 1.6;
-        }
-        .blog-prose code {
-            font-family: 'Fira Code', monospace; color: #c4b5fd;
-        }
-        .blog-prose pre code { color: #e5e7eb; }
-        .blog-prose :not(pre) > code {
-            background: #1a1a24; padding: 0.15rem 0.4rem; border-radius: 0.35rem; font-size: 0.85em;
-        }
-    </style>
+    <x-public.prose-styles />
 </x-layouts.app>

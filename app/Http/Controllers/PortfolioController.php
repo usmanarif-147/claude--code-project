@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Education;
 use App\Models\Experience\Experience;
 use App\Models\Profile;
-use App\Models\Project\Project;
 use App\Models\Skill\Skill;
 use App\Models\Strength;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Services\ResumeService;
 use App\Support\DummyBlogData;
+use App\Support\DummyProjectData;
 use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
@@ -28,7 +28,11 @@ class PortfolioController extends Controller
             'technologies' => Skill::groupedByCategory(),
             'workExperiences' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
             'education' => Education::query()->ordered()->get(),
-            'projects' => Project::query()->active()->ordered()->get(),
+            // BACKEND: swap dummy source for the real query, e.g.
+            // 'projects' => Project::query()->active()->ordered()->take(3)->get(),
+            // 'projectsHasMore' => Project::query()->active()->count() > 3,
+            'projects' => DummyProjectData::take(3),
+            'projectsHasMore' => DummyProjectData::count() > 3,
             'testimonials' => Testimonial::query()->visible()->ordered()->get(),
             // BACKEND: swap dummy source for the real query, e.g.
             // 'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),
