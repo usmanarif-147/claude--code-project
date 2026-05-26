@@ -36,10 +36,10 @@
                 <div class="tagline">{{ $header['tagline'] }}</div>
             @endif
             <div class="contact">
-                @if (!empty($header['phone'] ?? ''))<span>&#9990; {{ $header['phone'] }}</span>@endif
-                @if (!empty($header['email'] ?? ''))<span>&#9993; {{ $header['email'] }}</span>@endif
-                @if (!empty($header['location'] ?? ''))<span>&#9737; {{ $header['location'] }}</span>@endif
-                @if (!empty($header['github'] ?? ''))<span>&#8962; {{ $header['github'] }}</span>@endif
+                @if (!empty($header['phone'] ?? ''))<span><span class="ico">&#9990;</span> {{ $header['phone'] }}</span>@endif
+                @if (!empty($header['email'] ?? ''))<span><span class="ico">&#9993;</span> {{ $header['email'] }}</span>@endif
+                @if (!empty($header['location'] ?? ''))<span><span class="ico">&#9737;</span> {{ $header['location'] }}</span>@endif
+                @if (!empty($header['github'] ?? ''))<span><span class="ico">&#8962;</span> {{ $header['github'] }}</span>@endif
             </div>
         @elseif ($interactive)
             <div class="empty-hint">Header — click + to add your name, tagline, phone, email, location, and GitHub URL.</div>
@@ -158,8 +158,8 @@
                             @php $rows = array_chunk($strengths, 2); @endphp
                             @foreach ($rows as $pair)
                                 <tr>
-                                    <td>&#9733; {{ $pair[0] ?? '' }}</td>
-                                    <td>@if (isset($pair[1])) &#9733; {{ $pair[1] }} @endif</td>
+                                    <td><span class="ico">&#9733;</span> {{ $pair[0] ?? '' }}</td>
+                                    <td>@if (isset($pair[1]))<span class="ico">&#9733;</span> {{ $pair[1] }}@endif</td>
                                 </tr>
                             @endforeach
                         </table>

@@ -43,8 +43,16 @@
         font-size: 10px;
         color: #4b5563;
     }
-    .resume-paper .resume-header .contact span {
+    .resume-paper .resume-header .contact > span {
         margin-right: 16px;
+    }
+    /* Icon/symbol glyphs (contact icons, strength stars) — rendered from DejaVu Sans,
+       which is bundled in DomPDF and contains these glyphs. Core fonts (Helvetica) and
+       Carlito lack them, so without this they'd vanish in the PDF. In the browser DejaVu
+       isn't installed → falls back to sans-serif → the OS supplies the glyph (unchanged). */
+    .resume-paper .ico {
+        font-family: 'DejaVu Sans', sans-serif;
+        font-style: normal;
     }
     .resume-paper .empty-hint {
         color: #9ca3af;
