@@ -1,4 +1,5 @@
 <div>
+    @include('resume.templates._fonts', ['pdf' => false])
     @include('resume.templates._styles')
     @include('resume.templates._format_overrides')
 

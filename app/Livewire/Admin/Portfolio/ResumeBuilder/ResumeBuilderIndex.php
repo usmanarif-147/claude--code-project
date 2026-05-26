@@ -485,6 +485,7 @@ class ResumeBuilderIndex extends Component
         return [
             'fontFamilies' => [
                 'helvetica' => 'Helvetica',
+                'calibri' => 'Calibri',
                 'dejavu' => 'DejaVu Sans',
                 'times' => 'Times',
                 'courier' => 'Courier',

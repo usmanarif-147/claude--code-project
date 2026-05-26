@@ -11,6 +11,7 @@
      */
     $fontMap = [
         'helvetica' => 'Helvetica, Arial, sans-serif',
+        'calibri' => "'Carlito', 'Calibri', sans-serif",
         'dejavu' => "'DejaVu Sans', sans-serif",
         'times' => "'Times-Roman', 'Times New Roman', Times, serif",
         'courier' => "Courier, 'Courier New', monospace",
