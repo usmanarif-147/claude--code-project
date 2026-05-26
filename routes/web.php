@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\SharedProjectController;
@@ -12,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PortfolioController::class, 'index']);
 Route::get('/resume/download/{template?}', [PortfolioController::class, 'downloadResume'])->name('resume.download');
+
+Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+Route::get('/blogs/{slug}', [BlogController::class, 'show'])->name('blogs.show');
 
 Route::post('/chatbot/message', [ChatbotController::class, 'sendMessage'])
     ->middleware('throttle:20,1')

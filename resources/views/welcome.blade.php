@@ -361,8 +361,7 @@
         </section>
     @endif
 
-    {{-- ==================== BLOG (HIDDEN — re-enable by removing the wrapping Blade comment below) ==================== --}}
-    {{--
+    {{-- ==================== BLOG ==================== --}}
     @if($blogPosts->isNotEmpty())
         <section id="blog" class="py-24 md:py-32">
             <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -371,29 +370,30 @@
                     <h2 class="text-3xl md:text-4xl font-extrabold text-white text-center mb-16">Latest Articles</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     @foreach ($blogPosts as $post)
                         <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
-                             class="opacity-0 translate-y-8 transition-all duration-700 group"
+                             class="opacity-0 translate-y-8 transition-all duration-700"
                              style="transition-delay: {{ ($loop->index + 1) * 100 }}ms">
-                            <div class="bg-dark-800 border border-white/[0.04] rounded-2xl p-6 hover:border-accent/20 transition-all duration-300 h-full flex flex-col">
-                                <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
-                                    <span>{{ $post->published_at->format('M d, Y') }}</span>
-                                    @if($post->reading_time_minutes)
-                                        <span>&middot;</span>
-                                        <span>{{ $post->reading_time_minutes }} min read</span>
-                                    @endif
-                                </div>
-                                <h3 class="text-lg font-bold text-white mb-2 group-hover:text-accent transition-colors">{{ $post->title }}</h3>
-                                <p class="text-gray-400 text-sm flex-1">{{ $post->excerpt }}</p>
-                            </div>
+                            <x-blog-card :post="$post" />
                         </div>
                     @endforeach
                 </div>
+
+                @if($blogPostsHasMore ?? false)
+                    <div class="text-center mt-12">
+                        <a href="{{ route('blogs.index') }}"
+                           class="inline-flex items-center gap-2 px-8 py-3.5 border border-accent/30 text-accent hover:bg-accent/10 font-semibold text-sm rounded-xl transition-all duration-300">
+                            See more blogs
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                @endif
             </div>
         </section>
     @endif
-    --}}
 
     {{-- ==================== CONTACT ==================== --}}
     <section id="contact" class="py-24 md:py-32">

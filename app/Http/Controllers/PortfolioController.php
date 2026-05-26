@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Blog\BlogPost;
 use App\Models\Education;
 use App\Models\Experience\Experience;
 use App\Models\Profile;
@@ -12,6 +11,7 @@ use App\Models\Strength;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Services\ResumeService;
+use App\Support\DummyBlogData;
 use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
@@ -30,7 +30,11 @@ class PortfolioController extends Controller
             'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->active()->ordered()->get(),
             'testimonials' => Testimonial::query()->visible()->ordered()->get(),
-            'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),
+            // BACKEND: swap dummy source for the real query, e.g.
+            // 'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),
+            // 'blogPostsHasMore' => BlogPost::query()->published()->count() > 3,
+            'blogPosts' => DummyBlogData::latest(3),
+            'blogPostsHasMore' => DummyBlogData::count() > 3,
         ]);
     }
 
